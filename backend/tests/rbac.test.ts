@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { createApp } from '../src/app';
+import db from '../src/db/knex';
 
 const app = createApp();
 
@@ -52,15 +53,19 @@ describe('RBAC & Roles Module', () => {
     expect(createRes.status).toBe(201);
     const newRoleId = createRes.body.data.id;
 
+    // Fetch existing valid permission IDs from database
+    const perms = await db('permissions').limit(3).select('id');
+    const validPermIds = perms.map((p: { id: number }) => Number(p.id));
+
     // Update permissions for this role
     const updatePermRes = await request(app)
       .put(`/api/v1/roles/${newRoleId}/permissions`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        permissionIds: [1, 2, 3],
+        permissionIds: validPermIds,
       });
 
     expect(updatePermRes.status).toBe(200);
-    expect(updatePermRes.body.data.permissionIds).toEqual(expect.arrayContaining([1, 2, 3]));
+    expect(updatePermRes.body.data.permissionIds).toEqual(expect.arrayContaining(validPermIds));
   });
 });

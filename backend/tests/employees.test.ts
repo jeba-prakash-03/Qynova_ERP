@@ -28,13 +28,16 @@ describe('Employees Module Transaction & Lifecycle', () => {
   });
 
   it('should create user and employee in ONE transaction with temporary password', async () => {
+    const empRole = await db('roles').where({ name: 'Employee' }).first();
+    const roleId = Number(empRole.id);
+
     const uniqueEmail = `test.emp.${Date.now()}@qynova.erp`;
     const res = await request(app)
       .post('/api/v1/employees')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
         email: uniqueEmail,
-        role_id: 4, // Employee role
+        role_id: roleId,
         first_name: 'Rohit',
         last_name: 'Verma',
         joining_date: '2026-03-01',
@@ -85,13 +88,16 @@ describe('Employees Module Transaction & Lifecycle', () => {
 
   it('should soft delete employee and deactivate user login', async () => {
     // Create a temporary employee to delete
+    const empRole = await db('roles').where({ name: 'Employee' }).first();
+    const roleId = Number(empRole.id);
+
     const tempEmail = `delete.test.${Date.now()}@qynova.erp`;
     const createRes = await request(app)
       .post('/api/v1/employees')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
         email: tempEmail,
-        role_id: 4,
+        role_id: roleId,
         first_name: 'Temp',
         last_name: 'Delete',
         joining_date: '2026-01-01',
