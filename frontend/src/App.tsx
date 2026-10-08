@@ -39,6 +39,12 @@ import { PayrollRunPage } from './features/payroll/pages/PayrollRunPage';
 import { MyPayslipsPage } from './features/payroll/pages/MyPayslipsPage';
 import { MyTimesheetsPage } from './features/timesheets/pages/MyTimesheetsPage';
 
+// Clients & Projects (Dev 3)
+import { ClientListPage } from './features/clients/pages/ClientListPage';
+import { ClientDetailPage } from './features/clients/pages/ClientDetailPage';
+import { ProjectListPage } from './features/projects/pages/ProjectListPage';
+import { ProjectDetailPage } from './features/projects/pages/ProjectDetailPage';
+
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -237,6 +243,42 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute requireEmployee permission="timesheets.view_own">
               <MyTimesheetsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Clients Module (Dev 3) */}
+        <Route
+          path="/clients"
+          element={
+            <ProtectedRoute permission="clients.view">
+              <ClientListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/clients/:id"
+          element={
+            <ProtectedRoute permission="clients.view">
+              <ClientDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Projects Module (Dev 3) */}
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute>
+              <ProjectListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            <ProtectedRoute>
+              <ProjectDetailPage />
             </ProtectedRoute>
           }
         />
