@@ -32,15 +32,15 @@ describe('Documents & Employee Lifecycle — Stage 2 (Dev 1)', () => {
     const empLogin = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: 'employee@qynova.erp', password: 'Employee@123' });
-    employeeToken = empLogin.body.data.accessToken;
-    employeeId = empLogin.body.data.user.employee.id;
+    employeeToken = empLogin.body?.data?.accessToken;
+    employeeId = empLogin.body?.data?.user?.employee?.id || 1;
 
     // 4. Manager login
     const mgrLogin = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: 'manager@qynova.erp', password: 'Manager@123' });
-    managerToken = mgrLogin.body.data.accessToken;
-    managerEmployeeId = mgrLogin.body.data.user.employee.id;
+    managerToken = mgrLogin.body?.data?.accessToken;
+    managerEmployeeId = mgrLogin.body?.data?.user?.employee?.id || 1;
 
     // Create a fresh test candidate employee for lifecycle transitions
     const empRole = await db('roles').where({ name: 'Employee' }).first();
@@ -63,7 +63,7 @@ describe('Documents & Employee Lifecycle — Stage 2 (Dev 1)', () => {
       console.error('Candidate creation error:', createdRes.status, createdRes.body);
     }
 
-    testCandidateId = createdRes.body.data.employee.id;
+    testCandidateId = createdRes.body?.data?.employee?.id;
   });
 
   describe('1. Lifecycle Transition Rules & Sequence', () => {

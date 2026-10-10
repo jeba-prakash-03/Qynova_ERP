@@ -1,6 +1,11 @@
 import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
+  // Alter enum status column in leave_requests
+  await knex.raw(
+    "ALTER TABLE leave_requests MODIFY COLUMN status ENUM('pending', 'approved', 'partially_approved', 'rejected', 'cancelled') NOT NULL DEFAULT 'pending'"
+  );
+
   // 1. Add approved_days and rejected_days columns to leave_requests
   await knex.schema.alterTable('leave_requests', (table) => {
     table.decimal('approved_days', 4, 1).notNullable().defaultTo(0.0);

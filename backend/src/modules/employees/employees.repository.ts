@@ -11,22 +11,18 @@ import { EmployeeQueryParams } from './employees.schema';
 export class EmployeesRepository {
   public async getNextEmployeeCode(trx?: Knex.Transaction): Promise<string> {
     const runner = trx || db;
-    // Find the current highest numeric code
-    const last = await runner('employees')
-      .select('employee_code')
-      .orderBy('id', 'desc')
-      .first();
-
-    if (!last || !last.employee_code) {
-      return 'EMP-0001';
+    const rows = await runner('employees').select('employee_code');
+    let maxNum = 0;
+    for (const r of rows) {
+      if (r.employee_code) {
+        const m = r.employee_code.match(/EMP-?(\d+)/i);
+        if (m) {
+          const num = parseInt(m[1], 10);
+          if (num > maxNum) maxNum = num;
+        }
+      }
     }
-
-    const match = last.employee_code.match(/EMP-(\d+)/);
-    if (!match) {
-      return 'EMP-0001';
-    }
-
-    const nextNum = parseInt(match[1], 10) + 1;
+    const nextNum = maxNum + 1;
     return `EMP-${String(nextNum).padStart(4, '0')}`;
   }
 

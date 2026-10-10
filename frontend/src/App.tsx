@@ -34,6 +34,11 @@ import { AttendanceSheetPage } from './features/attendance/pages/AttendanceSheet
 import { MyLeavesPage } from './features/leaves/pages/MyLeavesPage';
 import { LeaveApprovalsPage } from './features/leaves/pages/LeaveApprovalsPage';
 
+// Payroll & Timesheets (Dev 2)
+import { PayrollRunPage } from './features/payroll/pages/PayrollRunPage';
+import { MyPayslipsPage } from './features/payroll/pages/MyPayslipsPage';
+import { MyTimesheetsPage } from './features/timesheets/pages/MyTimesheetsPage';
+
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -190,6 +195,34 @@ export const App: React.FC = () => {
         />
         <Route path="/leaves" element={<Navigate to="/leaves/my" replace />} />
         <Route path="/leave" element={<Navigate to="/leaves/my" replace />} />
+
+        {/* Payroll Module (Dev 2) */}
+        <Route
+          path="/payroll/runs"
+          element={
+            <ProtectedRoute permission="payroll.view">
+              <PayrollRunPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payroll/payslips"
+          element={
+            <ProtectedRoute requireEmployee permission="payroll.view_own">
+              <MyPayslipsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Timesheets Module (Dev 2) */}
+        <Route
+          path="/timesheets/my"
+          element={
+            <ProtectedRoute requireEmployee permission="timesheets.view_own">
+              <MyTimesheetsPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Fallback & Root redirect */}
         <Route path="/" element={<RootRedirect />} />
