@@ -21,6 +21,17 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
+interface LeaveRequestDay {
+  id: number;
+  leave_request_id: number;
+  date: string;
+  day_type: 'full' | 'first_half' | 'second_half';
+  from_time?: string | null;
+  to_time?: string | null;
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  decision_note?: string | null;
+}
+
 interface LeaveRequest {
   id: number;
   employee_id: number;
@@ -31,13 +42,14 @@ interface LeaveRequest {
   half_day_session?: string | null;
   days: number;
   reason: string;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  status: 'pending' | 'approved' | 'partially_approved' | 'rejected' | 'cancelled';
   employee_name: string;
   employee_code: string;
   department_name?: string | null;
   leave_type_name: string;
   leave_type_code: string;
   created_at: string;
+  day_rows?: LeaveRequestDay[];
 }
 
 interface LeaveType {
@@ -78,6 +90,8 @@ export const LeaveApprovalsPage: React.FC = () => {
 
   // Action Modals State
   const [approveTarget, setApproveTarget] = useState<LeaveRequest | null>(null);
+  const [selectedDates, setSelectedDates] = useState<Record<string, boolean>>({});
+  const [dayNotes, setDayNotes] = useState<Record<string, string>>({});
   const [approvalNote, setApprovalNote] = useState('');
 
   const [rejectTarget, setRejectTarget] = useState<LeaveRequest | null>(null);
@@ -136,18 +150,35 @@ export const LeaveApprovalsPage: React.FC = () => {
     enabled: isAdminOrHr && activeTab === 'allocation',
   });
 
-  // Approve Mutation
+  // Approve / Partial Approve Mutation
   const approveMutation = useMutation({
-    mutationFn: async ({ id, note }: { id: number; note: string }) => {
+    mutationFn: async ({
+      id,
+      approved_dates,
+      rejected_dates,
+      day_notes,
+      decision_note,
+    }: {
+      id: number;
+      approved_dates?: string[];
+      rejected_dates?: string[];
+      day_notes?: Record<string, string>;
+      decision_note?: string;
+    }) => {
       const res = await axiosClient.patch(`/leave-requests/${id}/approve`, {
-        decision_note: note || 'Approved',
+        approved_dates,
+        rejected_dates,
+        day_notes,
+        decision_note,
       });
       return res.data.data;
     },
     onSuccess: () => {
-      success('Leave request approved successfully!');
+      success('Leave request decision processed successfully!');
       setApproveTarget(null);
       setApprovalNote('');
+      setSelectedDates({});
+      setDayNotes({});
       queryClient.invalidateQueries({ queryKey: ['leave-requests', 'pending'] });
       queryClient.invalidateQueries({ queryKey: ['leave-requests', 'calendar'] });
     },
@@ -190,10 +221,41 @@ export const LeaveApprovalsPage: React.FC = () => {
     },
   });
 
+  const openApproveModal = (req: LeaveRequest) => {
+    setApproveTarget(req);
+    setApprovalNote('');
+    setDayNotes({});
+    const initialMap: Record<string, boolean> = {};
+    if (req.day_rows && req.day_rows.length > 0) {
+      req.day_rows.forEach((d) => {
+        initialMap[d.date] = true;
+      });
+    } else {
+      initialMap[req.from_date] = true;
+    }
+    setSelectedDates(initialMap);
+  };
+
   const handleApproveSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!approveTarget) return;
-    approveMutation.mutate({ id: approveTarget.id, note: approvalNote });
+
+    const dates = Object.keys(selectedDates);
+    const approved_dates = dates.filter((d) => selectedDates[d]);
+    const rejected_dates = dates.filter((d) => !selectedDates[d]);
+
+    if (rejected_dates.length > 0 && !approvalNote.trim()) {
+      error('Decision note is mandatory when unticking/rejecting any requested days.');
+      return;
+    }
+
+    approveMutation.mutate({
+      id: approveTarget.id,
+      approved_dates,
+      rejected_dates,
+      day_notes: dayNotes,
+      decision_note: approvalNote,
+    });
   };
 
   const handleRejectSubmit = (e: React.FormEvent) => {
@@ -396,13 +458,10 @@ export const LeaveApprovalsPage: React.FC = () => {
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
-                            onClick={() => {
-                              setApproveTarget(req);
-                              setApprovalNote('');
-                            }}
+                            onClick={() => openApproveModal(req)}
                             className="px-3 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors"
                           >
-                            Approve
+                            Review & Approve
                           </button>
                           <button
                             onClick={() => {
@@ -607,27 +666,124 @@ export const LeaveApprovalsPage: React.FC = () => {
         </div>
       )}
 
-      {/* APPROVE MODAL */}
+      {/* APPROVE / PARTIAL APPROVAL MODAL */}
       <Modal
         isOpen={Boolean(approveTarget)}
         onClose={() => setApproveTarget(null)}
-        title="Approve Leave Request"
+        title="Review Leave Request (Per-Day Decision)"
       >
         <form onSubmit={handleApproveSubmit} className="space-y-4">
           <p className="text-sm text-slate-600">
-            Approve leave for <strong>{approveTarget?.employee_name}</strong> for{' '}
+            Reviewing request for <strong>{approveTarget?.employee_name}</strong> for{' '}
             <strong>{approveTarget?.days} day(s)</strong> of {approveTarget?.leave_type_name} (
-            {approveTarget?.from_date} to {approveTarget?.to_date})?
+            {approveTarget?.from_date} to {approveTarget?.to_date}).
           </p>
-          <FormField label="Decision Note (Optional)">
+
+          <div className="space-y-2 border border-slate-200 rounded-lg p-3 bg-slate-50/50 max-h-60 overflow-y-auto">
+            <div className="flex items-center justify-between text-xs font-semibold text-slate-700 pb-1 border-b border-slate-200">
+              <span>Select days to APPROVE (untick to reject day)</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const m: Record<string, boolean> = {};
+                    Object.keys(selectedDates).forEach((k) => (m[k] = true));
+                    setSelectedDates(m);
+                  }}
+                  className="text-indigo-600 hover:underline text-[11px]"
+                >
+                  Select All
+                </button>
+                <span>|</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const m: Record<string, boolean> = {};
+                    Object.keys(selectedDates).forEach((k) => (m[k] = false));
+                    setSelectedDates(m);
+                  }}
+                  className="text-rose-600 hover:underline text-[11px]"
+                >
+                  Deselect All
+                </button>
+              </div>
+            </div>
+
+            {approveTarget?.day_rows && approveTarget.day_rows.length > 0 ? (
+              approveTarget.day_rows.map((day) => {
+                const isChecked = Boolean(selectedDates[day.date]);
+                return (
+                  <div
+                    key={day.id}
+                    className={`p-2.5 rounded-lg border text-xs transition-colors ${
+                      isChecked
+                        ? 'bg-emerald-50/60 border-emerald-200 text-slate-900'
+                        : 'bg-rose-50/60 border-rose-200 text-rose-900'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <label className="flex items-center gap-2 cursor-pointer font-medium">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) =>
+                            setSelectedDates({ ...selectedDates, [day.date]: e.target.checked })
+                          }
+                          className="rounded text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span className="font-mono">{day.date}</span>
+                        <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-white text-slate-600 border">
+                          {day.day_type.replace('_', ' ')}
+                        </span>
+                        {day.from_time && day.to_time && (
+                          <span className="text-slate-500 text-[11px]">
+                            ({day.from_time} - {day.to_time})
+                          </span>
+                        )}
+                      </label>
+                      <span className={`font-semibold ${isChecked ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        {isChecked ? 'Approved' : 'Rejected'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="p-2 text-xs text-slate-500">
+                Single day request for date <span className="font-mono font-semibold">{approveTarget?.from_date}</span>
+              </div>
+            )}
+          </div>
+
+          {Object.values(selectedDates).some((v) => !v) && (
+            <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs font-medium">
+              <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+              You are unticking 1 or more days. A decision note explaining the partial rejection is required.
+            </div>
+          )}
+
+          <FormField
+            label={
+              Object.values(selectedDates).some((v) => !v)
+                ? 'Decision / Rejection Note *'
+                : 'Decision Note (Optional)'
+            }
+            required={Object.values(selectedDates).some((v) => !v)}
+          >
             <textarea
               value={approvalNote}
               onChange={(e) => setApprovalNote(e.target.value)}
-              placeholder="e.g. Approved. Cover handled by teammate."
+              placeholder={
+                Object.values(selectedDates).some((v) => !v)
+                  ? 'Mandatory reason for unticked/rejected days...'
+                  : 'e.g. Approved. Coverage handled by team.'
+              }
               rows={2}
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required={Object.values(selectedDates).some((v) => !v)}
             />
           </FormField>
+
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
             <button
               type="button"
@@ -638,10 +794,13 @@ export const LeaveApprovalsPage: React.FC = () => {
             </button>
             <button
               type="submit"
-              disabled={approveMutation.isPending}
-              className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+              disabled={
+                approveMutation.isPending ||
+                (Object.values(selectedDates).some((v) => !v) && !approvalNote.trim())
+              }
+              className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors disabled:opacity-50"
             >
-              {approveMutation.isPending ? 'Approving...' : 'Confirm Approval'}
+              {approveMutation.isPending ? 'Processing...' : 'Submit Decision'}
             </button>
           </div>
         </form>

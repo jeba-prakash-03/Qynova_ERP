@@ -44,6 +44,17 @@ interface LeaveBalance {
   is_paid?: boolean;
 }
 
+interface LeaveRequestDay {
+  id: number;
+  leave_request_id: number;
+  date: string;
+  day_type: 'full' | 'first_half' | 'second_half';
+  from_time?: string | null;
+  to_time?: string | null;
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  decision_note?: string | null;
+}
+
 interface LeaveRequest {
   id: number;
   employee_id: number;
@@ -52,14 +63,19 @@ interface LeaveRequest {
   to_date: string;
   is_half_day: boolean;
   half_day_session?: 'first' | 'second' | null;
+  from_time?: string | null;
+  to_time?: string | null;
   days: number;
+  approved_days?: number;
+  rejected_days?: number;
   reason: string;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  status: 'pending' | 'approved' | 'partially_approved' | 'rejected' | 'cancelled';
   approver_name?: string | null;
   decision_note?: string | null;
   created_at: string;
   leave_type_name: string;
   leave_type_code: string;
+  days_breakdown?: LeaveRequestDay[];
 }
 
 interface CalculateDaysResponse {
@@ -85,6 +101,8 @@ export const MyLeavesPage: React.FC = () => {
     to_date: string;
     is_half_day: boolean;
     half_day_session: 'first' | 'second';
+    from_time: string;
+    to_time: string;
     reason: string;
   }>({
     leave_type_id: '',
@@ -92,6 +110,8 @@ export const MyLeavesPage: React.FC = () => {
     to_date: '',
     is_half_day: false,
     half_day_session: 'first',
+    from_time: '09:30',
+    to_time: '14:00',
     reason: '',
   });
 
@@ -126,7 +146,10 @@ export const MyLeavesPage: React.FC = () => {
     },
   });
 
-  // Live Working Days Calculation Debounce / Effect
+  const selectedTypeObj = leaveTypes.find((t) => t.id === Number(formData.leave_type_id));
+  const isPermission = selectedTypeObj?.code === 'PERM';
+
+  // Live Working Days Calculation
   useEffect(() => {
     if (!formData.from_date || !formData.to_date) {
       setCalcPreview(null);
@@ -153,7 +176,7 @@ export const MyLeavesPage: React.FC = () => {
         });
         if (isMounted) {
           setCalcPreview(res.data.data);
-          if (res.data.data.days === 0) {
+          if (res.data.data.days === 0 && !isPermission) {
             setCalcError('Selected date range contains 0 working days (weekends or public holidays).');
           } else {
             setCalcError(null);
@@ -173,7 +196,7 @@ export const MyLeavesPage: React.FC = () => {
       isMounted = false;
       clearTimeout(timer);
     };
-  }, [formData.from_date, formData.to_date, formData.is_half_day]);
+  }, [formData.from_date, formData.to_date, formData.is_half_day, isPermission]);
 
   // Apply Leave Mutation
   const applyMutation = useMutation({
@@ -217,13 +240,14 @@ export const MyLeavesPage: React.FC = () => {
       to_date: '',
       is_half_day: false,
       half_day_session: 'first',
+      from_time: '09:30',
+      to_time: '14:00',
       reason: '',
     });
     setCalcPreview(null);
     setCalcError(null);
   };
 
-  const selectedTypeObj = leaveTypes.find((t) => t.id === Number(formData.leave_type_id));
   const selectedBalance = myBalances.find((b) => b.leave_type_id === Number(formData.leave_type_id));
 
   const handleApplySubmit = (e: React.FormEvent) => {
@@ -233,18 +257,9 @@ export const MyLeavesPage: React.FC = () => {
       return;
     }
 
-    if (calcError || !calcPreview || calcPreview.days <= 0) {
+    if (!isPermission && (calcError || !calcPreview || calcPreview.days <= 0)) {
       error(calcError || 'Invalid working days range');
       return;
-    }
-
-    // Verify balance if not LOP
-    if (selectedTypeObj?.code !== 'LOP') {
-      const remaining = selectedBalance?.remaining ?? 0;
-      if (calcPreview.days > remaining) {
-        error(`Insufficient balance. Remaining: ${remaining}, Requested: ${calcPreview.days}`);
-        return;
-      }
     }
 
     applyMutation.mutate({
@@ -253,6 +268,8 @@ export const MyLeavesPage: React.FC = () => {
       to_date: formData.to_date,
       is_half_day: formData.is_half_day,
       half_day_session: formData.is_half_day ? formData.half_day_session : null,
+      from_time: formData.is_half_day || isPermission ? formData.from_time : null,
+      to_time: formData.is_half_day || isPermission ? formData.to_time : null,
       reason: formData.reason,
     });
   };
@@ -261,25 +278,31 @@ export const MyLeavesPage: React.FC = () => {
     switch (status) {
       case 'approved':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
             <CheckCircle2 className="w-3.5 h-3.5" /> Approved
+          </span>
+        );
+      case 'partially_approved':
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <CheckSquare className="w-3.5 h-3.5" /> Partly Approved
           </span>
         );
       case 'pending':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
             <Clock className="w-3.5 h-3.5" /> Pending
           </span>
         );
       case 'rejected':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
             <XCircle className="w-3.5 h-3.5" /> Rejected
           </span>
         );
       case 'cancelled':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
             <X className="w-3.5 h-3.5" /> Cancelled
           </span>
         );
@@ -298,7 +321,7 @@ export const MyLeavesPage: React.FC = () => {
             My Leaves & Time Off
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Apply for leave, track quota balances for {currentYear}, and monitor approval statuses.
+            Apply for leave, track quota balances for {currentYear}, and monitor partial approval day status.
           </p>
         </div>
         <button
@@ -312,7 +335,7 @@ export const MyLeavesPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Leave Balance Cards */}
+      {/* Leave Balance Cards: Available, Used, Pending, Remaining */}
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-semibold text-slate-800">Available Quotas ({currentYear})</h2>
@@ -330,10 +353,6 @@ export const MyLeavesPage: React.FC = () => {
             {myBalances.map((bal) => {
               const isLop = bal.leave_type_code === 'LOP';
               const remaining = isLop ? '∞' : bal.remaining;
-              const percentUsed =
-                !isLop && bal.allocated > 0
-                  ? Math.min(100, Math.round(((bal.used + bal.pending) / bal.allocated) * 100))
-                  : 0;
 
               return (
                 <div
@@ -352,44 +371,24 @@ export const MyLeavesPage: React.FC = () => {
                         {bal.is_paid ? 'Paid Time Off' : 'Unpaid Leave'}
                       </span>
                     </div>
-                    {bal.leave_type_code === 'WFH' ? (
-                      <Home className="w-5 h-5 text-indigo-400" />
-                    ) : (
-                      <Calendar className="w-5 h-5 text-slate-400" />
-                    )}
+                    <Calendar className="w-5 h-5 text-slate-400" />
                   </div>
 
                   <div className="mt-4 flex items-baseline justify-between">
                     <div>
                       <span className="text-3xl font-extrabold text-slate-900">{remaining}</span>
                       <span className="text-xs text-slate-500 font-medium ml-1.5">
-                        {isLop ? 'Unlimited' : 'days left'}
+                        {isLop ? 'Unlimited' : 'remaining'}
                       </span>
                     </div>
                     <div className="text-right text-xs text-slate-500 space-y-0.5">
+                      <div>Allocated: <strong className="text-slate-800">{bal.allocated}</strong></div>
                       <div>Used: <strong className="text-slate-800">{bal.used}</strong></div>
                       {bal.pending > 0 && (
                         <div className="text-amber-600">Pending: <strong>{bal.pending}</strong></div>
                       )}
                     </div>
                   </div>
-
-                  {!isLop && (
-                    <div className="mt-3">
-                      <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all ${
-                            percentUsed > 80 ? 'bg-amber-500' : 'bg-indigo-600'
-                          }`}
-                          style={{ width: `${percentUsed}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-[11px] text-slate-400 mt-1">
-                        <span>Allocated: {bal.allocated}</span>
-                        <span>{percentUsed}% taken</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -397,7 +396,7 @@ export const MyLeavesPage: React.FC = () => {
         )}
       </section>
 
-      {/* My Leave Requests Table */}
+      {/* My Leave Requests Table with Per-Day Breakdown */}
       <section className="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-900">My Leave Applications</h2>
@@ -410,9 +409,6 @@ export const MyLeavesPage: React.FC = () => {
           <div className="p-12 text-center">
             <CalendarDays className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <h3 className="text-sm font-semibold text-slate-700">No leave requests found</h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-              You haven't submitted any leave requests yet. Click "Apply for Leave" above to get started.
-            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -420,11 +416,11 @@ export const MyLeavesPage: React.FC = () => {
               <thead className="bg-slate-50/80 text-xs font-semibold text-slate-600 border-b border-slate-200">
                 <tr>
                   <th className="py-3 px-4">Leave Type</th>
-                  <th className="py-3 px-4">Dates</th>
-                  <th className="py-3 px-4 text-center">Working Days</th>
+                  <th className="py-3 px-4">Dates & Breakdown</th>
+                  <th className="py-3 px-4 text-center">Days</th>
                   <th className="py-3 px-4">Reason</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Decision / Approver</th>
+                  <th className="py-3 px-4">Overall Status</th>
+                  <th className="py-3 px-4">Decision / Note</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -444,16 +440,36 @@ export const MyLeavesPage: React.FC = () => {
                           </span>
                         </div>
                         {req.is_half_day && (
-                          <span className="text-[11px] text-amber-600 font-medium">
-                            Half Day ({req.half_day_session || 'first'} session)
+                          <span className="text-[11px] text-amber-600 font-medium block mt-0.5">
+                            Half Day ({req.from_time || '09:30'} - {req.to_time || '14:00'})
+                          </span>
+                        )}
+                        {req.leave_type_code === 'PERM' && req.from_time && (
+                          <span className="text-[11px] text-indigo-600 font-medium block mt-0.5">
+                            Permission ({req.from_time} - {req.to_time})
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-xs">
-                        {req.from_date === req.to_date ? (
-                          req.from_date
-                        ) : (
-                          `${req.from_date} to ${req.to_date}`
+                      <td className="py-3.5 px-4 font-mono text-xs space-y-1">
+                        <div>{req.from_date === req.to_date ? req.from_date : `${req.from_date} to ${req.to_date}`}</div>
+                        {req.days_breakdown && req.days_breakdown.length > 0 && (
+                          <div className="flex flex-wrap gap-1 pt-1">
+                            {req.days_breakdown.map((d) => (
+                              <span
+                                key={d.id}
+                                className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-medium border ${
+                                  d.status === 'approved'
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                    : d.status === 'rejected'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                                }`}
+                                title={d.decision_note || d.status}
+                              >
+                                {d.date.slice(5)}: {d.status.toUpperCase()}
+                              </span>
+                            ))}
+                          </div>
                         )}
                       </td>
                       <td className="py-3.5 px-4 text-center">
@@ -472,9 +488,6 @@ export const MyLeavesPage: React.FC = () => {
                           <div className="text-slate-500 italic mt-0.5" title={req.decision_note}>
                             "{req.decision_note}"
                           </div>
-                        )}
-                        {!req.approver_name && !req.decision_note && (
-                          <span className="text-slate-400">—</span>
                         )}
                       </td>
                       <td className="py-3.5 px-4 text-right">
@@ -518,7 +531,7 @@ export const MyLeavesPage: React.FC = () => {
               <option value="">-- Select Leave Type --</option>
               {leaveTypes.map((lt) => {
                 const bal = myBalances.find((b) => b.leave_type_id === lt.id);
-                const remStr = lt.code === 'LOP' ? 'Unlimited' : `${bal?.remaining ?? 0} left`;
+                const remStr = lt.code === 'LOP' ? 'Unlimited' : lt.code === 'PERM' ? '2 hrs max' : `${bal?.remaining ?? 0} left`;
                 return (
                   <option key={lt.id} value={lt.id}>
                     {lt.name} ({lt.code}) — {remStr}
@@ -539,7 +552,7 @@ export const MyLeavesPage: React.FC = () => {
                   setFormData({
                     ...formData,
                     from_date: val,
-                    to_date: formData.is_half_day ? val : formData.to_date || val,
+                    to_date: formData.is_half_day || isPermission ? val : formData.to_date || val,
                   });
                 }}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -551,7 +564,7 @@ export const MyLeavesPage: React.FC = () => {
               <input
                 type="date"
                 value={formData.to_date}
-                disabled={formData.is_half_day}
+                disabled={formData.is_half_day || isPermission}
                 min={formData.from_date}
                 onChange={(e) => setFormData({ ...formData, to_date: e.target.value })}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500"
@@ -560,8 +573,33 @@ export const MyLeavesPage: React.FC = () => {
             </FormField>
           </div>
 
+          {/* Permission or Half Day custom times */}
+          {(formData.is_half_day || isPermission) && (
+            <div className="grid grid-cols-2 gap-3 p-3 bg-indigo-50/50 rounded-xl border border-indigo-200 text-xs">
+              <FormField label="From Time (HH:mm)" required>
+                <input
+                  type="time"
+                  value={formData.from_time}
+                  onChange={(e) => setFormData({ ...formData, from_time: e.target.value })}
+                  className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
+                  required
+                />
+              </FormField>
+
+              <FormField label="To Time (HH:mm)" required>
+                <input
+                  type="time"
+                  value={formData.to_time}
+                  onChange={(e) => setFormData({ ...formData, to_time: e.target.value })}
+                  className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
+                  required
+                />
+              </FormField>
+            </div>
+          )}
+
           {/* Half day toggle */}
-          {selectedTypeObj?.allow_half_day && (
+          {selectedTypeObj?.allow_half_day && !isPermission && (
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-200/80 space-y-2">
               <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
                 <input
@@ -588,9 +626,9 @@ export const MyLeavesPage: React.FC = () => {
                       name="half_session"
                       value="first"
                       checked={formData.half_day_session === 'first'}
-                      onChange={() => setFormData({ ...formData, half_day_session: 'first' })}
+                      onChange={() => setFormData({ ...formData, half_day_session: 'first', from_time: '09:30', to_time: '14:00' })}
                     />
-                    First Half (Morning)
+                    First Half (09:30 - 14:00)
                   </label>
                   <label className="inline-flex items-center gap-1.5 text-xs text-slate-600">
                     <input
@@ -598,9 +636,9 @@ export const MyLeavesPage: React.FC = () => {
                       name="half_session"
                       value="second"
                       checked={formData.half_day_session === 'second'}
-                      onChange={() => setFormData({ ...formData, half_day_session: 'second' })}
+                      onChange={() => setFormData({ ...formData, half_day_session: 'second', from_time: '14:00', to_time: '18:30' })}
                     />
-                    Second Half (Afternoon)
+                    Second Half (14:00 - 18:30)
                   </label>
                 </div>
               )}
@@ -611,12 +649,12 @@ export const MyLeavesPage: React.FC = () => {
           {formData.from_date && formData.to_date && (
             <div className="p-3 rounded-lg border bg-indigo-50/60 border-indigo-100 text-xs text-indigo-900 space-y-1.5">
               <div className="flex items-center justify-between font-semibold">
-                <span>Working Days Calculation:</span>
+                <span>Working Days Summary:</span>
                 {isCalculating ? (
                   <span className="text-indigo-600">Calculating...</span>
                 ) : calcPreview ? (
                   <span className="text-base text-indigo-700 font-bold">
-                    {calcPreview.days} day(s)
+                    {isPermission ? 'Permission (0 days deducted)' : `${calcPreview.days} day(s)`}
                   </span>
                 ) : null}
               </div>
@@ -630,27 +668,13 @@ export const MyLeavesPage: React.FC = () => {
 
               {calcPreview && (
                 <div className="space-y-1 text-slate-600 pt-1 border-t border-indigo-100">
-                  {calcPreview.weekendDates.length > 0 && (
-                    <div>Weekends excluded: {calcPreview.weekendDates.join(', ')}</div>
-                  )}
                   {calcPreview.holidayDates.length > 0 && (
                     <div className="text-amber-700 font-medium">
                       Holidays excluded: {calcPreview.holidayDates.join(', ')}
                     </div>
                   )}
-                  {selectedTypeObj?.code !== 'LOP' && selectedBalance && (
-                    <div className="text-indigo-900 font-medium pt-1">
-                      Remaining balance after this request:{' '}
-                      <strong
-                        className={
-                          selectedBalance.remaining - calcPreview.days < 0
-                            ? 'text-rose-600'
-                            : 'text-emerald-700'
-                        }
-                      >
-                        {selectedBalance.remaining - calcPreview.days} day(s)
-                      </strong>
-                    </div>
+                  {calcPreview.weekendDates.length > 0 && (
+                    <div>Weekends excluded: {calcPreview.weekendDates.join(', ')}</div>
                   )}
                 </div>
               )}
@@ -697,7 +721,7 @@ export const MyLeavesPage: React.FC = () => {
           }
         }}
         title="Cancel Leave Request"
-        message={`Are you sure you want to cancel your leave request for ${cancelTarget?.leave_type_name} (${cancelTarget?.from_date} to ${cancelTarget?.to_date})? Your pending/used quota will be restored.`}
+        message={`Are you sure you want to cancel your leave request for ${cancelTarget?.leave_type_name} (${cancelTarget?.from_date} to ${cancelTarget?.to_date})?`}
         variant="danger"
         confirmText="Yes, Cancel Leave"
       />

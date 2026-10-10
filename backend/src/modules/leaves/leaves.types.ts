@@ -29,8 +29,28 @@ export interface LeaveBalance {
   updated_at?: string;
 }
 
-export type LeaveRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type LeaveRequestStatus =
+  | 'pending'
+  | 'approved'
+  | 'partially_approved'
+  | 'rejected'
+  | 'cancelled';
+
 export type HalfDaySession = 'first' | 'second';
+export type LeaveRequestDayStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface LeaveRequestDay {
+  id: number;
+  leave_request_id: number;
+  date: string;
+  day_type: 'full' | 'first_half' | 'second_half';
+  from_time?: string | null;
+  to_time?: string | null;
+  status: LeaveRequestDayStatus;
+  decision_note?: string | null;
+  decided_by?: number | null;
+  decided_at?: string | null;
+}
 
 export interface LeaveRequest {
   id: number;
@@ -40,7 +60,11 @@ export interface LeaveRequest {
   to_date: string;
   is_half_day: boolean;
   half_day_session?: HalfDaySession | null;
+  from_time?: string | null;
+  to_time?: string | null;
   days: number;
+  approved_days?: number;
+  rejected_days?: number;
   reason: string;
   status: LeaveRequestStatus;
   approver_employee_id?: number | null;
@@ -54,8 +78,12 @@ export interface LeaveRequest {
   leave_type_code?: string;
   employee_name?: string;
   employee_code?: string;
+  department_name?: string;
+  approver_name?: string;
+  day_rows?: LeaveRequestDay[];
   department_name?: string | null;
   approver_name?: string | null;
+  days_breakdown?: LeaveRequestDay[];
 }
 
 export interface CreateLeaveRequestDto {
@@ -64,10 +92,15 @@ export interface CreateLeaveRequestDto {
   to_date: string; // YYYY-MM-DD
   is_half_day?: boolean;
   half_day_session?: HalfDaySession | null;
+  from_time?: string | null;
+  to_time?: string | null;
   reason: string;
 }
 
 export interface ApproveLeaveRequestDto {
+  approved_dates?: string[];
+  rejected_dates?: string[];
+  day_notes?: Record<string, string>;
   decision_note?: string;
 }
 

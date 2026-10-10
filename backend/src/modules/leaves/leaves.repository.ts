@@ -422,6 +422,73 @@ export class LeavesRepository {
   }
 
   // ==========================================
+  // LEAVE REQUEST DAYS BREAKDOWN
+  // ==========================================
+  async createRequestDays(
+    days: Array<{
+      leave_request_id: number;
+      date: string;
+      day_type: 'full' | 'first_half' | 'second_half';
+      from_time?: string | null;
+      to_time?: string | null;
+      status?: string;
+    }>,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    const q = trx || db;
+    for (const d of days) {
+      await q('leave_request_days').insert({
+        leave_request_id: d.leave_request_id,
+        date: d.date,
+        day_type: d.day_type,
+        from_time: d.from_time || null,
+        to_time: d.to_time || null,
+        status: d.status || 'pending',
+      });
+    }
+  }
+
+  async findRequestDays(
+    leaveRequestId: number,
+    trx?: Knex.Transaction
+  ): Promise<any[]> {
+    const q = (trx || db)('leave_request_days')
+      .where({ leave_request_id: leaveRequestId })
+      .orderBy('date', 'asc');
+    const rows = await q;
+    return rows.map((r) => ({
+      id: Number(r.id),
+      leave_request_id: Number(r.leave_request_id),
+      date: r.date instanceof Date ? r.date.toISOString().split('T')[0] : String(r.date),
+      day_type: r.day_type,
+      from_time: r.from_time,
+      to_time: r.to_time,
+      status: r.status,
+      decision_note: r.decision_note,
+      decided_by: r.decided_by ? Number(r.decided_by) : null,
+      decided_at: r.decided_at,
+    }));
+  }
+
+  async updateRequestDayStatus(
+    dayId: number,
+    status: string,
+    decisionNote?: string | null,
+    decidedBy?: number | null,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    const q = trx || db;
+    await q('leave_request_days')
+      .where({ id: dayId })
+      .update({
+        status,
+        decision_note: decisionNote || null,
+        decided_by: decidedBy || null,
+        decided_at: db.fn.now(),
+      });
+  }
+
+  // ==========================================
   // HELPERS
   // ==========================================
   private formatLeaveType(row: any): LeaveType {
@@ -479,7 +546,11 @@ export class LeavesRepository {
           : String(row.to_date),
       is_half_day: Boolean(row.is_half_day),
       half_day_session: row.half_day_session,
+      from_time: row.from_time || null,
+      to_time: row.to_time || null,
       days: Number(row.days),
+      approved_days: Number(row.approved_days || 0),
+      rejected_days: Number(row.rejected_days || 0),
       reason: row.reason,
       status: row.status,
       approver_employee_id: row.approver_employee_id

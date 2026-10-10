@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
+const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 export const createLeaveRequestSchema = z
   .object({
     leave_type_id: z.coerce.number().int().positive('Valid leave type ID is required'),
@@ -9,6 +11,8 @@ export const createLeaveRequestSchema = z
     to_date: z.string().regex(dateRegex, 'to_date must be in YYYY-MM-DD format'),
     is_half_day: z.boolean().optional().default(false),
     half_day_session: z.enum(['first', 'second']).optional().nullable(),
+    from_time: z.string().regex(timeRegex, 'from_time must be in HH:mm format').optional().nullable(),
+    to_time: z.string().regex(timeRegex, 'to_time must be in HH:mm format').optional().nullable(),
     reason: z.string().trim().min(3, 'Reason must be at least 3 characters').max(1000),
   })
   .refine(
@@ -34,6 +38,9 @@ export const createLeaveRequestSchema = z
   );
 
 export const approveLeaveRequestSchema = z.object({
+  approved_dates: z.array(z.string().regex(dateRegex)).optional(),
+  rejected_dates: z.array(z.string().regex(dateRegex)).optional(),
+  day_notes: z.record(z.string(), z.string()).optional(),
   decision_note: z.string().max(500).optional().nullable(),
 });
 
