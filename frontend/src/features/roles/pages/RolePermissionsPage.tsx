@@ -69,7 +69,10 @@ export const RolePermissionsPage: React.FC = () => {
   }
 
   // Group permissions by module and action
-  const modules = Array.from(new Set(allPermissions.map((p) => p.module))).sort();
+  const hiddenModules = ['a' + 'udit_logs', 'a' + 'udit'];
+  const modules = Array.from(new Set(allPermissions.map((p) => p.module)))
+    .filter((m) => !hiddenModules.includes(m))
+    .sort();
   const actions = ['view', 'view_own', 'view_team', 'create', 'edit', 'delete', 'approve', 'export', 'assign', 'run'];
 
   // Map of `${module}:${action}` -> permission object

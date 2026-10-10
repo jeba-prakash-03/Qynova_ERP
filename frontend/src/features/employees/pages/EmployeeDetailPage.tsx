@@ -675,11 +675,11 @@ export const EmployeeDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Full Audit History Timeline */}
+          {/* Full Lifecycle History Timeline */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
             <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 mb-6 flex items-center gap-2">
               <Clock className="w-4 h-4 text-indigo-600" />
-              Lifecycle Transition Audit Log
+              Lifecycle Transition History
             </h3>
 
             {isLoadingHistory ? (
@@ -1081,7 +1081,7 @@ export const EmployeeDetailPage: React.FC = () => {
 
           <div>
             <label className="font-bold uppercase tracking-wider text-slate-600 block mb-1">
-              Audit Note / Transition Remarks
+              Transition Remarks
             </label>
             <textarea
               rows={3}
@@ -1281,7 +1281,7 @@ export const EmployeeDetailPage: React.FC = () => {
           }
         }}
         title="Delete Document"
-        message={`Are you sure you want to delete ${docToDelete?.name}? This action is irreversible and will be logged in the system audit trail.`}
+        message={`Are you sure you want to delete ${docToDelete?.name}? This action is irreversible and will be logged in system history.`}
         confirmText="Confirm Delete"
         isLoading={deleteDocMutation.isPending}
       />

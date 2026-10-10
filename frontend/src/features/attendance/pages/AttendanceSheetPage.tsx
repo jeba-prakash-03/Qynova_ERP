@@ -149,7 +149,7 @@ export const AttendanceSheetPage: React.FC = () => {
       }
     },
     onSuccess: () => {
-      success('Attendance updated and audit log recorded.');
+      success('Attendance updated successfully.');
       setEditingItem(null);
       setDetailItem(null);
       queryClient.invalidateQueries({ queryKey: ['attendance'] });
@@ -585,7 +585,7 @@ export const AttendanceSheetPage: React.FC = () => {
               Employee Code: <strong className="text-slate-900">{editingItem?.employee_code}</strong>
             </div>
             <div className="text-indigo-600 font-medium">
-              * The server recalculates working hours, flags, and writes an audit log.
+              * The server recalculates working hours and status flags.
             </div>
           </div>
 
@@ -650,7 +650,7 @@ export const AttendanceSheetPage: React.FC = () => {
               disabled={editMutation.isPending || editForm.reason.trim().length < 5}
               className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors disabled:opacity-50"
             >
-              {editMutation.isPending ? 'Saving...' : 'Save & Record Audit'}
+              {editMutation.isPending ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>

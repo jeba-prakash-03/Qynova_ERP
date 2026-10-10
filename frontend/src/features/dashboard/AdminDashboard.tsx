@@ -5,13 +5,10 @@ import axiosClient from '../../shared/api/axiosClient';
 import {
   Users,
   Building2,
-  Briefcase,
-  ShieldCheck,
   UserPlus,
   ArrowUpRight,
-  Shield,
-  Activity,
-  Layers,
+  Clock,
+  UserCheck,
 } from 'lucide-react';
 import { Loader } from '../../shared/components/Loader';
 
@@ -41,19 +38,38 @@ export const AdminDashboard: React.FC = () => {
     },
   });
 
-  const { data: auditData, isLoading: loadingAudit } = useQuery({
-    queryKey: ['audit-logs', 'recent'],
+  const { data: pendingLeaves = [], isLoading: loadingLeaves } = useQuery({
+    queryKey: ['leaves', 'pending-approvals-summary'],
     queryFn: async () => {
-      const res = await axiosClient.get('/audit-logs?limit=5');
-      return res.data.data;
+      try {
+        const res = await axiosClient.get('/leaves/pending');
+        return res.data.data || [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  const { data: todayAttendance = [], isLoading: loadingAttendance } = useQuery({
+    queryKey: ['attendance', 'today-summary'],
+    queryFn: async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const res = await axiosClient.get(`/attendance/sheet?date=${today}`);
+        return res.data.data || [];
+      } catch {
+        return [];
+      }
     },
   });
 
   const totalEmployees = employeesData?.meta?.total || 0;
   const recentEmployees = employeesData?.data || [];
-  const recentAudit = auditData || [];
+  const presentTodayCount = todayAttendance.filter(
+    (a: any) => a.status === 'present' || a.status === 'half_day' || a.status === 'wfh'
+  ).length;
 
-  const isLoading = loadingEmployees || loadingDepts || loadingRoles;
+  const isLoading = loadingEmployees || loadingDepts || loadingRoles || loadingLeaves || loadingAttendance;
 
   return (
     <div className="space-y-6">
@@ -67,7 +83,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Organization Overview</h1>
           <p className="text-indigo-200 text-sm mt-1 max-w-xl">
-            Welcome to Qynova ERP. Manage employees, departmental structures, role access policies, and audit trails.
+            Manage employees, departments and role access policies.
           </p>
         </div>
 
@@ -78,13 +94,6 @@ export const AdminDashboard: React.FC = () => {
           >
             <UserPlus className="w-4 h-4" />
             Add Employee
-          </Link>
-          <Link
-            to="/audit-logs"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold backdrop-blur-sm transition"
-          >
-            <Activity className="w-4 h-4" />
-            Audit Logs
           </Link>
         </div>
       </div>
@@ -112,6 +121,38 @@ export const AdminDashboard: React.FC = () => {
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
             <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Present Today</span>
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <UserCheck className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="text-2xl font-extrabold text-slate-900">{presentTodayCount}</div>
+            <Link
+              to="/attendance/sheet"
+              className="text-xs text-emerald-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"
+            >
+              Daily Sheet <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Approvals</span>
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <Clock className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="text-2xl font-extrabold text-slate-900">{pendingLeaves.length}</div>
+            <Link
+              to="/leaves/approvals"
+              className="text-xs text-amber-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"
+            >
+              Review Requests <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Departments</span>
               <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
                 <Building2 className="w-5 h-5" />
@@ -125,42 +166,10 @@ export const AdminDashboard: React.FC = () => {
               View Hierarchy <ArrowUpRight className="w-3 h-3" />
             </Link>
           </div>
-
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Security Roles</span>
-              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-2xl font-extrabold text-slate-900">{roles.length}</div>
-            <Link
-              to="/roles"
-              className="text-xs text-amber-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"
-            >
-              Configure RBAC <ArrowUpRight className="w-3 h-3" />
-            </Link>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Audit Trail</span>
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Shield className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="text-2xl font-extrabold text-emerald-600">Active</div>
-            <Link
-              to="/audit-logs"
-              className="text-xs text-emerald-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"
-            >
-              Immutable Logs <ArrowUpRight className="w-3 h-3" />
-            </Link>
-          </div>
         </div>
       )}
 
-      {/* Grid: Recent Employees & Audit Activities */}
+      {/* Grid: Recent Employees & Pending Approvals List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Employees */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col">
@@ -201,34 +210,32 @@ export const AdminDashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Recent Audit Activities */}
+        {/* Pending Approvals */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-slate-800">Recent Audit Trail</h2>
-            <Link to="/audit-logs" className="text-xs font-semibold text-indigo-600 hover:underline">
+            <h2 className="text-base font-bold text-slate-800">Pending Leave Approvals</h2>
+            <Link to="/leaves/approvals" className="text-xs font-semibold text-indigo-600 hover:underline">
               View all
             </Link>
           </div>
 
-          {recentAudit.length === 0 ? (
-            <p className="text-xs text-slate-400 py-6 text-center">No audit records yet</p>
+          {pendingLeaves.length === 0 ? (
+            <p className="text-xs text-slate-400 py-6 text-center">No pending leave requests</p>
           ) : (
             <div className="divide-y divide-slate-100 flex-1">
-              {recentAudit.map((log: any) => (
-                <div key={log.id} className="py-3 flex items-center justify-between gap-3">
+              {pendingLeaves.slice(0, 5).map((req: any) => (
+                <div key={req.id} className="py-3 flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold text-indigo-600">{log.action}</span>
-                      <span className="text-[11px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 capitalize">
-                        {log.entity}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                      by {log.user_email || 'System'}
+                    <h4 className="text-xs font-bold text-slate-800">
+                      {req.employee_name || `Employee #${req.employee_id}`}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      {req.leave_type_name || 'Leave'}: {req.from_date} to {req.to_date} ({req.days} day
+                      {req.days > 1 ? 's' : ''})
                     </p>
                   </div>
-                  <span className="text-[10px] text-slate-400 shrink-0">
-                    {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 shrink-0 capitalize">
+                    Pending
                   </span>
                 </div>
               ))}

@@ -222,7 +222,7 @@ export const RoleListPage: React.FC = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Finance Auditor"
+              placeholder="e.g. Operations Manager"
               disabled={editingRole?.is_system}
               required
               className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
