@@ -308,11 +308,12 @@ export class AttendanceService {
           daysMap[dateStr] = { status: 'weekend' };
           totalWeekend++;
         } else if (dateStr < todayStr) {
-          // Past working day without punch -> absent
+          // Past working day without punch -> mark as absent
           daysMap[dateStr] = { status: 'absent' };
           totalAbsent++;
         } else {
-          daysMap[dateStr] = { status: 'absent' }; // Future or today not yet checked in
+          // Today (in progress) or future day: do not count as absent yet
+          daysMap[dateStr] = { status: null as any };
         }
       }
     }
@@ -520,12 +521,14 @@ export class AttendanceService {
             status = 'weekend';
             code = 'W';
             totals.weekend++;
-          } else if (dateStr <= todayStr) {
+          } else if (dateStr < todayStr) {
+            // Past working day without any attendance record -> absent
             status = 'absent';
             code = 'A';
             totals.absent++;
           } else {
-            status = 'absent';
+            // Today (in progress) or future day — do not label absent
+            status = null as any;
             code = '-';
           }
 

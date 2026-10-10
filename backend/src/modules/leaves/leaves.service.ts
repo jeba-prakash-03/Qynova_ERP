@@ -14,6 +14,11 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '../../shared/err
 import { getWorkingDays } from '../holidays/holidays.service';
 import { notificationService } from '../../shared/services/notification.service';
 import { getTodayKolkata } from '../../shared/utils/date.util';
+import { SYSTEM_ROLES } from '../../shared/constants/roles';
+
+/** Case-insensitive role check — DB stores 'Admin', 'HR', etc. */
+const hasRole = (roles: string[], ...targets: string[]): boolean =>
+  roles.some((r) => targets.map((t) => t.toLowerCase()).includes(r.toLowerCase()));
 
 export class LeavesService {
   // ==========================================
@@ -88,9 +93,7 @@ export class LeavesService {
     const endDateObj = new Date(toDate);
 
     while (iter <= endDateObj) {
-      const dateStr = `${iter.getFullYear()}-${pad(iter.getMonth() + 1)}-${pad(
-        iter.getDate()
-      )}`;
+      const dateStr = `${iter.getFullYear()}-${pad(iter.getMonth() + 1)}-${pad(iter.getDate())}`;
       const dayOfWeek = iter.getDay();
 
       if (allWorkingDates.has(dateStr)) {
@@ -255,27 +258,42 @@ export class LeavesService {
       );
     });
 
-    // 5. Notify Reporting Manager
+    // 5. Notify Reporting Manager (fallback to HR if no manager)
     try {
       const employee = await db('employees').where({ id: employeeId }).first();
+      let notifyUserId: number | null = null;
+
       if (employee?.reporting_manager_id) {
         const manager = await db('employees')
           .where({ id: employee.reporting_manager_id })
           .first();
-
-        if (manager?.user_id) {
-          await notificationService.notify({
-            eventKey: `leave.applied:req:${createdRequest!.id}`,
-            userIds: manager.user_id,
-            type: 'info',
-            title: 'New Leave Request',
-            message: `${employee.first_name} ${employee.last_name} applied for ${calc.days} day(s) of ${leaveType.name} (${data.from_date} to ${data.to_date})`,
-            link: '/leaves/approvals',
-          });
-        }
+        notifyUserId = manager?.user_id || null;
       }
-    } catch (notifErr) {
-      console.error('[LEAVE_NOTIFY_ERROR] Failed to send leave application notification:', notifErr);
+
+      // Fallback: notify HR if no reporting manager configured
+      if (!notifyUserId) {
+        const hrUser = await db('users')
+          .join('user_roles', 'users.id', 'user_roles.user_id')
+          .join('roles', 'user_roles.role_id', 'roles.id')
+          .where('roles.name', SYSTEM_ROLES.HR)
+          .where('users.status', 'active')
+          .select('users.id')
+          .first();
+        notifyUserId = hrUser?.id || null;
+      }
+
+      if (notifyUserId && employee) {
+        await notificationService.notify({
+          eventKey: `leave.applied:req:${createdRequest!.id}`,
+          userIds: notifyUserId,
+          type: 'info',
+          title: 'New Leave Request',
+          message: `${employee.first_name} ${employee.last_name} applied for ${calc.days} day(s) of ${leaveType.name} (${data.from_date} to ${data.to_date})`,
+          link: '/leaves/approvals',
+        });
+      }
+    } catch {
+      // Non-fatal: notification failure must not roll back the leave request
     }
 
     return createdRequest!;
@@ -306,10 +324,7 @@ export class LeavesService {
     }
 
     // A person cannot approve their own leave
-    if (
-      currentUser.employeeId &&
-      currentUser.employeeId === request.employee_id
-    ) {
+    if (currentUser.employeeId && currentUser.employeeId === request.employee_id) {
       throw new ForbiddenError('You cannot approve your own leave request.');
     }
 
@@ -319,8 +334,7 @@ export class LeavesService {
       currentUser.employeeId &&
       employee?.reporting_manager_id === currentUser.employeeId;
     const isHrOrAdmin =
-      currentUser.roles.includes('admin') ||
-      currentUser.roles.includes('hr') ||
+      hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
       currentUser.permissions.includes('leave.approve') ||
       currentUser.permissions.includes('*');
 
@@ -389,8 +403,8 @@ export class LeavesService {
           link: '/leaves/my',
         });
       }
-    } catch (notifErr) {
-      console.error('[LEAVE_NOTIFY_ERROR] Failed to send approval notification:', notifErr);
+    } catch {
+      // Non-fatal
     }
 
     return updatedRequest!;
@@ -425,10 +439,7 @@ export class LeavesService {
     }
 
     // A person cannot reject their own leave
-    if (
-      currentUser.employeeId &&
-      currentUser.employeeId === request.employee_id
-    ) {
+    if (currentUser.employeeId && currentUser.employeeId === request.employee_id) {
       throw new ForbiddenError('You cannot reject your own leave request.');
     }
 
@@ -438,8 +449,7 @@ export class LeavesService {
       currentUser.employeeId &&
       employee?.reporting_manager_id === currentUser.employeeId;
     const isHrOrAdmin =
-      currentUser.roles.includes('admin') ||
-      currentUser.roles.includes('hr') ||
+      hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
       currentUser.permissions.includes('leave.approve') ||
       currentUser.permissions.includes('*');
 
@@ -465,7 +475,7 @@ export class LeavesService {
         trx
       );
 
-      // 2. Transition balance: pending -= days
+      // 2. Transition balance: pending -= days (restored to available)
       await leavesRepository.adjustBalance(
         request.employee_id,
         request.leave_type_id,
@@ -489,8 +499,8 @@ export class LeavesService {
           link: '/leaves/my',
         });
       }
-    } catch (notifErr) {
-      console.error('[LEAVE_NOTIFY_ERROR] Failed to send rejection notification:', notifErr);
+    } catch {
+      // Non-fatal
     }
 
     return updatedRequest!;
@@ -513,18 +523,19 @@ export class LeavesService {
       throw new NotFoundError(`Leave request with ID ${requestId} not found`);
     }
 
-    // Only applicant or admin can cancel
+    // Only applicant or admin/HR can cancel
     const isApplicant =
       currentUser.employeeId && currentUser.employeeId === request.employee_id;
-    const isAdmin =
-      currentUser.roles.includes('admin') || currentUser.roles.includes('hr');
+    const isAdmin = hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR);
 
     if (!isApplicant && !isAdmin) {
       throw new ForbiddenError('You can only cancel your own leave requests.');
     }
 
     if (request.status === 'cancelled' || request.status === 'rejected') {
-      throw new BadRequestError(`Cannot cancel a leave request that is already ${request.status}.`);
+      throw new BadRequestError(
+        `Cannot cancel a leave request that is already ${request.status}.`
+      );
     }
 
     const todayStr = getTodayKolkata();
@@ -553,7 +564,7 @@ export class LeavesService {
           trx
         );
       } else if (request.status === 'approved') {
-        // Approved cancellation: allowed only if from_date is in the future
+        // Approved cancellation: allowed only if leave has not started yet
         if (request.from_date < todayStr) {
           throw new BadRequestError(
             'Cannot cancel an approved leave that has already started or passed in the past.'
@@ -580,7 +591,7 @@ export class LeavesService {
           trx
         );
 
-        // Revert attendance rows
+        // Revert attendance rows (only rows not manually edited by admin)
         const calc = await this.calculateWorkingDays(
           request.from_date,
           request.to_date,
@@ -616,8 +627,7 @@ export class LeavesService {
     permissions: string[];
   }): Promise<LeaveRequest[]> {
     const isHrOrAdmin =
-      currentUser.roles.includes('admin') ||
-      currentUser.roles.includes('hr') ||
+      hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
       currentUser.permissions.includes('leave.approve') ||
       currentUser.permissions.includes('*');
 
@@ -653,18 +663,13 @@ export class LeavesService {
     const endDate = `${month}-${pad(lastDay)}`;
 
     const isHrOrAdmin =
-      currentUser.roles.includes('admin') ||
-      currentUser.roles.includes('hr') ||
+      hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
       currentUser.permissions.includes('leave.view') ||
       currentUser.permissions.includes('*');
 
     const reportingManagerId = isHrOrAdmin ? undefined : (currentUser.employeeId || -1);
 
-    return leavesRepository.findApprovedLeavesForMonth(
-      startDate,
-      endDate,
-      reportingManagerId
-    );
+    return leavesRepository.findApprovedLeavesForMonth(startDate, endDate, reportingManagerId);
   }
 }
 
