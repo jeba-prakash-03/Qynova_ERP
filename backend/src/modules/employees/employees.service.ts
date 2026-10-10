@@ -8,7 +8,11 @@ import {
 } from '../../shared/errors/app-error';
 import { auditService } from '../../shared/services/audit.service';
 import { notificationService } from '../../shared/services/notification.service';
-import { EmployeeRecord } from './employees.types';
+import {
+  EmployeeRecord,
+  ALLOWED_LIFECYCLE_TRANSITIONS,
+  EmployeeLifecycleHistoryRecord,
+} from './employees.types';
 import {
   CreateEmployeeInput,
   UpdateEmployeeInput,
@@ -288,32 +292,104 @@ export class EmployeesService {
     ip?: string
   ): Promise<EmployeeRecord> {
     const existing = await this.getEmployeeById(id);
+    const currentStage = existing.lifecycle_stage;
+    const nextStage = input.lifecycle_stage;
 
-    await employeesRepository.updateLifecycleStage(id, input.lifecycle_stage);
+    // Reject invalid jumps with 400
+    const allowed = ALLOWED_LIFECYCLE_TRANSITIONS[currentStage] || [];
+    if (!allowed.includes(nextStage)) {
+      throw new BadRequestError(
+        `Invalid lifecycle transition from '${currentStage}' to '${nextStage}'. Allowed next stage: ${
+          allowed.length > 0 ? allowed.join(', ') : 'None (Terminal state)'
+        }`
+      );
+    }
+
+    const note = (input as any).note || input.notes || null;
+
+    // Execute stage update, history record, and status change in DB transaction
+    await db.transaction(async (trx) => {
+      // 1. Record history
+      await employeesRepository.recordLifecycleTransition(
+        id,
+        currentStage,
+        nextStage,
+        performedByUserId || existing.user_id,
+        note,
+        trx
+      );
+
+      // 2. Update employee lifecycle stage
+      await employeesRepository.updateLifecycleStage(id, nextStage, trx);
+
+      // 3. On relieved: set employees.status = inactive and users.status = disabled
+      if (nextStage === 'relieved') {
+        await trx('employees').where({ id }).update({ status: 'inactive' });
+        await trx('users').where({ id: existing.user_id }).update({ status: 'disabled' });
+      }
+    });
 
     const updated = await this.getEmployeeById(id);
 
+    // Audit log
     await auditService.record({
       userId: performedByUserId,
       action: 'employees.lifecycle_change',
       entity: 'employees',
       entityId: id,
-      oldValue: { lifecycle_stage: existing.lifecycle_stage },
-      newValue: { lifecycle_stage: input.lifecycle_stage, notes: input.notes },
+      oldValue: { lifecycle_stage: currentStage },
+      newValue: { lifecycle_stage: nextStage, note },
       ip,
     });
 
+    // Notify HR when someone moves to resigned and when a new employee becomes active
+    try {
+      const hrUsers = await db('users as u')
+        .join('user_roles as ur', 'u.id', 'ur.user_id')
+        .join('roles as r', 'ur.role_id', 'r.id')
+        .whereIn('r.name', ['HR', 'Admin'])
+        .select('u.id');
+      const hrUserIds = Array.from(new Set(hrUsers.map((u) => Number(u.id))));
+
+      if (nextStage === 'resigned' && hrUserIds.length > 0) {
+        await notificationService.notify({
+          eventKey: `employee:${id}:lifecycle:resigned`,
+          userIds: hrUserIds,
+          type: 'warning',
+          title: 'Employee Resignation Submitted',
+          message: `${existing.first_name} ${existing.last_name} (${existing.employee_code}) has submitted their resignation.`,
+          link: `/employees/${id}`,
+        });
+      } else if (nextStage === 'active' && hrUserIds.length > 0) {
+        await notificationService.notify({
+          eventKey: `employee:${id}:lifecycle:active`,
+          userIds: hrUserIds,
+          type: 'success',
+          title: 'New Employee Active',
+          message: `${existing.first_name} ${existing.last_name} (${existing.employee_code}) is now marked as active in the company.`,
+          link: `/employees/${id}`,
+        });
+      }
+    } catch (notifErr) {
+      console.error('[LIFECYCLE_NOTIFY_ERROR] Failed to send HR notification:', notifErr);
+    }
+
     // Notify employee of lifecycle update
     await notificationService.notify({
-      eventKey: `employee:${id}:lifecycle:${input.lifecycle_stage}`,
+      eventKey: `employee:${id}:lifecycle:${nextStage}`,
       userIds: existing.user_id,
       type: 'info',
       title: 'Lifecycle Stage Updated',
-      message: `Your employment lifecycle stage has progressed to '${input.lifecycle_stage}'.`,
+      message: `Your employment lifecycle stage has progressed to '${nextStage}'.`,
       link: '/me',
     });
 
     return updated;
+  }
+
+  public async getLifecycleHistory(id: number): Promise<EmployeeLifecycleHistoryRecord[]> {
+    await this.getEmployeeById(id);
+    return employeesRepository.getLifecycleHistory(id);
   }
 
   public async deleteEmployee(id: number, performedByUserId?: number, ip?: string): Promise<void> {

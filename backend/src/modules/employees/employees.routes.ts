@@ -10,6 +10,8 @@ import {
   employeeQuerySchema,
   employeeIdParamSchema,
 } from './employees.schema';
+import { documentsController } from '../documents/documents.controller';
+import { uploadDocumentMiddleware } from '../documents/documents.middleware';
 
 const router = Router();
 
@@ -50,6 +52,34 @@ router.patch(
   requirePermission('employees.edit'),
   validate({ params: employeeIdParamSchema, body: updateLifecycleSchema }),
   employeesController.updateLifecycle
+);
+
+router.get(
+  '/:id/lifecycle-history',
+  validate({ params: employeeIdParamSchema }),
+  employeesController.getLifecycleHistory
+);
+
+// Employee Documents Endpoints
+router.post(
+  '/:id/documents',
+  validate({ params: employeeIdParamSchema }),
+  uploadDocumentMiddleware.single('file'),
+  documentsController.upload
+);
+
+router.get(
+  '/:id/documents',
+  validate({ params: employeeIdParamSchema }),
+  documentsController.listByEmployee
+);
+
+// Offer letter generation
+router.post(
+  '/:id/generate-offer-letter',
+  requirePermission('employees.edit'),
+  validate({ params: employeeIdParamSchema }),
+  documentsController.generateOfferLetter
 );
 
 router.delete(

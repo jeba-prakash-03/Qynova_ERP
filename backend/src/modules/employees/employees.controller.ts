@@ -66,6 +66,12 @@ export class EmployeesController {
     return sendSuccess(res, updated, 200, undefined, 'Lifecycle stage updated successfully');
   });
 
+  public getLifecycleHistory = asyncHandler(async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    const history = await employeesService.getLifecycleHistory(id);
+    return sendSuccess(res, history);
+  });
+
   public delete = asyncHandler(async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const ip = req.ip || (req.headers['x-forwarded-for'] as string);

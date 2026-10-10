@@ -110,6 +110,7 @@ export const updateLifecycleSchema = z.object({
     'notice_period',
     'relieved',
   ]),
+  note: z.string().optional(),
   notes: z.string().optional(),
 });
 

@@ -45,18 +45,29 @@ describe('Leaves Module — Unit & API Tests', () => {
     lopTypeId = types.find((t: any) => t.code === 'LOP').id;
     wfhTypeId = types.find((t: any) => t.code === 'WFH').id;
 
-    // Allocate 12 days CL to employee for test year 2026
+    // Allocate 12 days CL to employee and manager for test year 2026
     await db('leave_balances')
-      .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+      .whereIn('employee_id', [employeeId, managerEmployeeId])
+      .where({ leave_type_id: clTypeId, year: 2026 })
       .delete();
-    await db('leave_balances').insert({
-      employee_id: employeeId,
-      leave_type_id: clTypeId,
-      year: 2026,
-      allocated: 12.0,
-      used: 0.0,
-      pending: 0.0,
-    });
+    await db('leave_balances').insert([
+      {
+        employee_id: employeeId,
+        leave_type_id: clTypeId,
+        year: 2026,
+        allocated: 12.0,
+        used: 0.0,
+        pending: 0.0,
+      },
+      {
+        employee_id: managerEmployeeId,
+        leave_type_id: clTypeId,
+        year: 2026,
+        allocated: 12.0,
+        used: 0.0,
+        pending: 0.0,
+      },
+    ]);
   });
 
   describe('1. Working-day counting logic', () => {

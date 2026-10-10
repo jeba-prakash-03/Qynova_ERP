@@ -64,3 +64,28 @@ export interface EmployeeRecord {
   emergency_contacts?: EmergencyContactRecord[];
   roles?: string[];
 }
+
+export interface EmployeeLifecycleHistoryRecord {
+  id: number;
+  employee_id: number;
+  from_stage: LifecycleStage;
+  to_stage: LifecycleStage;
+  changed_by: number;
+  changed_by_name?: string;
+  note?: string | null;
+  created_at: string;
+}
+
+export const ALLOWED_LIFECYCLE_TRANSITIONS: Record<LifecycleStage, LifecycleStage[]> = {
+  candidate: ['selected'],
+  selected: ['offer_generated'],
+  offer_generated: ['offer_accepted'],
+  offer_accepted: ['onboarding'],
+  onboarding: ['active'],
+  active: ['probation'],
+  probation: ['confirmed'],
+  confirmed: ['resigned'],
+  resigned: ['notice_period'],
+  notice_period: ['relieved'],
+  relieved: [],
+};

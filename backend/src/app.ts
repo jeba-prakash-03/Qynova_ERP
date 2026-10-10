@@ -14,6 +14,7 @@ import attendanceRoutes from './modules/attendance/attendance.routes';
 import leaveRequestsRoutes from './modules/leaves/leave-requests.routes';
 import leaveBalancesRoutes from './modules/leaves/leave-balances.routes';
 import leaveTypesRoutes from './modules/leaves/leave-types.routes';
+import documentsRoutes from './modules/documents/documents.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -52,6 +53,7 @@ export const createApp = (): Application => {
   app.use('/api/v1/leave-requests', leaveRequestsRoutes);
   app.use('/api/v1/leave-balances', leaveBalancesRoutes);
   app.use('/api/v1/leave-types', leaveTypesRoutes);
+  app.use('/api/v1/documents', documentsRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

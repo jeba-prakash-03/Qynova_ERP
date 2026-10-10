@@ -1,6 +1,11 @@
 import { Knex } from 'knex';
 import db from '../../db/knex';
-import { EmployeeRecord, BankDetailsRecord, EmergencyContactRecord } from './employees.types';
+import {
+  EmployeeRecord,
+  BankDetailsRecord,
+  EmergencyContactRecord,
+  EmployeeLifecycleHistoryRecord,
+} from './employees.types';
 import { EmployeeQueryParams } from './employees.schema';
 
 export class EmployeesRepository {
@@ -249,8 +254,50 @@ export class EmployeesRepository {
     }
   }
 
-  public async updateLifecycleStage(id: number, stage: string): Promise<void> {
-    await db('employees').where({ id }).update({ lifecycle_stage: stage });
+  public async updateLifecycleStage(id: number, stage: string, trx?: Knex.Transaction): Promise<void> {
+    const q = trx || db;
+    await q('employees').where({ id }).update({ lifecycle_stage: stage });
+  }
+
+  public async recordLifecycleTransition(
+    employeeId: number,
+    fromStage: string,
+    toStage: string,
+    changedBy: number,
+    note?: string | null,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    const q = trx || db;
+    await q('employee_lifecycle_history').insert({
+      employee_id: employeeId,
+      from_stage: fromStage,
+      to_stage: toStage,
+      changed_by: changedBy,
+      note: note || null,
+    });
+  }
+
+  public async getLifecycleHistory(employeeId: number): Promise<EmployeeLifecycleHistoryRecord[]> {
+    const rows = await db('employee_lifecycle_history as elh')
+      .leftJoin('users as u', 'elh.changed_by', 'u.id')
+      .leftJoin('employees as e', 'u.id', 'e.user_id')
+      .where('elh.employee_id', employeeId)
+      .select(
+        'elh.*',
+        db.raw("COALESCE(CONCAT(e.first_name, ' ', e.last_name), u.email) as changed_by_name")
+      )
+      .orderBy('elh.id', 'desc');
+
+    return rows.map((r) => ({
+      id: Number(r.id),
+      employee_id: Number(r.employee_id),
+      from_stage: r.from_stage,
+      to_stage: r.to_stage,
+      changed_by: Number(r.changed_by),
+      changed_by_name: r.changed_by_name,
+      note: r.note,
+      created_at: r.created_at instanceof Date ? r.created_at.toISOString() : String(r.created_at),
+    }));
   }
 
   public async softDelete(id: number): Promise<void> {
