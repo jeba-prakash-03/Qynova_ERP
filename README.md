@@ -280,6 +280,21 @@ $$\text{Working Days} = \text{Calendar Days in Month} - \text{Weekly Off Days (S
 
 ---
 
+### 7. Leave Management & Attendance Synchronization (Dev 2 Stage 2)
+
+#### Leave Endpoints:
+- `POST /api/v1/leave-requests`: Employee applies for leave (dates, type, half day option, reason). Automatically counts working days and deducts from `pending` in a DB transaction.
+- `GET /api/v1/leave-requests/me`: Employee self-service request history with real-time status and approver notes.
+- `PATCH /api/v1/leave-requests/:id/cancel`: Employee cancels pending requests or future approved requests (automatically reverts attendance and restores quota).
+- `GET /api/v1/leave-requests/pending`: Manager views direct team's pending leaves; HR/Admin views company-wide.
+- `PATCH /api/v1/leave-requests/:id/approve`: Reporting manager or HR/Admin approves leave. Transitions `pending` to `used`, syncs `attendance` rows (`status = leave` or `work_type = wfh`), and notifies employee. Self-approval is blocked.
+- `PATCH /api/v1/leave-requests/:id/reject`: Rejection requires mandatory `decision_note`. Reverts `pending` balance.
+- `GET /api/v1/leave-balances/me`: Employee gets their yearly quotas, used, pending, and calculated remaining days.
+- `POST /api/v1/leave-balances/allocate`: HR/Admin yearly quota allocation (individual or bulk for all active employees).
+- `GET /api/v1/leave-requests/calendar?month=YYYY-MM`: Team absence schedule for calendar visualizations.
+
+---
+
 ## 📋 API Conventions
 
 - **Base URL**: `/api/v1/<module>`
