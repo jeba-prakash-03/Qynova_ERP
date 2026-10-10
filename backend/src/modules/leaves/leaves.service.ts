@@ -219,6 +219,19 @@ export class LeavesService {
       }
     }
 
+    const empRec = await db('employees').where({ id: employeeId }).first();
+    if (empRec && empRec.joining_date) {
+      const empJoiningDate = empRec.joining_date instanceof Date ? empRec.joining_date.toISOString().split('T')[0] : String(empRec.joining_date);
+      if (data.from_date < empJoiningDate) {
+        const jDateObj = new Date(empJoiningDate + 'T00:00:00');
+        const formattedDate = jDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        throw new BadRequestError(
+          `Leave cannot be applied for dates before joining date (${formattedDate}).`,
+          [{ field: 'from_date', message: `Leave cannot be applied for dates before joining date (${formattedDate}).` }]
+        );
+      }
+    }
+
     // 1. Calculate working days
     const calc = await this.calculateWorkingDays(
       data.from_date,

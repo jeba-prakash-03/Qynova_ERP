@@ -322,9 +322,10 @@ export class EmployeesService {
       // 2. Update employee lifecycle stage
       await employeesRepository.updateLifecycleStage(id, nextStage, trx);
 
-      // 3. On relieved: set employees.status = inactive and users.status = disabled
+      // 3. On relieved: set employees.status = inactive, last_working_date = today and users.status = disabled
       if (nextStage === 'relieved') {
-        await trx('employees').where({ id }).update({ status: 'inactive' });
+        const today = new Date().toISOString().split('T')[0];
+        await trx('employees').where({ id }).update({ status: 'inactive', last_working_date: today });
         await trx('users').where({ id: existing.user_id }).update({ status: 'disabled' });
       }
     });

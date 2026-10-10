@@ -1,3 +1,4 @@
+import db from '../../db/knex';
 import { attendanceRepository } from './attendance.repository';
 import { holidaysService } from '../holidays/holidays.service';
 import {
@@ -25,6 +26,17 @@ export class AttendanceService {
    */
   async checkIn(employeeId: number, dto: CheckInDto): Promise<Attendance> {
     const today = getKolkataDateString();
+
+    const emp = await db('employees').where({ id: employeeId }).first();
+    if (emp && emp.joining_date) {
+      const empJoiningDate = emp.joining_date instanceof Date ? emp.joining_date.toISOString().split('T')[0] : String(emp.joining_date);
+      if (today < empJoiningDate) {
+        const jDateObj = new Date(empJoiningDate + 'T00:00:00');
+        const formattedDate = jDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        throw new BadRequestError(`Employee joined on ${formattedDate}`);
+      }
+    }
+
     const existing = await attendanceRepository.findByEmployeeAndDate(employeeId, today);
 
     if (existing && existing.check_in) {
@@ -284,12 +296,18 @@ export class AttendanceService {
 
     const todayStr = getKolkataDateString();
 
+    const empObj = await db('employees').where({ id: employeeId }).first();
+    const empJoiningDate = empObj && empObj.joining_date ? (empObj.joining_date instanceof Date ? empObj.joining_date.toISOString().split('T')[0] : String(empObj.joining_date)) : '1970-01-01';
+    const empLastWorkingDate = empObj && empObj.last_working_date ? (empObj.last_working_date instanceof Date ? empObj.last_working_date.toISOString().split('T')[0] : String(empObj.last_working_date)) : null;
+
     for (let day = 1; day <= totalDays; day++) {
       const dateStr = `${year}-${pad(m)}-${pad(day)}`;
       const dateObj = new Date(year, m - 1, day);
       const dayOfWeek = dateObj.getDay();
 
-      if (recordsMap[dateStr]) {
+      if (dateStr < empJoiningDate || (empLastWorkingDate && dateStr > empLastWorkingDate)) {
+        daysMap[dateStr] = { status: 'not_joined' as any };
+      } else if (recordsMap[dateStr]) {
         const att = recordsMap[dateStr];
         daysMap[dateStr] = { status: att.status };
         totalWorkingMinutes += att.working_minutes;
@@ -474,12 +492,23 @@ export class AttendanceService {
         total_overtime_minutes: 0,
       };
 
+      const empJoiningDate = emp.joining_date ? (emp.joining_date instanceof Date ? emp.joining_date.toISOString().split('T')[0] : String(emp.joining_date)) : '1970-01-01';
+      const empLastWorkingDate = emp.last_working_date ? (emp.last_working_date instanceof Date ? emp.last_working_date.toISOString().split('T')[0] : String(emp.last_working_date)) : null;
+
       for (let day = 1; day <= totalDays; day++) {
         const dateStr = `${year}-${pad(m)}-${pad(day)}`;
         const dateObj = new Date(year, m - 1, day);
         const dayOfWeek = dateObj.getDay();
 
-        if (empAttendance.has(dateStr)) {
+        if (dateStr < empJoiningDate || (empLastWorkingDate && dateStr > empLastWorkingDate)) {
+          days[dateStr] = {
+            date: dateStr,
+            status: 'not_joined',
+            statusCode: '-',
+            working_minutes: 0,
+            is_late: false,
+          };
+        } else if (empAttendance.has(dateStr)) {
           const rec = empAttendance.get(dateStr)!;
           const status = rec.status as AttendanceStatus;
           const code =
@@ -573,6 +602,16 @@ export class AttendanceService {
       throw new NotFoundError(`Attendance record ${id} not found`);
     }
 
+    const empRec = await db('employees').where({ id: current.employee_id }).first();
+    if (empRec && empRec.joining_date) {
+      const empJoiningDate = empRec.joining_date instanceof Date ? empRec.joining_date.toISOString().split('T')[0] : String(empRec.joining_date);
+      if (current.date < empJoiningDate) {
+        const jDateObj = new Date(empJoiningDate + 'T00:00:00');
+        const formattedDate = jDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        throw new BadRequestError(`Employee joined on ${formattedDate}`);
+      }
+    }
+
     // Recalculate working minutes and status based on check-in and check-out
     const checkIn = dto.check_in !== undefined ? (dto.check_in ? new Date(dto.check_in) : null) : (current.check_in ? new Date(current.check_in) : null);
     const checkOut = dto.check_out !== undefined ? (dto.check_out ? new Date(dto.check_out) : null) : (current.check_out ? new Date(current.check_out) : null);
@@ -644,6 +683,16 @@ export class AttendanceService {
     dto: ManualAttendanceDto,
     userId: number
   ): Promise<Attendance> {
+    const empRec = await db('employees').where({ id: dto.employee_id }).first();
+    if (empRec && empRec.joining_date) {
+      const empJoiningDate = empRec.joining_date instanceof Date ? empRec.joining_date.toISOString().split('T')[0] : String(empRec.joining_date);
+      if (dto.date < empJoiningDate) {
+        const jDateObj = new Date(empJoiningDate + 'T00:00:00');
+        const formattedDate = jDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        throw new BadRequestError(`Employee joined on ${formattedDate}`);
+      }
+    }
+
     const existing = await attendanceRepository.findByEmployeeAndDate(dto.employee_id, dto.date);
     if (existing) {
       return this.updateAttendance(existing.id, dto, userId);

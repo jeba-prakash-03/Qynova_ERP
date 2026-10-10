@@ -174,7 +174,9 @@ export class AttendanceRepository {
       .leftJoin('departments as d', 'e.department_id', 'd.id')
       .leftJoin('designations as des', 'e.designation_id', 'des.id')
       .whereNull('e.deleted_at')
-      .where('e.status', 'active')
+      .where('e.joining_date', '<=', options.date)
+      .where((q) => q.whereNull('e.last_working_date').orWhere('e.last_working_date', '>=', options.date))
+      .whereNotIn('e.lifecycle_stage', ['candidate', 'selected', 'offer_generated', 'offer_accepted'])
       .select(
         'e.id as employee_id',
         'e.employee_code',
@@ -238,6 +240,8 @@ export class AttendanceRepository {
         'e.employee_code',
         'e.first_name',
         'e.last_name',
+        'e.joining_date',
+        'e.last_working_date',
         'e.reporting_manager_id',
         'd.name as department_name'
       )

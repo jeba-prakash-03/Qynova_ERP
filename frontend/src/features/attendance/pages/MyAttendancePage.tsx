@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../../../shared/api/axiosClient';
 import { useToast } from '../../../shared/context/ToastContext';
+import { useAuth } from '../../../shared/context/AuthContext';
 import { Modal } from '../../../shared/components/Modal';
 import {
   Clock,
@@ -204,6 +205,11 @@ export const MyAttendancePage: React.FC = () => {
     day: 'numeric',
   });
 
+  const { user } = useAuth();
+  const formattedJoiningDate = user?.employee?.joining_date
+    ? new Date(user.employee.joining_date).toLocaleDateString('en-GB')
+    : null;
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
       {/* Page Header */}
@@ -215,6 +221,11 @@ export const MyAttendancePage: React.FC = () => {
         <p className="text-slate-500 text-sm mt-1">
           Punch in/out, view daily timer, and track your monthly work calendar.
         </p>
+        {formattedJoiningDate && (
+          <p className="text-xs text-slate-600 font-semibold mt-1">
+            Joining Date: <span className="text-indigo-700">{formattedJoiningDate}</span>
+          </p>
+        )}
       </div>
 
       {/* BIG MAIN PUNCH CARD */}
@@ -435,7 +446,10 @@ export const MyAttendancePage: React.FC = () => {
               let bgStyle = 'bg-slate-100 text-slate-700 border-slate-200';
               let badgeText = 'Weekend';
 
-              if (dayInfo.status === 'present') {
+              if (dayInfo.status === 'not_joined') {
+                bgStyle = 'bg-slate-100/60 text-slate-400 border-slate-200/60 opacity-60';
+                badgeText = '-';
+              } else if (dayInfo.status === 'present') {
                 bgStyle = 'bg-emerald-50 text-emerald-800 border-emerald-200';
                 badgeText = 'Present';
               } else if (dayInfo.status === 'wfh') {
@@ -458,6 +472,7 @@ export const MyAttendancePage: React.FC = () => {
               return (
                 <div
                   key={dateStr}
+                  title={dayInfo.status === 'not_joined' ? 'Not joined yet' : ''}
                   onClick={() => setSelectedDayPopup({ date: dateStr, dayInfo, record })}
                   className={`p-3 rounded-xl border text-left flex flex-col justify-between min-h-[80px] cursor-pointer hover:shadow-md transition-all ${bgStyle}`}
                 >

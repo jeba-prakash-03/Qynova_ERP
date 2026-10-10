@@ -13,6 +13,8 @@ export interface UserAuth {
     photo_url: string | null;
     department_id: number | null;
     designation_id: number | null;
+    joining_date?: string | null;
+    last_working_date?: string | null;
   } | null;
 }
 
