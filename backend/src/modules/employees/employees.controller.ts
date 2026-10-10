@@ -78,6 +78,11 @@ export class EmployeesController {
     await employeesService.deleteEmployee(id, req.user?.userId, ip);
     return sendSuccess(res, { deleted: true }, 200, undefined, 'Employee removed successfully');
   });
+
+  public getStatsSummary = asyncHandler(async (_req: Request, res: Response) => {
+    const summary = await employeesService.getStatsSummary();
+    return sendSuccess(res, summary);
+  });
 }
 
 export const employeesController = new EmployeesController();

@@ -410,6 +410,10 @@ export class EmployeesService {
       ip,
     });
   }
+
+  public async getStatsSummary() {
+    return employeesRepository.getStatsSummary();
+  }
 }
 
 export const employeesService = new EmployeesService();

@@ -63,7 +63,22 @@ export const AdminDashboard: React.FC = () => {
     },
   });
 
+  const { data: statsSummary } = useQuery({
+    queryKey: ['employees', 'stats-summary'],
+    queryFn: async () => {
+      try {
+        const res = await axiosClient.get('/employees/stats/summary');
+        return res.data.data;
+      } catch {
+        return null;
+      }
+    },
+  });
+
   const totalEmployees = employeesData?.meta?.total || 0;
+  const activeTotalCount = statsSummary?.activeTotal ?? totalEmployees;
+  const onboardingCount = statsSummary?.onboardingCount ?? 0;
+  const relievedCount = statsSummary?.relievedCount ?? 0;
   const recentEmployees = employeesData?.data || [];
   const presentTodayCount = todayAttendance.filter(
     (a: any) => a.status === 'present' || a.status === 'half_day' || a.status === 'wfh'
@@ -110,7 +125,10 @@ export const AdminDashboard: React.FC = () => {
                 <Users className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-2xl font-extrabold text-slate-900">{totalEmployees}</div>
+            <div className="text-2xl font-extrabold text-slate-900">{activeTotalCount}</div>
+            <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              {onboardingCount} onboarding, {relievedCount} relieved
+            </p>
             <Link
               to="/employees"
               className="text-xs text-indigo-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"

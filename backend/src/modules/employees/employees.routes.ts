@@ -19,6 +19,7 @@ router.use(authenticate);
 
 // Employee can view own profile without employees.view
 router.get('/me', employeesController.getMe);
+router.get('/stats/summary', requirePermission('employees.view'), employeesController.getStatsSummary);
 
 router.get(
   '/',

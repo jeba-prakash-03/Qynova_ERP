@@ -2,7 +2,15 @@ import type { Knex } from 'knex';
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+import fs from 'fs';
+
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
+const envPath = path.resolve(__dirname, `../../${envFile}`);
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+} else {
+  dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+}
 
 const config: { [key: string]: Knex.Config } = {
   development: {
@@ -37,7 +45,7 @@ const config: { [key: string]: Knex.Config } = {
       port: Number(process.env.DB_PORT) || 3306,
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '7868',
-      database: process.env.DB_NAME || 'qynova_erp',
+      database: process.env.DB_NAME || 'qynova_test',
       timezone: '+00:00',
       dateStrings: true,
     },

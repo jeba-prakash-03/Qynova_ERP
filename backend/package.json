@@ -11,7 +11,8 @@
     "migrate:latest": "knex --knexfile src/db/knexfile.ts migrate:latest",
     "migrate:rollback": "knex --knexfile src/db/knexfile.ts migrate:rollback",
     "seed:run": "knex --knexfile src/db/knexfile.ts seed:run",
-    "test": "jest --runInBand --detectOpenHandles --forceExit",
+    "db:reset:test": "NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:rollback --all && NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:latest && NODE_ENV=test knex --knexfile src/db/knexfile.ts seed:run",
+    "test": "NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {

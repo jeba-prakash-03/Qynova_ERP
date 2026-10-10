@@ -302,6 +302,34 @@ export class EmployeesRepository {
       status: 'inactive',
     });
   }
+
+  public async getStatsSummary(): Promise<{ activeTotal: number; onboardingCount: number; relievedCount: number; totalAll: number }> {
+    const rows = await db('employees')
+      .whereNull('deleted_at')
+      .select('lifecycle_stage');
+
+    let activeTotal = 0;
+    let onboardingCount = 0;
+    let relievedCount = 0;
+
+    for (const r of rows) {
+      const stage = (r.lifecycle_stage || '').toLowerCase();
+      if (['active', 'probation', 'confirmed', 'notice_period'].includes(stage)) {
+        activeTotal++;
+      } else if (['candidate', 'selected', 'offer_generated', 'offer_accepted'].includes(stage)) {
+        onboardingCount++;
+      } else if (stage === 'relieved') {
+        relievedCount++;
+      }
+    }
+
+    return {
+      activeTotal,
+      onboardingCount,
+      relievedCount,
+      totalAll: rows.length,
+    };
+  }
 }
 
 export const employeesRepository = new EmployeesRepository();
