@@ -10,3 +10,4 @@
 | 6 | The "from path" redirect (Phase 2) stores the attempted URL in `location.state.from` (standard React Router pattern). | Standard approach, consistent with existing ProtectedRoute navigate call. |
 | 7 | For Phase 5 salary_structures: `effective_from` date determines which row payroll uses. When a new structure is added, the previous one is NOT deleted. | Spec says "changes create a new row, keep history". |
 | 8 | The attendance export route (`/export`) has no permission guard. Assumption: requires `attendance.view` permission (added in Phase 1 fix). | Consistent with other admin attendance routes. |
+| 9 | Dev 3 modules (clients, projects, tasks, milestones, invoices, expenses, crm, contracts, reports) are disconnected from frontend navigation and RBAC grid. Timesheets uses a free-text task description with nullable project_id/task_id. No Dev 3 source files existed in frontend. | Task 3 specifications. |

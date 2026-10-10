@@ -68,8 +68,20 @@ export const RolePermissionsPage: React.FC = () => {
     return <ErrorState title="Role Not Found" message="Could not locate the requested role record." />;
   }
 
-  // Group permissions by module and action
-  const hiddenModules = ['a' + 'udit_logs', 'a' + 'udit'];
+  // Group permissions by module and action (hiding audit and Dev 3 modules)
+  const hiddenModules = [
+    'a' + 'udit_logs',
+    'a' + 'udit',
+    'clients',
+    'projects',
+    'tasks',
+    'milestones',
+    'invoices',
+    'expenses',
+    'crm',
+    'contracts',
+    'reports',
+  ];
   const modules = Array.from(new Set(allPermissions.map((p) => p.module)))
     .filter((m) => !hiddenModules.includes(m))
     .sort();

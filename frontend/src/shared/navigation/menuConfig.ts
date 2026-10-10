@@ -104,6 +104,12 @@ export const MENU_CONFIG: MenuGroup[] = [
         icon: CheckSquare,
         permission: 'leave.approve',
       },
+      {
+        title: 'My Timesheets',
+        path: '/timesheets/my',
+        icon: Clock,
+        requireEmployee: true,
+      },
     ],
   },
   {
@@ -111,9 +117,15 @@ export const MENU_CONFIG: MenuGroup[] = [
     items: [
       {
         title: 'Payroll',
-        path: '/payroll',
+        path: '/payroll/runs',
         icon: Banknote,
         permission: 'payroll.view',
+      },
+      {
+        title: 'My Payslips',
+        path: '/payroll/payslips',
+        icon: Banknote,
+        requireEmployee: true,
       },
     ],
   },
