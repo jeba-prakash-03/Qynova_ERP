@@ -75,17 +75,17 @@ Create the MySQL database:
 CREATE DATABASE IF NOT EXISTS qynova_erp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Configure `backend/.env` (copied from `backend/.env.example`):
+Configure `backend/.env`:
 ```env
 PORT=5000
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
-DB_PASSWORD=7868
+DB_PASSWORD=your_mysql_password
 DB_NAME=qynova_erp
 
-JWT_SECRET=super_secret_jwt_access_key_qynova_erp_2026_dev1
-JWT_REFRESH_SECRET=super_secret_jwt_refresh_key_qynova_erp_2026_dev1
+JWT_SECRET=your_jwt_secret_key_change_in_production
+JWT_REFRESH_SECRET=your_jwt_refresh_secret_key_change_in_production
 JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 CLIENT_URL=http://localhost:5173
