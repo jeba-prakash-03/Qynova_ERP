@@ -5,6 +5,7 @@ import { Modal } from '../../../shared/components/Modal';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { FormField } from '../../../shared/components/FormField';
 import { useToast } from '../../../shared/context/ToastContext';
+import { useAuth } from '../../../shared/context/AuthContext';
 import {
   CalendarDays,
   Plus,
@@ -310,6 +311,24 @@ export const MyLeavesPage: React.FC = () => {
         return <span className="text-xs text-slate-600">{status}</span>;
     }
   };
+
+  const { user } = useAuth();
+
+  if (!user?.employee) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center p-6 text-center">
+        <div className="bg-white p-8 rounded-2xl border border-slate-200/90 shadow-sm max-w-md w-full">
+          <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <h2 className="text-lg font-bold text-slate-800 mb-1">Employee Profile Required</h2>
+          <p className="text-sm text-slate-500 mb-5">
+            Apply Leave & My Leaves module is reserved for users with an active employee record.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">

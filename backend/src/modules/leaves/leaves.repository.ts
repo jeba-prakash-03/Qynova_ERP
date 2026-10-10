@@ -180,12 +180,15 @@ export class LeavesRepository {
     employeeId: number,
     fromDate: string,
     toDate: string,
+    isHalfDay: boolean = false,
+    fromTime?: string | null,
+    toTime?: string | null,
     excludeRequestId?: number,
     trx?: Knex.Transaction
   ): Promise<LeaveRequest | null> {
     const q = (trx || db)('leave_requests')
       .where({ employee_id: employeeId })
-      .whereIn('status', ['pending', 'approved'])
+      .whereIn('status', ['pending', 'approved', 'partially_approved'])
       .where('from_date', '<=', toDate)
       .where('to_date', '>=', fromDate);
 
@@ -193,8 +196,31 @@ export class LeavesRepository {
       q.whereNot('id', excludeRequestId);
     }
 
-    const row = await q.first();
-    return row ? this.formatLeaveRequest(row) : null;
+    const rows = await q;
+
+    const timeToMins = (t: string) => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    };
+
+    for (const r of rows) {
+      // If either request is full-day (or missing time bounds), date match = overlap
+      if (!isHalfDay || !r.is_half_day || !fromTime || !toTime || !r.from_time || !r.to_time) {
+        return this.formatLeaveRequest(r);
+      }
+
+      // Both are half-day/permission: check time overlap
+      const existingStart = timeToMins(r.from_time);
+      const existingEnd = timeToMins(r.to_time);
+      const newStart = timeToMins(fromTime);
+      const newEnd = timeToMins(toTime);
+
+      if (newStart < existingEnd && newEnd > existingStart) {
+        return this.formatLeaveRequest(r);
+      }
+    }
+
+    return null;
   }
 
   async createRequest(
@@ -205,6 +231,8 @@ export class LeavesRepository {
       to_date: string;
       is_half_day: boolean;
       half_day_session?: HalfDaySession | null;
+      from_time?: string | null;
+      to_time?: string | null;
       days: number;
       reason: string;
       status?: LeaveRequestStatus;
@@ -219,6 +247,8 @@ export class LeavesRepository {
       to_date: data.to_date,
       is_half_day: data.is_half_day,
       half_day_session: data.half_day_session || null,
+      from_time: data.from_time || null,
+      to_time: data.to_time || null,
       days: data.days,
       reason: data.reason,
       status: data.status || 'pending',
@@ -235,6 +265,8 @@ export class LeavesRepository {
       approver_employee_id?: number | null;
       decided_at?: Date | string | null;
       decision_note?: string | null;
+      approved_days?: number;
+      rejected_days?: number;
     },
     trx?: Knex.Transaction
   ): Promise<LeaveRequest> {

@@ -11,9 +11,9 @@ import {
   CalculateDaysResult,
 } from './leaves.types';
 import { BadRequestError, ForbiddenError, NotFoundError } from '../../shared/errors/app-error';
-import { getWorkingDays } from '../holidays/holidays.service';
+import { getWorkingDays, holidaysService } from '../holidays/holidays.service';
 import { notificationService } from '../../shared/services/notification.service';
-import { getTodayKolkata } from '../../shared/utils/date.util';
+import { getTodayKolkata, timeStringToMinutes } from '../../shared/utils/date.util';
 import { SYSTEM_ROLES } from '../../shared/constants/roles';
 
 /** Case-insensitive role check — DB stores 'Admin', 'HR', etc. */
@@ -209,13 +209,41 @@ export class LeavesService {
     let fromTime = data.from_time || null;
     let toTime = data.to_time || null;
 
-    if (data.is_half_day && (!fromTime || !toTime)) {
-      if (data.half_day_session === 'second') {
-        fromTime = '14:00';
-        toTime = '18:30';
-      } else {
-        fromTime = '09:30';
-        toTime = '14:00';
+    if (data.is_half_day) {
+      data.to_date = data.from_date;
+      if (!fromTime || !toTime) {
+        throw new BadRequestError('Both From time and To time are required for half day leave', [
+          { field: 'from_time', message: 'From time is required' },
+          { field: 'to_time', message: 'To time is required' },
+        ]);
+      }
+
+      const workSettings = await holidaysService.getWorkSettings();
+      const shiftStartMins = timeStringToMinutes(workSettings.shift_start);
+      const shiftEndMins = timeStringToMinutes(workSettings.shift_end);
+      const fromMins = timeStringToMinutes(fromTime);
+      const toMins = timeStringToMinutes(toTime);
+
+      if (fromMins >= toMins) {
+        throw new BadRequestError('To time must be later than From time', [
+          { field: 'to_time', message: 'To time must be later than From time' },
+        ]);
+      }
+
+      if (fromMins < shiftStartMins || toMins > shiftEndMins) {
+        throw new BadRequestError(`Times must be inside shift hours (${workSettings.shift_start} to ${workSettings.shift_end})`, [
+          { field: 'from_time', message: `Times must be inside shift hours (${workSettings.shift_start} to ${workSettings.shift_end})` },
+        ]);
+      }
+
+      const shiftLength = shiftEndMins - shiftStartMins;
+      const maxHalfDayMins = shiftLength / 2 + 15;
+      const duration = toMins - fromMins;
+
+      if (duration > maxHalfDayMins) {
+        throw new BadRequestError(`Half day duration (${duration} mins) exceeds maximum allowed half shift length (${maxHalfDayMins} mins)`, [
+          { field: 'to_time', message: `Half day duration exceeds maximum allowed half shift length (${maxHalfDayMins} mins)` },
+        ]);
       }
     }
 
@@ -251,7 +279,10 @@ export class LeavesService {
     const overlap = await leavesRepository.findOverlapping(
       employeeId,
       data.from_date,
-      data.to_date
+      data.to_date,
+      Boolean(data.is_half_day || isPermission),
+      fromTime,
+      toTime
     );
 
     if (overlap) {
@@ -301,6 +332,8 @@ export class LeavesService {
           to_date: data.to_date,
           is_half_day: Boolean(data.is_half_day),
           half_day_session: data.half_day_session || null,
+          from_time: fromTime,
+          to_time: toTime,
           days: daysCount,
           reason: data.reason,
           status: 'pending',
@@ -490,14 +523,11 @@ export class LeavesService {
           approver_employee_id: currentUser.employeeId || null,
           decided_at: new Date(),
           decision_note: dto.decision_note || (derivedStatus === 'approved' ? 'Approved' : 'Partially Approved'),
+          approved_days: approvedDaysCount,
+          rejected_days: rejectedDaysCount,
         },
         trx
       );
-
-      await trx('leave_requests').where({ id: request.id }).update({
-        approved_days: approvedDaysCount,
-        rejected_days: rejectedDaysCount,
-      });
 
       // 2. Adjust balance: pending -= requested.days, used += approvedDaysCount
       await leavesRepository.adjustBalance(
