@@ -31,6 +31,8 @@ import { AuditLogListPage } from './features/audit-logs/pages/AuditLogListPage';
 import { HolidaysPage } from './features/holidays/pages/HolidaysPage';
 import { MyAttendancePage } from './features/attendance/pages/MyAttendancePage';
 import { AttendanceSheetPage } from './features/attendance/pages/AttendanceSheetPage';
+import { MyLeavesPage } from './features/leaves/pages/MyLeavesPage';
+import { LeaveApprovalsPage } from './features/leaves/pages/LeaveApprovalsPage';
 
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
@@ -177,6 +179,26 @@ export const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Leaves Module (Dev 2) */}
+        <Route
+          path="/leaves/my"
+          element={
+            <ProtectedRoute requireEmployee>
+              <MyLeavesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leaves/approvals"
+          element={
+            <ProtectedRoute>
+              <LeaveApprovalsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/leaves" element={<Navigate to="/leaves/my" replace />} />
+        <Route path="/leave" element={<Navigate to="/leaves/my" replace />} />
 
         {/* Fallback & Root redirect */}
         <Route path="/" element={<RootRedirect />} />

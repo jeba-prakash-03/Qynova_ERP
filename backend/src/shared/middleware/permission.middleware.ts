@@ -21,6 +21,26 @@ export const requirePermission = (permission: string) => {
   };
 };
 
+export const requireAnyPermission = (...permissions: string[]) => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      throw new UnauthorizedError('User authentication required');
+    }
+
+    // Admins bypass granular permission checks
+    if (req.user.roles.includes(SYSTEM_ROLES.ADMIN)) {
+      return next();
+    }
+
+    const hasAny = permissions.some((p) => req.user!.permissions.includes(p));
+    if (!hasAny) {
+      throw new ForbiddenError(`One of permissions [${permissions.join(', ')}] required`);
+    }
+
+    next();
+  };
+};
+
 export const requireEmployee = (req: Request, _res: Response, next: NextFunction): void => {
   if (!req.user) {
     throw new UnauthorizedError('User authentication required');

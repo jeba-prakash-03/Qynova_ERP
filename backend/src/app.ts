@@ -11,6 +11,9 @@ import auditLogsRoutes from './modules/audit-logs/audit-logs.routes';
 import notificationsRoutes from './modules/notifications/notifications.routes';
 import holidaysRoutes from './modules/holidays/holidays.routes';
 import attendanceRoutes from './modules/attendance/attendance.routes';
+import leaveRequestsRoutes from './modules/leaves/leave-requests.routes';
+import leaveBalancesRoutes from './modules/leaves/leave-balances.routes';
+import leaveTypesRoutes from './modules/leaves/leave-types.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -46,6 +49,9 @@ export const createApp = (): Application => {
   app.use('/api/v1/notifications', notificationsRoutes);
   app.use('/api/v1/holidays', holidaysRoutes);
   app.use('/api/v1/attendance', attendanceRoutes);
+  app.use('/api/v1/leave-requests', leaveRequestsRoutes);
+  app.use('/api/v1/leave-balances', leaveBalancesRoutes);
+  app.use('/api/v1/leave-types', leaveTypesRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

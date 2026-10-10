@@ -124,10 +124,16 @@ export const MENU_CONFIG: MenuGroup[] = [
         permission: 'holidays.view',
       },
       {
-        title: 'Leave Requests',
-        path: '/leave',
+        title: 'My Leaves',
+        path: '/leaves/my',
         icon: CalendarDays,
-        permission: 'leave.view',
+        requireEmployee: true,
+      },
+      {
+        title: 'Leave Approvals',
+        path: '/leaves/approvals',
+        icon: CheckSquare,
+        permission: 'leave.approve',
       },
       {
         title: 'Timesheets',

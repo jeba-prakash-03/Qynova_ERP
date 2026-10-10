@@ -14,6 +14,8 @@ export function getKolkataDateString(d: Date = new Date()): string {
   return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); // en-CA gives YYYY-MM-DD format
 }
 
+export const getTodayKolkata = getKolkataDateString;
+
 /**
  * Returns HH:mm in Asia/Kolkata timezone
  */
