@@ -103,13 +103,25 @@ export const MENU_CONFIG: MenuGroup[] = [
   },
   // --- DEV 2 MODULES (Time, Attendance, Payroll) ---
   {
-    groupTitle: 'Attendance & Payroll (Dev 2)',
+    groupTitle: 'Attendance & Time (Dev 2)',
     items: [
       {
-        title: 'Attendance',
-        path: '/attendance',
+        title: 'My Punch Clock',
+        path: '/attendance/my',
         icon: Clock,
+        requireEmployee: true,
+      },
+      {
+        title: 'Attendance Sheet',
+        path: '/attendance',
+        icon: FileText,
         permission: 'attendance.view',
+      },
+      {
+        title: 'Holidays & Calendar',
+        path: '/holidays',
+        icon: CalendarDays,
+        permission: 'holidays.view',
       },
       {
         title: 'Leave Requests',

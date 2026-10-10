@@ -27,6 +27,11 @@ import { RoleListPage } from './features/roles/pages/RoleListPage';
 import { RolePermissionsPage } from './features/roles/pages/RolePermissionsPage';
 import { AuditLogListPage } from './features/audit-logs/pages/AuditLogListPage';
 
+// Time & Attendance (Dev 2)
+import { HolidaysPage } from './features/holidays/pages/HolidaysPage';
+import { MyAttendancePage } from './features/attendance/pages/MyAttendancePage';
+import { AttendanceSheetPage } from './features/attendance/pages/AttendanceSheetPage';
+
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -143,6 +148,32 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute permission="audit_logs.view">
               <AuditLogListPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Attendance & Holidays (Dev 2) */}
+        <Route
+          path="/attendance/my"
+          element={
+            <ProtectedRoute requireEmployee>
+              <MyAttendancePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/attendance"
+          element={
+            <ProtectedRoute>
+              <AttendanceSheetPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/holidays"
+          element={
+            <ProtectedRoute permission="holidays.view">
+              <HolidaysPage />
             </ProtectedRoute>
           }
         />

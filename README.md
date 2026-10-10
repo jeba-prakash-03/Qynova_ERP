@@ -257,6 +257,29 @@ The AppShell dynamically verifies permissions and employee status and renders na
 
 ---
 
+### 6. How Teammates Use the `getWorkingDays` Calendar Contract (Dev 2)
+
+Exported service function for Payroll and Leave calculations:
+
+```typescript
+import { getWorkingDays } from '@/shared/services/calendar.service';
+// or from backend:
+import { getWorkingDays } from '../shared/services/calendar.service';
+
+const { workingDates, count } = await getWorkingDays(2026, 10);
+// workingDates: ['2026-10-01', '2026-10-05', ...]
+// count: 21 (working days in that month)
+```
+
+#### Calculation Formula:
+$$\text{Working Days} = \text{Calendar Days in Month} - \text{Weekly Off Days (Sat/Sun)} - \text{Public/Company Holidays}$$
+
+- Used directly in payroll to compute daily salary:
+  $$\text{Daily Salary} = \frac{\text{Monthly Salary}}{\text{working days of THAT month}}$$
+- Never hardcoded to 30 or 365. Accounts for leap years and custom company holidays.
+
+---
+
 ## 📋 API Conventions
 
 - **Base URL**: `/api/v1/<module>`

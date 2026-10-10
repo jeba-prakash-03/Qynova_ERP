@@ -1,0 +1,714 @@
+import { attendanceRepository } from './attendance.repository';
+import { holidaysService } from '../holidays/holidays.service';
+import {
+  Attendance,
+  AttendanceBreak,
+  AttendanceStatus,
+  CheckInDto,
+  CheckOutDto,
+  ManualAttendanceDto,
+  UpdateAttendanceDto,
+  DailySheetItem,
+  MonthlySheetEmployee,
+} from './attendance.types';
+import {
+  getKolkataDateString,
+  getKolkataMinutesOfDay,
+  timeStringToMinutes,
+} from '../../shared/utils/date.util';
+import { BadRequestError, NotFoundError } from '../../shared/errors/app-error';
+import { auditService } from '../../shared/services/audit.service';
+
+export class AttendanceService {
+  /**
+   * Employee Check-In
+   */
+  async checkIn(employeeId: number, dto: CheckInDto): Promise<Attendance> {
+    const today = getKolkataDateString();
+    const existing = await attendanceRepository.findByEmployeeAndDate(employeeId, today);
+
+    if (existing && existing.check_in) {
+      throw new BadRequestError(`You have already checked in today at ${existing.check_in}`);
+    }
+
+    const now = new Date();
+    const workSettings = await holidaysService.getWorkSettings();
+
+    // Check if late (check_in minutes > shift_start + grace)
+    const checkInMinutes = getKolkataMinutesOfDay(now);
+    const shiftStartMinutes = timeStringToMinutes(workSettings.shift_start);
+    const lateThreshold = shiftStartMinutes + workSettings.late_grace_minutes;
+    const isLate = checkInMinutes > lateThreshold;
+
+    const status: AttendanceStatus = dto.work_type === 'wfh' ? 'wfh' : 'present';
+
+    if (existing) {
+      // Update existing record if created as placeholder
+      const updated = await attendanceRepository.update(existing.id, {
+        check_in: now.toISOString(),
+        status,
+        work_type: dto.work_type || 'office',
+        is_late: isLate,
+        remarks: dto.remarks || existing.remarks,
+      });
+      return updated!;
+    }
+
+    return attendanceRepository.create({
+      employee_id: employeeId,
+      date: today,
+      check_in: now,
+      status,
+      work_type: dto.work_type || 'office',
+      is_late: isLate,
+      remarks: dto.remarks,
+    });
+  }
+
+  /**
+   * Employee Check-Out
+   */
+  async checkOut(employeeId: number, dto: CheckOutDto): Promise<Attendance> {
+    const today = getKolkataDateString();
+    const attendance = await attendanceRepository.findByEmployeeAndDate(employeeId, today);
+
+    if (!attendance || !attendance.check_in) {
+      throw new BadRequestError('Cannot check out without checking in first');
+    }
+
+    if (attendance.check_out) {
+      throw new BadRequestError('You have already checked out today');
+    }
+
+    const now = new Date();
+    const checkInDate = new Date(attendance.check_in);
+
+    // Auto-close open breaks on check-out
+    await attendanceRepository.closeAllOpenBreaks(attendance.id, now);
+
+    // Recalculate total break minutes
+    const breaks = await attendanceRepository.getBreaks(attendance.id);
+    let totalBreakMinutes = 0;
+    for (const b of breaks) {
+      if (b.break_end) {
+        const diff = Math.round(
+          (new Date(b.break_end).getTime() - new Date(b.break_start).getTime()) / 60000
+        );
+        totalBreakMinutes += Math.max(0, diff);
+      }
+    }
+
+    // Calculate gross and net working minutes
+    const grossMinutes = Math.round((now.getTime() - checkInDate.getTime()) / 60000);
+    const workingMinutes = Math.max(0, grossMinutes - totalBreakMinutes);
+
+    // Work settings calculation
+    const workSettings = await holidaysService.getWorkSettings();
+    const shiftEndMinutes = timeStringToMinutes(workSettings.shift_end);
+    const shiftStartMinutes = timeStringToMinutes(workSettings.shift_start);
+    const shiftLengthMinutes = Math.max(0, shiftEndMinutes - shiftStartMinutes);
+
+    const checkOutMinutes = getKolkataMinutesOfDay(now);
+    const isEarlyCheckout = checkOutMinutes < shiftEndMinutes;
+
+    // Overtime = minutes worked beyond shift length
+    const overtimeMinutes = Math.max(0, workingMinutes - shiftLengthMinutes);
+
+    // Determine status based on minimum hours
+    const fullDayMinutes = workSettings.min_hours_full_day * 60;
+    const halfDayMinutes = workSettings.min_hours_half_day * 60;
+
+    let finalStatus: AttendanceStatus;
+    if (workingMinutes >= fullDayMinutes) {
+      finalStatus = attendance.work_type === 'wfh' ? 'wfh' : 'present';
+    } else if (workingMinutes >= halfDayMinutes) {
+      finalStatus = 'half_day';
+    } else {
+      finalStatus = 'absent';
+    }
+
+    const updated = await attendanceRepository.update(attendance.id, {
+      check_out: now.toISOString(),
+      working_minutes: workingMinutes,
+      break_minutes: totalBreakMinutes,
+      overtime_minutes: overtimeMinutes,
+      is_early_checkout: isEarlyCheckout,
+      status: finalStatus,
+      remarks: dto.remarks || attendance.remarks,
+    });
+
+    return updated!;
+  }
+
+  /**
+   * Start Break
+   */
+  async startBreak(employeeId: number): Promise<AttendanceBreak> {
+    const today = getKolkataDateString();
+    const attendance = await attendanceRepository.findByEmployeeAndDate(employeeId, today);
+
+    if (!attendance || !attendance.check_in) {
+      throw new BadRequestError('Must check in before taking a break');
+    }
+
+    if (attendance.check_out) {
+      throw new BadRequestError('Cannot take a break after checking out');
+    }
+
+    const openBreak = await attendanceRepository.findOpenBreak(attendance.id);
+    if (openBreak) {
+      throw new BadRequestError('You already have an active break in progress');
+    }
+
+    const now = new Date();
+    return attendanceRepository.createBreak(attendance.id, now);
+  }
+
+  /**
+   * End Break
+   */
+  async endBreak(employeeId: number): Promise<AttendanceBreak> {
+    const today = getKolkataDateString();
+    const attendance = await attendanceRepository.findByEmployeeAndDate(employeeId, today);
+
+    if (!attendance) {
+      throw new BadRequestError('No active attendance record found for today');
+    }
+
+    const openBreak = await attendanceRepository.findOpenBreak(attendance.id);
+    if (!openBreak) {
+      throw new BadRequestError('No active break found to end');
+    }
+
+    const now = new Date();
+    await attendanceRepository.closeBreak(openBreak.id, now);
+
+    // Recalculate break minutes on attendance record
+    const breaks = await attendanceRepository.getBreaks(attendance.id);
+    let totalBreakMinutes = 0;
+    for (const b of breaks) {
+      const endTime = b.id === openBreak.id ? now : (b.break_end ? new Date(b.break_end) : null);
+      if (endTime) {
+        const diff = Math.round((endTime.getTime() - new Date(b.break_start).getTime()) / 60000);
+        totalBreakMinutes += Math.max(0, diff);
+      }
+    }
+
+    await attendanceRepository.update(attendance.id, {
+      break_minutes: totalBreakMinutes,
+    });
+
+    return {
+      ...openBreak,
+      break_end: now.toISOString(),
+    };
+  }
+
+  /**
+   * Get Current Employee's Attendance for Today
+   */
+  async getToday(employeeId: number): Promise<{
+    attendance: Attendance | null;
+    activeBreak: AttendanceBreak | null;
+    serverTime: string;
+    serverDate: string;
+    shift: { start: string; end: string };
+  }> {
+    const today = getKolkataDateString();
+    const attendance = await attendanceRepository.findByEmployeeAndDate(employeeId, today);
+    const activeBreak = attendance ? await attendanceRepository.findOpenBreak(attendance.id) : null;
+    const settings = await holidaysService.getWorkSettings();
+
+    return {
+      attendance,
+      activeBreak,
+      serverTime: new Date().toISOString(),
+      serverDate: today,
+      shift: {
+        start: settings.shift_start,
+        end: settings.shift_end,
+      },
+    };
+  }
+
+  /**
+   * Get Current Employee's Monthly Calendar & Stats
+   */
+  async getMyMonthly(employeeId: number, monthStr?: string): Promise<{
+    month: string;
+    records: Record<string, Attendance>;
+    days: Record<string, { status: AttendanceStatus; name?: string }>;
+    summary: {
+      totalPresent: number;
+      totalAbsent: number;
+      totalHalfDay: number;
+      totalLeave: number;
+      totalHoliday: number;
+      totalWeekend: number;
+      totalWorkingMinutes: number;
+      totalOvertimeMinutes: number;
+    };
+  }> {
+    const now = new Date();
+    const month = monthStr || `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+    const [year, m] = month.split('-').map(Number);
+
+    const totalDays = new Date(year, m, 0).getDate();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const startDate = `${year}-${pad(m)}-01`;
+    const endDate = `${year}-${pad(m)}-${pad(totalDays)}`;
+
+    const [attendanceList, holidays, settings] = await Promise.all([
+      attendanceRepository.findByEmployeeAndMonth(employeeId, startDate, endDate),
+      holidaysService.getAll({ year, month: m }),
+      holidaysService.getWorkSettings(),
+    ]);
+
+    const weeklyOffs = new Set(settings.weekly_off_days);
+    const holidayMap = new Map(holidays.map((h) => [h.date, h.name]));
+    const recordsMap: Record<string, Attendance> = {};
+    for (const a of attendanceList) {
+      recordsMap[a.date] = a;
+    }
+
+    const daysMap: Record<string, { status: AttendanceStatus; name?: string }> = {};
+
+    let totalPresent = 0;
+    let totalAbsent = 0;
+    let totalHalfDay = 0;
+    let totalLeave = 0;
+    let totalHoliday = 0;
+    let totalWeekend = 0;
+    let totalWorkingMinutes = 0;
+    let totalOvertimeMinutes = 0;
+
+    const todayStr = getKolkataDateString();
+
+    for (let day = 1; day <= totalDays; day++) {
+      const dateStr = `${year}-${pad(m)}-${pad(day)}`;
+      const dateObj = new Date(year, m - 1, day);
+      const dayOfWeek = dateObj.getDay();
+
+      if (recordsMap[dateStr]) {
+        const att = recordsMap[dateStr];
+        daysMap[dateStr] = { status: att.status };
+        totalWorkingMinutes += att.working_minutes;
+        totalOvertimeMinutes += att.overtime_minutes;
+
+        if (att.status === 'present' || att.status === 'wfh') totalPresent++;
+        else if (att.status === 'half_day') totalHalfDay++;
+        else if (att.status === 'leave') totalLeave++;
+        else if (att.status === 'absent') totalAbsent++;
+      } else {
+        // Compute virtual status for unrecorded days
+        if (holidayMap.has(dateStr)) {
+          daysMap[dateStr] = { status: 'holiday', name: holidayMap.get(dateStr) };
+          totalHoliday++;
+        } else if (weeklyOffs.has(dayOfWeek)) {
+          daysMap[dateStr] = { status: 'weekend' };
+          totalWeekend++;
+        } else if (dateStr < todayStr) {
+          // Past working day without punch -> absent
+          daysMap[dateStr] = { status: 'absent' };
+          totalAbsent++;
+        } else {
+          daysMap[dateStr] = { status: 'absent' }; // Future or today not yet checked in
+        }
+      }
+    }
+
+    return {
+      month,
+      records: recordsMap,
+      days: daysMap,
+      summary: {
+        totalPresent,
+        totalAbsent,
+        totalHalfDay,
+        totalLeave,
+        totalHoliday,
+        totalWeekend,
+        totalWorkingMinutes,
+        totalOvertimeMinutes,
+      },
+    };
+  }
+
+  /**
+   * Daily Attendance Sheet (Admin, HR, Manager)
+   */
+  async getDailySheet(options: {
+    date: string;
+    departmentId?: number;
+    search?: string;
+    reportingManagerId?: number;
+  }): Promise<{ date: string; items: DailySheetItem[]; summary: Record<string, number> }> {
+    const rows = await attendanceRepository.getDailySheet(options);
+
+    // Get holiday and work settings for the requested date
+    const holiday = await holidaysService.getAll({
+      year: Number(options.date.slice(0, 4)),
+      month: Number(options.date.slice(5, 7)),
+    });
+    const holidayMatch = holiday.find((h) => h.date === options.date);
+    const settings = await holidaysService.getWorkSettings();
+    const dateObj = new Date(options.date);
+    const isWeekend = settings.weekly_off_days.includes(dateObj.getDay());
+
+    const summary: Record<string, number> = {
+      total: rows.length,
+      present: 0,
+      absent: 0,
+      half_day: 0,
+      leave: 0,
+      holiday: 0,
+      weekend: 0,
+      wfh: 0,
+    };
+
+    const items: DailySheetItem[] = rows.map((r) => {
+      let status: AttendanceStatus;
+      if (r.attendance_status) {
+        status = r.attendance_status;
+      } else if (holidayMatch) {
+        status = 'holiday';
+      } else if (isWeekend) {
+        status = 'weekend';
+      } else {
+        status = 'absent';
+      }
+
+      summary[status] = (summary[status] || 0) + 1;
+
+      return {
+        employee_id: Number(r.employee_id),
+        employee_code: r.employee_code,
+        first_name: r.first_name,
+        last_name: r.last_name,
+        department_name: r.department_name || 'Unassigned',
+        designation_title: r.designation_title || 'Unassigned',
+        reporting_manager_id: r.reporting_manager_id ? Number(r.reporting_manager_id) : null,
+        attendance_id: r.attendance_id ? Number(r.attendance_id) : null,
+        date: options.date,
+        check_in: r.check_in,
+        check_out: r.check_out,
+        status,
+        work_type: r.work_type || 'office',
+        working_minutes: Number(r.working_minutes || 0),
+        break_minutes: Number(r.break_minutes || 0),
+        overtime_minutes: Number(r.overtime_minutes || 0),
+        is_late: Boolean(r.is_late),
+        is_early_checkout: Boolean(r.is_early_checkout),
+        remarks: r.remarks,
+        edited_by: r.edited_by ? Number(r.edited_by) : null,
+      };
+    });
+
+    return { date: options.date, items, summary };
+  }
+
+  /**
+   * Monthly Matrix Sheet (Admin, HR, Manager)
+   */
+  async getMonthlySheet(options: {
+    month: string; // YYYY-MM
+    departmentId?: number;
+    search?: string;
+    reportingManagerId?: number;
+  }): Promise<{
+    month: string;
+    totalDays: number;
+    employees: MonthlySheetEmployee[];
+  }> {
+    const [year, m] = options.month.split('-').map(Number);
+    const totalDays = new Date(year, m, 0).getDate();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const startDate = `${year}-${pad(m)}-01`;
+    const endDate = `${year}-${pad(m)}-${pad(totalDays)}`;
+
+    const [sheetData, holidays, settings] = await Promise.all([
+      attendanceRepository.getMonthlySheetData({
+        startDate,
+        endDate,
+        departmentId: options.departmentId,
+        search: options.search,
+        reportingManagerId: options.reportingManagerId,
+      }),
+      holidaysService.getAll({ year, month: m }),
+      holidaysService.getWorkSettings(),
+    ]);
+
+    const weeklyOffs = new Set(settings.weekly_off_days);
+    const holidayMap = new Map(holidays.map((h) => [h.date, h.name]));
+
+    // Group attendance rows by employee_id -> date
+    const attMap = new Map<number, Map<string, any>>();
+    for (const row of sheetData.attendanceRows) {
+      const empId = Number(row.employee_id);
+      let dateStr = row.date;
+      if (dateStr instanceof Date) dateStr = dateStr.toISOString().split('T')[0];
+
+      if (!attMap.has(empId)) {
+        attMap.set(empId, new Map());
+      }
+      attMap.get(empId)!.set(dateStr, row);
+    }
+
+    const todayStr = getKolkataDateString();
+
+    const employeesResult: MonthlySheetEmployee[] = sheetData.employees.map((emp) => {
+      const empId = Number(emp.employee_id);
+      const empAttendance = attMap.get(empId) || new Map<string, any>();
+      const days: Record<string, any> = {};
+
+      const totals = {
+        present: 0,
+        absent: 0,
+        half_day: 0,
+        leave: 0,
+        holiday: 0,
+        weekend: 0,
+        wfh: 0,
+        total_working_minutes: 0,
+        total_overtime_minutes: 0,
+      };
+
+      for (let day = 1; day <= totalDays; day++) {
+        const dateStr = `${year}-${pad(m)}-${pad(day)}`;
+        const dateObj = new Date(year, m - 1, day);
+        const dayOfWeek = dateObj.getDay();
+
+        if (empAttendance.has(dateStr)) {
+          const rec = empAttendance.get(dateStr)!;
+          const status = rec.status as AttendanceStatus;
+          const code =
+            status === 'present'
+              ? 'P'
+              : status === 'wfh'
+              ? 'WFH'
+              : status === 'half_day'
+              ? 'HD'
+              : status === 'leave'
+              ? 'L'
+              : status === 'holiday'
+              ? 'H'
+              : status === 'weekend'
+              ? 'W'
+              : 'A';
+
+          days[dateStr] = {
+            date: dateStr,
+            status,
+            statusCode: code,
+            working_minutes: Number(rec.working_minutes || 0),
+            is_late: Boolean(rec.is_late),
+          };
+
+          totals[status] = (totals[status] || 0) + 1;
+          totals.total_working_minutes += Number(rec.working_minutes || 0);
+          totals.total_overtime_minutes += Number(rec.overtime_minutes || 0);
+        } else {
+          // Virtual state
+          let status: AttendanceStatus;
+          let code: any;
+
+          if (holidayMap.has(dateStr)) {
+            status = 'holiday';
+            code = 'H';
+            totals.holiday++;
+          } else if (weeklyOffs.has(dayOfWeek)) {
+            status = 'weekend';
+            code = 'W';
+            totals.weekend++;
+          } else if (dateStr <= todayStr) {
+            status = 'absent';
+            code = 'A';
+            totals.absent++;
+          } else {
+            status = 'absent';
+            code = '-';
+          }
+
+          days[dateStr] = {
+            date: dateStr,
+            status: code === '-' ? null : status,
+            statusCode: code,
+            working_minutes: 0,
+            is_late: false,
+          };
+        }
+      }
+
+      return {
+        employee_id: empId,
+        employee_code: emp.employee_code,
+        first_name: emp.first_name,
+        last_name: emp.last_name,
+        department_name: emp.department_name || 'Unassigned',
+        days,
+        totals,
+      };
+    });
+
+    return {
+      month: options.month,
+      totalDays,
+      employees: employeesResult,
+    };
+  }
+
+  /**
+   * Admin / HR Manual Edit
+   */
+  async updateAttendance(
+    id: number,
+    dto: UpdateAttendanceDto,
+    userId: number
+  ): Promise<Attendance> {
+    const current = await attendanceRepository.findById(id);
+    if (!current) {
+      throw new NotFoundError(`Attendance record ${id} not found`);
+    }
+
+    // Recalculate working minutes and status based on check-in and check-out
+    const checkIn = dto.check_in !== undefined ? (dto.check_in ? new Date(dto.check_in) : null) : (current.check_in ? new Date(current.check_in) : null);
+    const checkOut = dto.check_out !== undefined ? (dto.check_out ? new Date(dto.check_out) : null) : (current.check_out ? new Date(current.check_out) : null);
+
+    let workingMinutes = current.working_minutes;
+    let isLate = current.is_late;
+    let isEarlyCheckout = current.is_early_checkout;
+    let overtimeMinutes = current.overtime_minutes;
+    let status = dto.status || current.status;
+
+    const workSettings = await holidaysService.getWorkSettings();
+    const shiftStartMinutes = timeStringToMinutes(workSettings.shift_start);
+    const shiftEndMinutes = timeStringToMinutes(workSettings.shift_end);
+    const shiftLengthMinutes = Math.max(0, shiftEndMinutes - shiftStartMinutes);
+
+    if (checkIn && checkOut) {
+      const gross = Math.round((checkOut.getTime() - checkIn.getTime()) / 60000);
+      workingMinutes = Math.max(0, gross - current.break_minutes);
+
+      const checkInMins = getKolkataMinutesOfDay(checkIn);
+      isLate = checkInMins > shiftStartMinutes + workSettings.late_grace_minutes;
+
+      const checkOutMins = getKolkataMinutesOfDay(checkOut);
+      isEarlyCheckout = checkOutMins < shiftEndMinutes;
+
+      overtimeMinutes = Math.max(0, workingMinutes - shiftLengthMinutes);
+
+      if (!dto.status) {
+        if (workingMinutes >= workSettings.min_hours_full_day * 60) {
+          status = current.work_type === 'wfh' ? 'wfh' : 'present';
+        } else if (workingMinutes >= workSettings.min_hours_half_day * 60) {
+          status = 'half_day';
+        } else {
+          status = 'absent';
+        }
+      }
+    }
+
+    const updated = await attendanceRepository.update(id, {
+      check_in: checkIn ? checkIn.toISOString() : null,
+      check_out: checkOut ? checkOut.toISOString() : null,
+      status,
+      work_type: dto.work_type || current.work_type,
+      working_minutes: workingMinutes,
+      is_late: isLate,
+      is_early_checkout: isEarlyCheckout,
+      overtime_minutes: overtimeMinutes,
+      remarks: dto.reason ? `[Edit Reason]: ${dto.reason}` : current.remarks,
+      edited_by: userId,
+    });
+
+    // Record audit log
+    await auditService.record({
+      userId,
+      action: 'attendance.edit',
+      entity: 'attendance',
+      entityId: id,
+      oldValue: current,
+      newValue: updated,
+    });
+
+    return updated!;
+  }
+
+  /**
+   * Admin / HR Create Attendance for Missing Day
+   */
+  async createManualAttendance(
+    dto: ManualAttendanceDto,
+    userId: number
+  ): Promise<Attendance> {
+    const existing = await attendanceRepository.findByEmployeeAndDate(dto.employee_id, dto.date);
+    if (existing) {
+      return this.updateAttendance(existing.id, dto, userId);
+    }
+
+    const checkIn = dto.check_in ? new Date(dto.check_in) : null;
+    const checkOut = dto.check_out ? new Date(dto.check_out) : null;
+
+    let workingMinutes = 0;
+    let isLate = false;
+    let isEarlyCheckout = false;
+    let overtimeMinutes = 0;
+    let status = dto.status || 'present';
+
+    const workSettings = await holidaysService.getWorkSettings();
+    const shiftStartMinutes = timeStringToMinutes(workSettings.shift_start);
+    const shiftEndMinutes = timeStringToMinutes(workSettings.shift_end);
+    const shiftLengthMinutes = Math.max(0, shiftEndMinutes - shiftStartMinutes);
+
+    if (checkIn && checkOut) {
+      const gross = Math.round((checkOut.getTime() - checkIn.getTime()) / 60000);
+      workingMinutes = Math.max(0, gross);
+
+      const checkInMins = getKolkataMinutesOfDay(checkIn);
+      isLate = checkInMins > shiftStartMinutes + workSettings.late_grace_minutes;
+
+      const checkOutMins = getKolkataMinutesOfDay(checkOut);
+      isEarlyCheckout = checkOutMins < shiftEndMinutes;
+
+      overtimeMinutes = Math.max(0, workingMinutes - shiftLengthMinutes);
+
+      if (!dto.status) {
+        if (workingMinutes >= workSettings.min_hours_full_day * 60) {
+          status = dto.work_type === 'wfh' ? 'wfh' : 'present';
+        } else if (workingMinutes >= workSettings.min_hours_half_day * 60) {
+          status = 'half_day';
+        } else {
+          status = 'absent';
+        }
+      }
+    }
+
+    const created = await attendanceRepository.create({
+      employee_id: dto.employee_id,
+      date: dto.date,
+      check_in: checkIn,
+      check_out: checkOut,
+      status,
+      work_type: dto.work_type || 'office',
+      working_minutes: workingMinutes,
+      break_minutes: 0,
+      overtime_minutes: overtimeMinutes,
+      is_late: isLate,
+      is_early_checkout: isEarlyCheckout,
+      remarks: `[Manual Entry Reason]: ${dto.reason}`,
+      edited_by: userId,
+    });
+
+    await auditService.record({
+      userId,
+      action: 'attendance.create_manual',
+      entity: 'attendance',
+      entityId: created.id,
+      newValue: created,
+    });
+
+    return created;
+  }
+}
+
+export const attendanceService = new AttendanceService();

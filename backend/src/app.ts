@@ -9,6 +9,8 @@ import designationsRoutes from './modules/designations/designations.routes';
 import employeesRoutes from './modules/employees/employees.routes';
 import auditLogsRoutes from './modules/audit-logs/audit-logs.routes';
 import notificationsRoutes from './modules/notifications/notifications.routes';
+import holidaysRoutes from './modules/holidays/holidays.routes';
+import attendanceRoutes from './modules/attendance/attendance.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -42,6 +44,8 @@ export const createApp = (): Application => {
   app.use('/api/v1/employees', employeesRoutes);
   app.use('/api/v1/audit-logs', auditLogsRoutes);
   app.use('/api/v1/notifications', notificationsRoutes);
+  app.use('/api/v1/holidays', holidaysRoutes);
+  app.use('/api/v1/attendance', attendanceRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {
