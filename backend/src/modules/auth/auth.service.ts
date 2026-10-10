@@ -37,9 +37,10 @@ export class AuthService {
       ]);
     }
 
-    if (user.status !== 'active') {
-      throw new BadRequestError('Your account has been deactivated. Please contact HR/Admin.', [
-        { field: 'email', message: 'Account is inactive' },
+    const employee = await authRepository.getEmployeeByUserId(user.id);
+    if (user.status !== 'active' || employee?.lifecycle_stage === 'relieved') {
+      throw new BadRequestError('Account disabled, contact HR', [
+        { field: 'email', message: 'Account disabled, contact HR' },
       ]);
     }
 
@@ -49,7 +50,6 @@ export class AuthService {
 
     const roles = await authRepository.getUserRoles(user.id);
     const permissions = await authRepository.getUserPermissions(user.id);
-    const employee = await authRepository.getEmployeeByUserId(user.id);
 
     const employeeId = employee ? Number(employee.id) : null;
 

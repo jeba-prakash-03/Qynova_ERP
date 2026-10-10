@@ -102,29 +102,43 @@ export const EmployeeCreatePage: React.FC = () => {
     employee: any;
     temporaryPassword: string;
   } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createMutation = useMutation({
-    mutationFn: async (payload: any) => {
-      const res = await axiosClient.post('/employees', payload);
-      return res.data.data;
-    },
-    onSuccess: (data) => {
-      setCreatedResult(data);
-    },
-    onError: (err: any) => {
-      if (err.response?.data?.errors) {
-        const map: Record<string, string> = {};
-        err.response.data.errors.forEach((e: any) => {
-          map[e.field] = e.message;
-        });
-        setFieldErrors(map);
-      } else {
-        error(err.response?.data?.message || 'Failed to create employee');
-      }
-    },
-  });
+  // File upload state for Resume
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [resumeError, setResumeError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleResumeSelect = (file: File | null) => {
+    setResumeError(null);
+    if (!file) {
+      setResumeFile(null);
+      return;
+    }
+
+    const validTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const validExts = ['pdf', 'doc', 'docx'];
+
+    if (!validTypes.includes(file.type) && (!ext || !validExts.includes(ext))) {
+      setResumeError('Only PDF, DOC, or DOCX files are allowed.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setResumeError('File size exceeds maximum allowed limit of 5 MB.');
+      return;
+    }
+
+    setResumeFile(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFieldErrors({});
 
@@ -169,7 +183,39 @@ export const EmployeeCreatePage: React.FC = () => {
       ];
     }
 
-    createMutation.mutate(payload);
+    setIsSubmitting(true);
+    try {
+      const res = await axiosClient.post('/employees', payload);
+      const createdData = res.data.data;
+
+      // Upload Resume if attached
+      if (resumeFile && createdData.employee?.id) {
+        try {
+          const docForm = new FormData();
+          docForm.append('file', resumeFile);
+          docForm.append('type', 'resume');
+          await axiosClient.post(`/employees/${createdData.employee.id}/documents`, docForm, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } catch {
+          error('Employee created, resume upload failed. Retry from the employee page.');
+        }
+      }
+
+      setCreatedResult(createdData);
+    } catch (err: any) {
+      if (err.response?.data?.errors) {
+        const map: Record<string, string> = {};
+        err.response.data.errors.forEach((e: any) => {
+          map[e.field] = e.message;
+        });
+        setFieldErrors(map);
+      } else {
+        error(err.response?.data?.message || 'Failed to create employee');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const copyPassword = () => {
@@ -239,7 +285,7 @@ export const EmployeeCreatePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 2: Personal Profile */}
+        {/* Section 2: Personal Profile & Resume Upload */}
         <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
           <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
             <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
@@ -247,7 +293,7 @@ export const EmployeeCreatePage: React.FC = () => {
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-800">Personal Information</h3>
-              <p className="text-xs text-slate-400">Basic identification and contact particulars</p>
+              <p className="text-xs text-slate-400">Basic identification, resume upload, and contact particulars</p>
             </div>
           </div>
 
@@ -302,6 +348,71 @@ export const EmployeeCreatePage: React.FC = () => {
                 className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </FormField>
+
+            {/* Resume Upload Drag & Drop */}
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Resume Attachment <span className="text-slate-400 font-normal">(Optional, PDF / DOC / DOCX, max 5 MB)</span>
+              </label>
+
+              {resumeFile ? (
+                <div className="flex items-center justify-between p-3.5 bg-indigo-50/60 border border-indigo-200 rounded-2xl text-xs">
+                  <div className="flex items-center gap-2 text-indigo-900 font-medium truncate">
+                    <Info className="w-4 h-4 text-indigo-600 shrink-0" />
+                    <span className="truncate">{resumeFile.name}</span>
+                    <span className="text-slate-400 font-mono">
+                      ({(resumeFile.size / (1024 * 1024)).toFixed(2)} MB)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setResumeFile(null)}
+                    className="px-2.5 py-1 text-[11px] font-bold text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    if (e.dataTransfer.files?.[0]) {
+                      handleResumeSelect(e.dataTransfer.files[0]);
+                    }
+                  }}
+                  className={`border-2 border-dashed rounded-2xl p-6 text-center transition cursor-pointer ${
+                    isDragging
+                      ? 'border-indigo-500 bg-indigo-50/50'
+                      : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'
+                  }`}
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.pdf,.doc,.docx';
+                    input.onchange = (ev: any) => {
+                      if (ev.target.files?.[0]) {
+                        handleResumeSelect(ev.target.files[0]);
+                      }
+                    };
+                    input.click();
+                  }}
+                >
+                  <p className="text-xs text-slate-600 font-medium">
+                    Drag and drop resume here, or <span className="text-indigo-600 font-bold underline">browse file</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-1">Accepted: PDF, DOC, DOCX up to 5MB</p>
+                </div>
+              )}
+              {resumeError && (
+                <p className="mt-1.5 text-xs text-rose-600 font-medium">{resumeError}</p>
+              )}
+            </div>
 
             <div className="sm:col-span-2">
               <FormField label="Residential Address" error={fieldErrors['address']}>
@@ -375,6 +486,15 @@ export const EmployeeCreatePage: React.FC = () => {
               </select>
             </FormField>
 
+            {!formData.reporting_manager_id && (
+              <div className="sm:col-span-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center gap-2">
+                <Info className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  <strong>Warning:</strong> No reporting manager selected. Leave and timesheet approval requests will fall back to HR.
+                </span>
+              </div>
+            )}
+
             <FormField label="Joining Date" error={fieldErrors['joining_date']} required>
               <input
                 type="date"
@@ -433,7 +553,35 @@ export const EmployeeCreatePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 4: Bank Details */}
+        {/* Section 4: Compensation & Salary */}
+        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+            <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+              <CreditCard className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">Salary Structure</h3>
+              <p className="text-xs text-slate-400">Monthly base salary allocation for payroll calculation</p>
+            </div>
+          </div>
+
+          <div className="max-w-xs">
+            <FormField label="Monthly Base Salary (₹)" required>
+              <input
+                type="number"
+                min="0"
+                step="500"
+                value={formData.initial_salary}
+                onChange={(e) => setFormData({ ...formData, initial_salary: e.target.value })}
+                placeholder="50000"
+                required
+                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-mono font-bold text-slate-800"
+              />
+            </FormField>
+          </div>
+        </div>
+
+        {/* Section 5: Bank Details */}
         <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
           <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
             <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -488,7 +636,7 @@ export const EmployeeCreatePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 5: Emergency Contacts */}
+        {/* Section 6: Emergency Contacts */}
         <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
           <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
             <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -533,35 +681,6 @@ export const EmployeeCreatePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 6: Dev 2 Salary Placeholder (Contract Rule) */}
-        <div className="bg-slate-100/70 border border-dashed border-slate-300 rounded-3xl p-6 sm:p-7 space-y-3 opacity-90">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-slate-700">
-              <Info className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-xs font-bold uppercase tracking-wider">
-                Salary Structure (Owned by Dev 2 - Disabled Placeholder)
-              </h3>
-            </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 font-mono">
-              TODO [Dev 2 Integration]
-            </span>
-          </div>
-          <p className="text-xs text-slate-500">
-            Per team contract, salary is NOT stored in the employees table. It lives in Dev 2's salary_structures table.
-            This field will invoke Dev 2's initial salary endpoint when merged.
-          </p>
-
-          <div className="max-w-xs pt-1">
-            <label className="text-xs font-semibold text-slate-500 block mb-1">Initial Annual CTC (₹)</label>
-            <input
-              type="text"
-              disabled
-              value={formData.initial_salary}
-              className="w-full px-3.5 py-2 text-sm bg-slate-200/70 border border-slate-300 rounded-xl text-slate-500 cursor-not-allowed font-mono"
-            />
-          </div>
-        </div>
-
         {/* Form Submit */}
         <div className="flex items-center justify-end gap-3 pt-4">
           <Link
@@ -572,10 +691,10 @@ export const EmployeeCreatePage: React.FC = () => {
           </Link>
           <button
             type="submit"
-            disabled={createMutation.isPending}
+            disabled={isSubmitting}
             className="px-6 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/30 transition flex items-center gap-2 disabled:opacity-50"
           >
-            {createMutation.isPending ? 'Creating Employee...' : 'Complete Onboarding'}
+            {isSubmitting ? 'Creating Employee...' : 'Complete Onboarding'}
           </button>
         </div>
       </form>

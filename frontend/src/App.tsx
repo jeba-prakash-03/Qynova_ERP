@@ -25,7 +25,7 @@ import { DesignationListPage } from './features/designations/pages/DesignationLi
 // Security & RBAC (Dev 1)
 import { RoleListPage } from './features/roles/pages/RoleListPage';
 import { RolePermissionsPage } from './features/roles/pages/RolePermissionsPage';
-import { AuditLogListPage } from './features/audit-logs/pages/AuditLogListPage';
+
 
 // Time & Attendance (Dev 2)
 import { HolidaysPage } from './features/holidays/pages/HolidaysPage';
@@ -144,15 +144,6 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Audit Logs Module */}
-        <Route
-          path="/audit-logs"
-          element={
-            <ProtectedRoute permission="audit_logs.view">
-              <AuditLogListPage />
-            </ProtectedRoute>
-          }
-        />
 
         {/* Attendance & Holidays (Dev 2) */}
         <Route

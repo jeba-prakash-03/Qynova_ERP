@@ -93,4 +93,39 @@ describe('Auth Module', () => {
 
     expect(reuseRes.status).toBe(401);
   });
+
+  it('should enforce password complexity rules and clear must_change_password flag', async () => {
+    const loginRes = await request(app)
+      .post('/api/v1/auth/login')
+      .send({ email: 'employee@qynova.erp', password: 'Employee@123' });
+
+    const token = loginRes.body.data.accessToken;
+
+    // Reject weak password
+    const weakRes = await request(app)
+      .post('/api/v1/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ oldPassword: 'Employee@123', newPassword: 'simple' });
+
+    expect(weakRes.status).toBe(400);
+
+    // Accept strong password
+    const validRes = await request(app)
+      .post('/api/v1/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ oldPassword: 'Employee@123', newPassword: 'NewSecurePass@99' });
+
+    expect(validRes.status).toBe(200);
+
+    // Verify user record has must_change_password = 0
+    const user = await db('users').where({ email: 'employee@qynova.erp' }).first();
+    expect(Boolean(user.must_change_password)).toBe(false);
+
+    // Reset password back for other tests
+    const restoreRes = await request(app)
+      .post('/api/v1/auth/change-password')
+      .set('Authorization', `Bearer ${loginRes.body.data.accessToken}`)
+      .send({ oldPassword: 'NewSecurePass@99', newPassword: 'Employee@123' });
+    expect(restoreRes.status).toBe(200);
+  });
 });

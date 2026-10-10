@@ -17,6 +17,19 @@ export const ChangePasswordPage: React.FC = () => {
   const { success } = useToast();
   const navigate = useNavigate();
 
+  const rules = [
+    { label: 'At least 8 characters long', valid: newPassword.length >= 8 },
+    { label: 'At least 1 uppercase letter (A-Z)', valid: /[A-Z]/.test(newPassword) },
+    { label: 'At least 1 lowercase letter (a-z)', valid: /[a-z]/.test(newPassword) },
+    { label: 'At least 1 number (0-9)', valid: /[0-9]/.test(newPassword) },
+    {
+      label: 'Different from current password',
+      valid: newPassword.length > 0 && oldPassword.length > 0 && newPassword !== oldPassword,
+    },
+  ];
+
+  const allRulesValid = rules.every((r) => r.valid);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -26,8 +39,8 @@ export const ChangePasswordPage: React.FC = () => {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setErrorMsg('New password must be at least 6 characters long');
+    if (!allRulesValid) {
+      setErrorMsg('Please satisfy all password complexity rules below');
       return;
     }
 
@@ -89,7 +102,7 @@ export const ChangePasswordPage: React.FC = () => {
             />
           </FormField>
 
-          <FormField label="New Password" helperText="Must be at least 6 characters" required>
+          <FormField label="New Password" required>
             <input
               type="password"
               value={newPassword}
@@ -99,6 +112,28 @@ export const ChangePasswordPage: React.FC = () => {
               className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
             />
           </FormField>
+
+          {/* Live password complexity rules checklist */}
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+            <span className="font-bold text-slate-700 block mb-1">Password Requirements:</span>
+            {rules.map((rule, idx) => (
+              <div
+                key={idx}
+                className={`flex items-center gap-2 ${
+                  rule.valid ? 'text-emerald-700 font-medium' : 'text-slate-400'
+                }`}
+              >
+                <div
+                  className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+                    rule.valid ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
+                  ✓
+                </div>
+                <span>{rule.label}</span>
+              </div>
+            ))}
+          </div>
 
           <FormField label="Confirm New Password" required>
             <input
@@ -113,7 +148,7 @@ export const ChangePasswordPage: React.FC = () => {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !allRulesValid}
             className="w-full mt-4 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isLoading ? 'Updating...' : 'Set New Password'}

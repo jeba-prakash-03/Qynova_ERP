@@ -2,11 +2,22 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { FormField } from '../../../shared/components/FormField';
-import { Layers, ArrowRight, ShieldCheck, User, Users, Briefcase, GraduationCap } from 'lucide-react';
+import {
+  Layers,
+  ArrowRight,
+  ShieldCheck,
+  User,
+  Users,
+  Briefcase,
+  GraduationCap,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -86,14 +97,23 @@ export const LoginPage: React.FC = () => {
             </FormField>
 
             <FormField label="Password" error={fieldErrors['password']} required>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full px-3.5 py-2.5 pr-10 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </FormField>
 
             <div className="flex items-center justify-between text-xs pt-1">
@@ -117,57 +137,59 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* Quick Demo Switcher for fast evaluation */}
-          <div className="mt-8 pt-6 border-t border-slate-100">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 text-center">
-              Quick Test Credentials
+          {(import.meta as any).env?.DEV !== false && (
+            <div className="mt-8 pt-6 border-t border-slate-100">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 text-center">
+                Quick Test Credentials
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('admin@qynova.erp', 'Admin@123')}
+                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
+                >
+                  <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                  <span className="font-bold">Admin</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('hr@qynova.erp', 'Hr@123')}
+                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
+                >
+                  <Users className="w-4 h-4 text-pink-600" />
+                  <span className="font-bold">HR</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('manager@qynova.erp', 'Manager@123')}
+                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
+                >
+                  <Briefcase className="w-4 h-4 text-amber-600" />
+                  <span className="font-bold">Manager</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('employee@qynova.erp', 'Employee@123')}
+                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
+                >
+                  <User className="w-4 h-4 text-emerald-600" />
+                  <span className="font-bold">Employee</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('intern@qynova.erp', 'Intern@123')}
+                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition col-span-2 sm:col-span-1"
+                >
+                  <GraduationCap className="w-4 h-4 text-blue-600" />
+                  <span className="font-bold">Intern</span>
+                </button>
+              </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin@qynova.erp', 'Admin@123')}
-                className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
-              >
-                <ShieldCheck className="w-4 h-4 text-indigo-600" />
-                <span className="font-bold">Admin</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('hr@qynova.erp', 'Hr@123')}
-                className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
-              >
-                <Users className="w-4 h-4 text-pink-600" />
-                <span className="font-bold">HR</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('manager@qynova.erp', 'Manager@123')}
-                className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
-              >
-                <Briefcase className="w-4 h-4 text-amber-600" />
-                <span className="font-bold">Manager</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('employee@qynova.erp', 'Employee@123')}
-                className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
-              >
-                <User className="w-4 h-4 text-emerald-600" />
-                <span className="font-bold">Employee</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('intern@qynova.erp', 'Intern@123')}
-                className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition col-span-2 sm:col-span-1"
-              >
-                <GraduationCap className="w-4 h-4 text-blue-600" />
-                <span className="font-bold">Intern</span>
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

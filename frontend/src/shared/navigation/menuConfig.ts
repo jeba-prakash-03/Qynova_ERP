@@ -42,19 +42,19 @@ export const MENU_CONFIG: MenuGroup[] = [
     groupTitle: 'Overview',
     items: [
       {
-        title: 'Admin Dashboard',
+        title: 'Dashboard',
         path: '/admin',
         icon: LayoutDashboard,
         adminOnly: true,
       },
       {
-        title: 'Manager Dashboard',
+        title: 'Dashboard',
         path: '/manager',
         icon: LayoutDashboard,
         managerOnly: true,
       },
       {
-        title: 'My Profile & Portal',
+        title: 'Dashboard',
         path: '/me',
         icon: UserCheck,
         requireEmployee: true,
@@ -62,7 +62,7 @@ export const MENU_CONFIG: MenuGroup[] = [
     ],
   },
   {
-    groupTitle: 'People & Organization',
+    groupTitle: 'People',
     items: [
       {
         title: 'Employees',
@@ -85,28 +85,10 @@ export const MENU_CONFIG: MenuGroup[] = [
     ],
   },
   {
-    groupTitle: 'Security & System',
+    groupTitle: 'Attendance and Leave',
     items: [
       {
-        title: 'Roles & RBAC',
-        path: '/roles',
-        icon: ShieldCheck,
-        permission: 'roles.view',
-      },
-      {
-        title: 'Audit Logs',
-        path: '/audit-logs',
-        icon: FileText,
-        permission: 'audit_logs.view',
-      },
-    ],
-  },
-  // --- DEV 2 MODULES (Time, Attendance, Payroll) ---
-  {
-    groupTitle: 'Attendance & Time (Dev 2)',
-    items: [
-      {
-        title: 'My Punch Clock',
+        title: 'My Attendance',
         path: '/attendance/my',
         icon: Clock,
         requireEmployee: true,
@@ -124,7 +106,7 @@ export const MENU_CONFIG: MenuGroup[] = [
         permission: 'holidays.view',
       },
       {
-        title: 'My Leaves',
+        title: 'Apply / My Leaves',
         path: '/leaves/my',
         icon: CalendarDays,
         requireEmployee: true,
@@ -135,12 +117,11 @@ export const MENU_CONFIG: MenuGroup[] = [
         icon: CheckSquare,
         permission: 'leave.approve',
       },
-      {
-        title: 'Timesheets',
-        path: '/timesheets',
-        icon: Clock,
-        permission: 'timesheets.view',
-      },
+    ],
+  },
+  {
+    groupTitle: 'Payroll',
+    items: [
       {
         title: 'Payroll',
         path: '/payroll',
@@ -149,33 +130,14 @@ export const MENU_CONFIG: MenuGroup[] = [
       },
     ],
   },
-  // --- DEV 3 MODULES (Projects & Billing) ---
   {
-    groupTitle: 'Projects & Finance (Dev 3)',
+    groupTitle: 'Security',
     items: [
       {
-        title: 'Clients',
-        path: '/clients',
-        icon: Building,
-        permission: 'clients.view',
-      },
-      {
-        title: 'Projects',
-        path: '/projects',
-        icon: FolderKanban,
-        permission: 'projects.view',
-      },
-      {
-        title: 'Tasks',
-        path: '/tasks',
-        icon: CheckSquare,
-        permission: 'tasks.view',
-      },
-      {
-        title: 'Invoices',
-        path: '/invoices',
-        icon: Receipt,
-        permission: 'invoices.view',
+        title: 'Roles & RBAC',
+        path: '/roles',
+        icon: ShieldCheck,
+        permission: 'roles.view',
       },
     ],
   },
