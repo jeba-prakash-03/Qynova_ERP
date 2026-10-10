@@ -8,14 +8,16 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
   permission?: string;
   requireEmployee?: boolean;
+  targetDashboard?: '/admin' | '/manager' | '/me';
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   permission,
   requireEmployee = false,
+  targetDashboard,
 }) => {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -33,6 +35,32 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Force password change if required
   if (user.must_change_password && location.pathname !== '/change-password') {
     return <Navigate to="/change-password" replace />;
+  }
+
+  // Check role dashboard restriction
+  if (targetDashboard) {
+    const userHighestDashboard = getRedirectPath(user);
+    if (userHighestDashboard !== targetDashboard) {
+      return (
+        <div className="min-h-[70vh] flex items-center justify-center p-6">
+          <div className="max-w-md w-full text-center bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-800 mb-1">Access Restricted (403)</h2>
+            <p className="text-sm text-slate-500 mb-5">
+              You do not have permission to access this dashboard module.
+            </p>
+            <a
+              href={userHighestDashboard}
+              className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+            >
+              Go to My Dashboard
+            </a>
+          </div>
+        </div>
+      );
+    }
   }
 
   // Check employee requirement

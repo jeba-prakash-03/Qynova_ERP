@@ -43,21 +43,8 @@ export const MENU_CONFIG: MenuGroup[] = [
     items: [
       {
         title: 'Dashboard',
-        path: '/admin',
+        path: '/dashboard',
         icon: LayoutDashboard,
-        adminOnly: true,
-      },
-      {
-        title: 'Dashboard',
-        path: '/manager',
-        icon: LayoutDashboard,
-        managerOnly: true,
-      },
-      {
-        title: 'Dashboard',
-        path: '/me',
-        icon: UserCheck,
-        requireEmployee: true,
       },
     ],
   },

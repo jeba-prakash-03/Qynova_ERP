@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, getRoleRedirectPath } from '../context/AuthContext';
 import { MENU_CONFIG } from '../navigation/menuConfig';
 import { NotificationBell } from '../../features/notifications/NotificationBell';
 import {
@@ -28,32 +28,41 @@ export const AppShell: React.FC = () => {
   const isManager = user.roles?.includes('Manager');
   const hasEmployee = Boolean(user.employee);
 
+  const userDashboardPath = getRoleRedirectPath(user);
+
   // Filter menu items according to user permissions and employee status
   const visibleMenuGroups = MENU_CONFIG.map((group) => {
-    const visibleItems = group.items.filter((item) => {
-      // 1. Employee requirement check
-      if (item.requireEmployee && !hasEmployee) {
-        return false;
-      }
+    const visibleItems = group.items
+      .map((item) => {
+        if (item.path === '/dashboard') {
+          return { ...item, path: userDashboardPath };
+        }
+        return item;
+      })
+      .filter((item) => {
+        // 1. Employee requirement check
+        if (item.requireEmployee && !hasEmployee) {
+          return false;
+        }
 
-      // 2. Admin dashboard check
-      if (item.adminOnly && !isAdmin && !isHR) {
-        return false;
-      }
+        // 2. Admin dashboard check
+        if (item.adminOnly && !isAdmin && !isHR) {
+          return false;
+        }
 
-      // 3. Manager dashboard check
-      if (item.managerOnly && !isManager && !isAdmin) {
-        return false;
-      }
+        // 3. Manager dashboard check
+        if (item.managerOnly && !isManager && !isAdmin) {
+          return false;
+        }
 
-      // 4. Permission check
-      if (item.permission) {
-        if (isAdmin) return true;
-        return user.permissions?.includes(item.permission);
-      }
+        // 4. Permission check
+        if (item.permission) {
+          if (isAdmin) return true;
+          return user.permissions?.includes(item.permission);
+        }
 
-      return true;
-    });
+        return true;
+      });
 
     return {
       groupTitle: group.groupTitle,
@@ -239,10 +248,7 @@ export const AppShell: React.FC = () => {
 
           {/* Footer Environment Tag */}
           <div className="p-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-[11px] text-slate-400">
-            <span className="flex items-center gap-1 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Stage 1 Foundation
-            </span>
+            <span className="font-semibold text-slate-600">Qynova ERP</span>
             <span>v1.0.0</span>
           </div>
         </aside>

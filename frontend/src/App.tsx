@@ -73,12 +73,26 @@ export const App: React.FC = () => {
         }
       >
         {/* Dashboards */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/manager" element={<ManagerDashboard />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute targetDashboard="/admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager"
+          element={
+            <ProtectedRoute targetDashboard="/manager">
+              <ManagerDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/me"
           element={
-            <ProtectedRoute requireEmployee>
+            <ProtectedRoute requireEmployee targetDashboard="/me">
               <EmployeeDashboard />
             </ProtectedRoute>
           }
