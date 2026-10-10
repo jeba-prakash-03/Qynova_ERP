@@ -47,9 +47,12 @@ const RootRedirect: React.FC = () => {
   return <Navigate to={getRedirectPath(user)} replace />;
 };
 
+import ErrorBoundary from './shared/components/ErrorBoundary';
+
 export const App: React.FC = () => {
   return (
-    <Routes>
+    <ErrorBoundary>
+      <Routes>
       {/* Public Auth Routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -243,6 +246,7 @@ export const App: React.FC = () => {
         <Route path="*" element={<RootRedirect />} />
       </Route>
     </Routes>
+    </ErrorBoundary>
   );
 };
 

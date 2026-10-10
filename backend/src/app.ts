@@ -53,6 +53,7 @@ export const createApp = (): Application => {
   app.use('/api/v1/holidays', holidaysRoutes);
   app.use('/api/v1/attendance', attendanceRoutes);
   app.use('/api/v1/leave-requests', leaveRequestsRoutes);
+  app.use('/api/v1/leaves', leaveRequestsRoutes);
   app.use('/api/v1/leave-balances', leaveBalancesRoutes);
   app.use('/api/v1/leave-types', leaveTypesRoutes);
   app.use('/api/v1/documents', documentsRoutes);
