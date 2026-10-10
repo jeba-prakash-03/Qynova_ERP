@@ -186,10 +186,6 @@ export class AuthService {
 
   public async forgotPassword(email: string): Promise<void> {
     const user = await authRepository.findByEmail(email);
-    if (user) {
-      // Stub password reset email sending
-      console.log(`[STUB EMAIL] Password reset requested for ${user.email}. Temporary reset link: /reset-password?token=stub-token-${user.id}`);
-    }
     // Always succeed without leaking whether email exists
   }
 

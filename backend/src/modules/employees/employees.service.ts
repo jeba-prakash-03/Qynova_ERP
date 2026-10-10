@@ -8,6 +8,7 @@ import {
 } from '../../shared/errors/app-error';
 import { auditService } from '../../shared/services/audit.service';
 import { notificationService } from '../../shared/services/notification.service';
+import { getTodayKolkata } from '../../shared/utils/date.util';
 import {
   EmployeeRecord,
   ALLOWED_LIFECYCLE_TRANSITIONS,
@@ -144,6 +145,16 @@ export class EmployeesService {
         input.bank_details || null,
         input.emergency_contacts || null
       );
+
+      if (input.initial_salary && Number(input.initial_salary) > 0) {
+        await trx('salary_structures').insert({
+          employee_id: empId,
+          base_salary: Number(input.initial_salary),
+          is_annual: false,
+          effective_from: input.joining_date || getTodayKolkata(),
+          created_by: performedByUserId || null,
+        });
+      }
 
       createdEmployeeId = empId;
     });
