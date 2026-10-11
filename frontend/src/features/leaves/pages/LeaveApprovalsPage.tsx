@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../../../shared/api/axiosClient';
 import { Modal } from '../../../shared/components/Modal';
 import { FormField } from '../../../shared/components/FormField';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
+import { Button } from '../../../shared/components/Button';
 import { useToast } from '../../../shared/context/ToastContext';
 import { useAuth } from '../../../shared/context/AuthContext';
 import {
@@ -299,7 +301,6 @@ export const LeaveApprovalsPage: React.FC = () => {
     );
   });
 
-  // Month navigation for Calendar
   const handlePrevMonth = () => {
     const [y, m] = calendarMonth.split('-').map(Number);
     const prev = new Date(y, m - 2, 1);
@@ -321,29 +322,29 @@ export const LeaveApprovalsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
-            <CheckSquare className="w-7 h-7 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-[#0F172A] flex items-center gap-2.5">
+            <CheckSquare className="w-7 h-7 text-[#4F46E5]" />
             Leave Approvals & Team Calendar
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-[#64748B] mt-1">
             Review pending employee leave requests, view department absence schedules, and manage quotas.
           </p>
         </div>
 
         {/* Tab Controls */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-xl text-sm font-medium">
+        <div className="flex items-center bg-[#F1F5F9] p-1 rounded-xl text-sm font-medium border border-[#E2E8F0]">
           <button
             onClick={() => setActiveTab('pending')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition-all ${
               activeTab === 'pending'
-                ? 'bg-white text-indigo-700 shadow-sm font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#4F46E5] shadow-sm font-semibold'
+                : 'text-[#475569] hover:text-[#0F172A]'
             }`}
           >
             <Clock className="w-4 h-4" />
             Pending Approvals
             {pendingRequests.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-xs font-bold bg-amber-500 text-white">
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-xs font-bold bg-[#D97706] text-white">
                 {pendingRequests.length}
               </span>
             )}
@@ -352,8 +353,8 @@ export const LeaveApprovalsPage: React.FC = () => {
             onClick={() => setActiveTab('calendar')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition-all ${
               activeTab === 'calendar'
-                ? 'bg-white text-indigo-700 shadow-sm font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#4F46E5] shadow-sm font-semibold'
+                : 'text-[#475569] hover:text-[#0F172A]'
             }`}
           >
             <Calendar className="w-4 h-4" />
@@ -364,8 +365,8 @@ export const LeaveApprovalsPage: React.FC = () => {
               onClick={() => setActiveTab('allocation')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition-all ${
                 activeTab === 'allocation'
-                  ? 'bg-white text-indigo-700 shadow-sm font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-[#4F46E5] shadow-sm font-semibold'
+                  : 'text-[#475569] hover:text-[#0F172A]'
               }`}
             >
               <Sliders className="w-4 h-4" />
@@ -377,37 +378,37 @@ export const LeaveApprovalsPage: React.FC = () => {
 
       {/* TAB 1: PENDING APPROVALS */}
       {activeTab === 'pending' && (
-        <div className="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search employee, department..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-9 pr-3 py-1.5 text-sm border border-[#E2E8F0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               />
             </div>
-            <div className="text-xs text-slate-500 font-medium">
+            <div className="text-xs text-[#64748B] font-medium">
               Showing {filteredPending.length} of {pendingRequests.length} pending request(s)
             </div>
           </div>
 
           {pendingLoading ? (
-            <div className="p-12 text-center text-slate-500">Loading pending requests...</div>
+            <div className="p-12 text-center text-[#64748B]">Loading pending requests...</div>
           ) : filteredPending.length === 0 ? (
             <div className="p-16 text-center">
-              <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-base font-semibold text-slate-800">Inbox Zero!</h3>
-              <p className="text-xs text-slate-400 mt-1">
+              <CheckCircle2 className="w-12 h-12 text-[#16A34A] mx-auto mb-3" />
+              <h3 className="text-base font-semibold text-[#0F172A]">Inbox Zero!</h3>
+              <p className="text-xs text-[#64748B] mt-1">
                 There are no pending leave requests requiring your review at this time.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50/80 text-xs font-semibold text-slate-600 border-b border-slate-200">
+                <thead className="bg-[#F8FAFC] text-xs font-semibold text-[#64748B] border-b border-[#E2E8F0]">
                   <tr>
                     <th className="py-3 px-4">Employee</th>
                     <th className="py-3 px-4">Leave Type</th>
@@ -418,24 +419,24 @@ export const LeaveApprovalsPage: React.FC = () => {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
+                <tbody className="divide-y divide-[#E2E8F0] text-[#475569]">
                   {filteredPending.map((req) => (
-                    <tr key={req.id} className="hover:bg-slate-50/60 transition-colors">
-                      <td className="py-3.5 px-4 font-medium text-slate-900">
+                    <tr key={req.id} className="hover:bg-[#F8FAFC] transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-[#0F172A]">
                         <div>{req.employee_name}</div>
-                        <div className="text-xs text-slate-400 font-normal">
+                        <div className="text-xs text-[#64748B] font-normal">
                           {req.employee_code} • {req.department_name || 'No Department'}
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-1.5 font-medium text-slate-900">
+                        <div className="flex items-center gap-1.5 font-medium text-[#0F172A]">
                           <span>{req.leave_type_name}</span>
-                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-600">
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#F1F5F9] text-[#475569]">
                             {req.leave_type_code}
                           </span>
                         </div>
                         {req.is_half_day && (
-                          <div className="text-[11px] text-amber-600 font-medium">
+                          <div className="text-[11px] text-[#D97706] font-medium">
                             Half Day ({req.half_day_session || 'first'} half)
                           </div>
                         )}
@@ -446,32 +447,34 @@ export const LeaveApprovalsPage: React.FC = () => {
                           : `${req.from_date} to ${req.to_date}`}
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <span className="font-semibold text-slate-900">{req.days}</span>{' '}
-                        <span className="text-xs text-slate-500">day(s)</span>
+                        <span className="font-semibold text-[#0F172A]">{req.days}</span>{' '}
+                        <span className="text-xs text-[#64748B]">day(s)</span>
                       </td>
-                      <td className="py-3.5 px-4 max-w-xs truncate text-slate-600" title={req.reason}>
+                      <td className="py-3.5 px-4 max-w-xs truncate text-[#475569]" title={req.reason}>
                         {req.reason}
                       </td>
-                      <td className="py-3.5 px-4 text-xs text-slate-500">
+                      <td className="py-3.5 px-4 text-xs text-[#64748B]">
                         {new Date(req.created_at).toLocaleDateString()}
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
+                          <Button
+                            variant="success"
+                            size="sm"
                             onClick={() => openApproveModal(req)}
-                            className="px-3 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors"
                           >
                             Review & Approve
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
                             onClick={() => {
                               setRejectTarget(req);
                               setRejectNote('');
                             }}
-                            className="px-3 py-1 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors"
                           >
                             Reject
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -485,37 +488,31 @@ export const LeaveApprovalsPage: React.FC = () => {
 
       {/* TAB 2: TEAM LEAVE CALENDAR */}
       {activeTab === 'calendar' && (
-        <div className="bg-white rounded-xl border border-slate-200/90 shadow-sm p-5 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-5 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
             <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-indigo-600" />
-              <h2 className="font-semibold text-slate-900">
+              <Calendar className="w-5 h-5 text-[#4F46E5]" />
+              <h2 className="font-semibold text-[#0F172A]">
                 Approved Leaves for {calendarMonth}
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={handlePrevMonth}
-                className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600"
-              >
+              <Button variant="secondary" size="sm" onClick={handlePrevMonth}>
                 <ChevronLeft className="w-4 h-4" />
-              </button>
+              </Button>
               <span className="font-mono text-sm font-semibold px-2">{calendarMonth}</span>
-              <button
-                onClick={handleNextMonth}
-                className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600"
-              >
+              <Button variant="secondary" size="sm" onClick={handleNextMonth}>
                 <ChevronRight className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           </div>
 
           {calendarLoading ? (
-            <div className="p-12 text-center text-slate-500">Loading leave schedule...</div>
+            <div className="p-12 text-center text-[#64748B]">Loading leave schedule...</div>
           ) : calendarLeaves.length === 0 ? (
             <div className="p-12 text-center">
-              <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-sm text-slate-600 font-medium">
+              <Calendar className="w-10 h-10 text-[#94A3B8] mx-auto mb-2" />
+              <p className="text-sm text-[#475569] font-medium">
                 No approved leaves scheduled in {calendarMonth}
               </p>
             </div>
@@ -524,23 +521,21 @@ export const LeaveApprovalsPage: React.FC = () => {
               {calendarLeaves.map((l) => (
                 <div
                   key={l.id}
-                  className="p-3.5 rounded-lg border border-slate-200/90 bg-slate-50/50 hover:bg-slate-50 transition-colors space-y-1.5"
+                  className="p-3.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] hover:bg-white transition-colors space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-sm text-slate-900">{l.employee_name}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      {l.leave_type_code}
-                    </span>
+                    <span className="font-semibold text-sm text-[#0F172A]">{l.employee_name}</span>
+                    <StatusBadge status="leave" label={l.leave_type_code} size="sm" />
                   </div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-[#64748B]">
                     {l.employee_code} • {l.department_name || 'General'}
                   </div>
-                  <div className="text-xs font-mono font-medium text-slate-700 pt-1">
+                  <div className="text-xs font-mono font-medium text-[#475569] pt-1">
                     {l.from_date === l.to_date ? l.from_date : `${l.from_date} → ${l.to_date}`} (
                     {l.days} day)
                   </div>
                   {l.reason && (
-                    <div className="text-xs text-slate-500 italic truncate" title={l.reason}>
+                    <div className="text-xs text-[#64748B] italic truncate" title={l.reason}>
                       "{l.reason}"
                     </div>
                   )}
@@ -553,13 +548,13 @@ export const LeaveApprovalsPage: React.FC = () => {
 
       {/* TAB 3: QUOTA ALLOCATION (ADMIN / HR) */}
       {isAdminOrHr && activeTab === 'allocation' && (
-        <div className="bg-white rounded-xl border border-slate-200/90 shadow-sm p-6 max-w-2xl space-y-5">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6 max-w-2xl space-y-5">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Sliders className="w-5 h-5 text-indigo-600" />
+            <h2 className="text-lg font-bold text-[#0F172A] flex items-center gap-2">
+              <Sliders className="w-5 h-5 text-[#4F46E5]" />
               Yearly Leave Quota Allocation
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#64748B] mt-1">
               Allocate or update yearly leave balances for all employees or individually.
             </p>
           </div>
@@ -575,7 +570,7 @@ export const LeaveApprovalsPage: React.FC = () => {
                   onChange={(e) =>
                     setAllocationForm({ ...allocationForm, year: Number(e.target.value) })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                   required
                 />
               </FormField>
@@ -589,7 +584,7 @@ export const LeaveApprovalsPage: React.FC = () => {
                       leave_type_id: e.target.value ? Number(e.target.value) : '',
                     })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                   required
                 >
                   <option value="">-- Select Leave Type --</option>
@@ -611,20 +606,20 @@ export const LeaveApprovalsPage: React.FC = () => {
                 onChange={(e) =>
                   setAllocationForm({ ...allocationForm, allocated: Number(e.target.value) })
                 }
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                 required
               />
             </FormField>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-              <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-slate-800">
+            <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] space-y-3">
+              <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-[#0F172A]">
                 <input
                   type="checkbox"
                   checked={allocationForm.allocate_all}
                   onChange={(e) =>
                     setAllocationForm({ ...allocationForm, allocate_all: e.target.checked })
                   }
-                  className="rounded text-indigo-600 focus:ring-indigo-500"
+                  className="rounded text-[#4F46E5] focus:ring-[#4F46E5]"
                 />
                 Allocate to ALL Active Employees
               </label>
@@ -639,7 +634,7 @@ export const LeaveApprovalsPage: React.FC = () => {
                         employee_id: e.target.value ? Number(e.target.value) : '',
                       })
                     }
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                     required={!allocationForm.allocate_all}
                   >
                     <option value="">-- Choose Employee --</option>
@@ -654,13 +649,13 @@ export const LeaveApprovalsPage: React.FC = () => {
             </div>
 
             <div className="pt-2">
-              <button
+              <Button
                 type="submit"
-                disabled={allocateMutation.isPending}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg transition-colors shadow-sm disabled:opacity-50"
+                variant="primary"
+                isLoading={allocateMutation.isPending}
               >
-                {allocateMutation.isPending ? 'Allocating...' : 'Confirm Quota Allocation'}
-              </button>
+                Confirm Quota Allocation
+              </Button>
             </div>
           </form>
         </div>
@@ -673,14 +668,14 @@ export const LeaveApprovalsPage: React.FC = () => {
         title="Review Leave Request (Per-Day Decision)"
       >
         <form onSubmit={handleApproveSubmit} className="space-y-4">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-[#475569]">
             Reviewing request for <strong>{approveTarget?.employee_name}</strong> for{' '}
             <strong>{approveTarget?.days} day(s)</strong> of {approveTarget?.leave_type_name} (
             {approveTarget?.from_date} to {approveTarget?.to_date}).
           </p>
 
-          <div className="space-y-2 border border-slate-200 rounded-lg p-3 bg-slate-50/50 max-h-60 overflow-y-auto">
-            <div className="flex items-center justify-between text-xs font-semibold text-slate-700 pb-1 border-b border-slate-200">
+          <div className="space-y-2 border border-[#E2E8F0] rounded-lg p-3 bg-[#F8FAFC] max-h-60 overflow-y-auto">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#475569] pb-1 border-b border-[#E2E8F0]">
               <span>Select days to APPROVE (untick to reject day)</span>
               <div className="flex items-center gap-2">
                 <button
@@ -690,7 +685,7 @@ export const LeaveApprovalsPage: React.FC = () => {
                     Object.keys(selectedDates).forEach((k) => (m[k] = true));
                     setSelectedDates(m);
                   }}
-                  className="text-indigo-600 hover:underline text-[11px]"
+                  className="text-[#4F46E5] hover:underline text-[11px]"
                 >
                   Select All
                 </button>
@@ -702,7 +697,7 @@ export const LeaveApprovalsPage: React.FC = () => {
                     Object.keys(selectedDates).forEach((k) => (m[k] = false));
                     setSelectedDates(m);
                   }}
-                  className="text-rose-600 hover:underline text-[11px]"
+                  className="text-[#DC2626] hover:underline text-[11px]"
                 >
                   Deselect All
                 </button>
@@ -717,8 +712,8 @@ export const LeaveApprovalsPage: React.FC = () => {
                     key={day.id}
                     className={`p-2.5 rounded-lg border text-xs transition-colors ${
                       isChecked
-                        ? 'bg-emerald-50/60 border-emerald-200 text-slate-900'
-                        : 'bg-rose-50/60 border-rose-200 text-rose-900'
+                        ? 'bg-[#DCFCE7]/60 border-[#BBF7D0] text-[#0F172A]'
+                        : 'bg-[#FEE2E2]/60 border-[#FECACA] text-[#B91C1C]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -729,35 +724,33 @@ export const LeaveApprovalsPage: React.FC = () => {
                           onChange={(e) =>
                             setSelectedDates({ ...selectedDates, [day.date]: e.target.checked })
                           }
-                          className="rounded text-emerald-600 focus:ring-emerald-500"
+                          className="rounded text-[#16A34A] focus:ring-[#16A34A]"
                         />
                         <span className="font-mono">{day.date}</span>
-                        <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-white text-slate-600 border">
+                        <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-white text-[#475569] border">
                           {day.day_type.replace('_', ' ')}
                         </span>
                         {day.from_time && day.to_time && (
-                          <span className="text-slate-500 text-[11px]">
+                          <span className="text-[#64748B] text-[11px]">
                             ({day.from_time} - {day.to_time})
                           </span>
                         )}
                       </label>
-                      <span className={`font-semibold ${isChecked ? 'text-emerald-700' : 'text-rose-700'}`}>
-                        {isChecked ? 'Approved' : 'Rejected'}
-                      </span>
+                      <StatusBadge status={isChecked ? 'approved' : 'rejected'} size="sm" />
                     </div>
                   </div>
                 );
               })
             ) : (
-              <div className="p-2 text-xs text-slate-500">
+              <div className="p-2 text-xs text-[#64748B]">
                 Single day request for date <span className="font-mono font-semibold">{approveTarget?.from_date}</span>
               </div>
             )}
           </div>
 
           {Object.values(selectedDates).some((v) => !v) && (
-            <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs font-medium">
-              <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+            <div className="flex items-center gap-2 p-3 bg-[#FEF3C7] border border-[#FDE68A] rounded-lg text-[#B45309] text-xs font-medium">
+              <AlertCircle className="w-4 h-4 shrink-0 text-[#D97706]" />
               You are unticking 1 or more days. A decision note explaining the partial rejection is required.
             </div>
           )}
@@ -779,73 +772,58 @@ export const LeaveApprovalsPage: React.FC = () => {
                   : 'e.g. Approved. Coverage handled by team.'
               }
               rows={2}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               required={Object.values(selectedDates).some((v) => !v)}
             />
           </FormField>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={() => setApproveTarget(null)}
-              className="px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-lg"
-            >
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+            <Button variant="secondary" onClick={() => setApproveTarget(null)}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={
-                approveMutation.isPending ||
-                (Object.values(selectedDates).some((v) => !v) && !approvalNote.trim())
-              }
-              className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors disabled:opacity-50"
+              variant="success"
+              isLoading={approveMutation.isPending}
+              disabled={Object.values(selectedDates).some((v) => !v) && !approvalNote.trim()}
             >
-              {approveMutation.isPending ? 'Processing...' : 'Submit Decision'}
-            </button>
+              Confirm Decision
+            </Button>
           </div>
         </form>
       </Modal>
 
-      {/* REJECT MODAL (MANDATORY REASON) */}
+      {/* REJECT MODAL */}
       <Modal
         isOpen={Boolean(rejectTarget)}
         onClose={() => setRejectTarget(null)}
-        title="Reject Leave Request"
+        title={`Reject Leave Request: ${rejectTarget?.employee_name}`}
       >
         <form onSubmit={handleRejectSubmit} className="space-y-4">
-          <div className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs font-medium">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            A rejection reason is strictly mandatory so the employee understands why it was declined.
-          </div>
-          <p className="text-sm text-slate-600">
-            Rejecting request from <strong>{rejectTarget?.employee_name}</strong> for{' '}
-            {rejectTarget?.days} day(s) ({rejectTarget?.from_date} to {rejectTarget?.to_date}).
-          </p>
-          <FormField label="Rejection Reason" required>
+          <FormField label="Mandatory Reason for Rejection" required>
             <textarea
+              rows={3}
+              placeholder="State clear rationale for rejecting this request..."
               value={rejectNote}
               onChange={(e) => setRejectNote(e.target.value)}
-              placeholder="Provide a mandatory reason for declining this request..."
-              rows={3}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               required
+              minLength={5}
             />
           </FormField>
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={() => setRejectTarget(null)}
-              className="px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-lg"
-            >
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+            <Button variant="secondary" onClick={() => setRejectTarget(null)}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={rejectMutation.isPending || !rejectNote.trim()}
-              className="px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors disabled:opacity-50"
+              variant="danger"
+              isLoading={rejectMutation.isPending}
+              disabled={!rejectNote.trim()}
             >
-              {rejectMutation.isPending ? 'Rejecting...' : 'Reject Request'}
-            </button>
+              Reject Request
+            </Button>
           </div>
         </form>
       </Modal>

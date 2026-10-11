@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { Loader } from '../../shared/components/Loader';
 import WidgetErrorBoundary from '../../shared/components/WidgetErrorBoundary';
+import { StatusBadge } from '../../shared/components/StatusBadge';
+import { Button } from '../../shared/components/Button';
 
 export const AdminDashboard: React.FC = () => {
   // Fetch overview stats
@@ -105,8 +107,8 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      {/* Top Banner - Preserving Navy Dark (#0F172A) */}
+      <div className="bg-[#0F172A] rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
@@ -120,12 +122,10 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            to="/employees/new"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-900/40 transition"
-          >
-            <UserPlus className="w-4 h-4" />
-            Add Employee
+          <Link to="/employees/new">
+            <Button variant="primary" leftIcon={<UserPlus className="w-4 h-4" />}>
+              Add Employee
+            </Button>
           </Link>
         </div>
       </div>
@@ -136,68 +136,68 @@ export const AdminDashboard: React.FC = () => {
           <Loader text="Loading dashboard metrics..." />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Employees</span>
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#64748B]">Total Employees</span>
+                <div className="w-9 h-9 rounded-xl bg-[#EEF2FF] text-[#4F46E5] flex items-center justify-center">
                   <Users className="w-5 h-5" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-900">{activeTotalCount}</div>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              <div className="text-2xl font-extrabold text-[#0F172A]">{activeTotalCount}</div>
+              <p className="text-[11px] text-[#64748B] font-medium mt-0.5">
                 {onboardingCount} onboarding, {relievedCount} relieved
               </p>
               <Link
                 to="/employees"
-                className="text-xs text-indigo-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"
+                className="text-xs text-[#4F46E5] font-semibold hover:underline mt-2 inline-flex items-center gap-1"
               >
                 Manage Directory <ArrowUpRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Present Today</span>
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#64748B]">Present Today</span>
+                <div className="w-9 h-9 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center">
                   <UserCheck className="w-5 h-5" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-900">{presentTodayCount}</div>
+              <div className="text-2xl font-extrabold text-[#0F172A]">{presentTodayCount}</div>
               <Link
                 to="/attendance/sheet"
-                className="text-xs text-emerald-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"
+                className="text-xs text-[#15803D] font-semibold hover:underline mt-2 inline-flex items-center gap-1"
               >
                 Daily Sheet <ArrowUpRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Approvals</span>
-                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#64748B]">Pending Approvals</span>
+                <div className="w-9 h-9 rounded-xl bg-[#FEF3C7] text-[#B45309] flex items-center justify-center">
                   <Clock className="w-5 h-5" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-900">{pendingLeavesList.length}</div>
+              <div className="text-2xl font-extrabold text-[#0F172A]">{pendingLeavesList.length}</div>
               <Link
                 to="/leaves/approvals"
-                className="text-xs text-amber-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"
+                className="text-xs text-[#B45309] font-semibold hover:underline mt-2 inline-flex items-center gap-1"
               >
                 Review Requests <ArrowUpRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Departments</span>
-                <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#64748B]">Departments</span>
+                <div className="w-9 h-9 rounded-xl bg-[#EEF2FF] text-[#4F46E5] flex items-center justify-center">
                   <Building2 className="w-5 h-5" />
                 </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-900">{departmentsList.length}</div>
+              <div className="text-2xl font-extrabold text-[#0F172A]">{departmentsList.length}</div>
               <Link
                 to="/departments"
-                className="text-xs text-pink-600 font-semibold hover:underline mt-2 inline-flex items-center gap-1"
+                className="text-xs text-[#4F46E5] font-semibold hover:underline mt-2 inline-flex items-center gap-1"
               >
                 View Hierarchy <ArrowUpRight className="w-3 h-3" />
               </Link>
@@ -210,37 +210,37 @@ export const AdminDashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Employees Widget */}
         <WidgetErrorBoundary widgetName="Recent Employees">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col min-h-[300px]">
+          <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col min-h-[300px]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-slate-800">Recent Employees</h2>
-              <Link to="/employees" className="text-xs font-semibold text-indigo-600 hover:underline">
+              <h2 className="text-base font-bold text-[#0F172A]">Recent Employees</h2>
+              <Link to="/employees" className="text-xs font-semibold text-[#4F46E5] hover:underline">
                 View all
               </Link>
             </div>
 
             {recentEmployeesList.length === 0 ? (
-              <p className="text-xs text-slate-400 py-6 text-center">No employee records yet</p>
+              <p className="text-xs text-[#64748B] py-6 text-center">No employee records yet</p>
             ) : (
-              <div className="divide-y divide-slate-100 flex-1">
+              <div className="divide-y divide-[#E2E8F0] flex-1">
                 {recentEmployeesList.map((emp: any) => (
                   <div key={emp.id} className="py-3 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold">
+                      <div className="w-9 h-9 rounded-xl bg-[#F1F5F9] text-[#475569] flex items-center justify-center text-xs font-bold">
                         {emp.first_name?.[0] || 'E'}
                         {emp.last_name?.[0] || ''}
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-800">
+                        <h4 className="text-xs font-bold text-[#0F172A]">
                           {emp.first_name || ''} {emp.last_name || ''}
                         </h4>
-                        <p className="text-[11px] text-slate-400">{emp.email || ''}</p>
+                        <p className="text-[11px] text-[#64748B]">{emp.email || ''}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold">
+                    <div className="text-right flex items-center gap-2">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#F1F5F9] text-[#475569] font-bold">
                         {emp.employee_code || ''}
                       </span>
-                      <p className="text-[10px] text-slate-400 mt-1 capitalize">{emp.lifecycle_stage || ''}</p>
+                      <StatusBadge status={emp.lifecycle_stage} size="sm" />
                     </div>
                   </div>
                 ))}
@@ -251,32 +251,30 @@ export const AdminDashboard: React.FC = () => {
 
         {/* Pending Approvals Widget */}
         <WidgetErrorBoundary widgetName="Pending Leave Approvals">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col min-h-[300px]">
+          <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col min-h-[300px]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-slate-800">Pending Leave Approvals</h2>
-              <Link to="/leaves/approvals" className="text-xs font-semibold text-indigo-600 hover:underline">
+              <h2 className="text-base font-bold text-[#0F172A]">Pending Leave Approvals</h2>
+              <Link to="/leaves/approvals" className="text-xs font-semibold text-[#4F46E5] hover:underline">
                 View all
               </Link>
             </div>
 
             {pendingLeavesList.length === 0 ? (
-              <p className="text-xs text-slate-400 py-6 text-center">No pending leave requests</p>
+              <p className="text-xs text-[#64748B] py-6 text-center">No pending leave requests</p>
             ) : (
-              <div className="divide-y divide-slate-100 flex-1">
+              <div className="divide-y divide-[#E2E8F0] flex-1">
                 {pendingLeavesList.slice(0, 5).map((req: any) => (
                   <div key={req.id} className="py-3 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-slate-800">
+                      <h4 className="text-xs font-bold text-[#0F172A]">
                         {req.employee_name || `Employee #${req.employee_id}`}
                       </h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-[#475569] mt-0.5">
                         {req.leave_type_name || 'Leave'}: {req.from_date} to {req.to_date} ({req.days} day
                         {req.days > 1 ? 's' : ''})
                       </p>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 shrink-0 capitalize">
-                      Pending
-                    </span>
+                    <StatusBadge status="pending" size="sm" />
                   </div>
                 ))}
               </div>

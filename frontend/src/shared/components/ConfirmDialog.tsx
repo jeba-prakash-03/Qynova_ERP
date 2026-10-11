@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal } from './Modal';
+import { Button } from './Button';
 import { AlertTriangle, Trash2, Check } from 'lucide-react';
 
 interface ConfirmDialogProps {
@@ -28,21 +29,21 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   const iconConfig = {
     danger: {
       icon: Trash2,
-      bgColor: 'bg-rose-100',
-      textColor: 'text-rose-600',
-      btnColor: 'bg-rose-600 hover:bg-rose-700 text-white',
+      bgColor: 'bg-[#FEE2E2]',
+      textColor: 'text-[#DC2626]',
+      btnVariant: 'danger' as const,
     },
     warning: {
       icon: AlertTriangle,
-      bgColor: 'bg-amber-100',
-      textColor: 'text-amber-600',
-      btnColor: 'bg-amber-600 hover:bg-amber-700 text-white',
+      bgColor: 'bg-[#FEF3C7]',
+      textColor: 'text-[#D97706]',
+      btnVariant: 'danger' as const,
     },
     primary: {
       icon: Check,
-      bgColor: 'bg-indigo-100',
-      textColor: 'text-indigo-600',
-      btnColor: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+      bgColor: 'bg-[#EEF2FF]',
+      textColor: 'text-[#4F46E5]',
+      btnVariant: 'primary' as const,
     },
   }[variant];
 
@@ -56,22 +57,20 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       maxWidth="md"
       footer={
         <>
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"
           >
             {cancelText}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant={iconConfig.btnVariant}
             onClick={onConfirm}
-            disabled={isLoading}
-            className={`px-4 py-2 text-sm font-medium rounded-lg shadow-sm transition disabled:opacity-50 ${iconConfig.btnColor}`}
+            isLoading={isLoading}
           >
-            {isLoading ? 'Processing...' : confirmText}
-          </button>
+            {confirmText}
+          </Button>
         </>
       }
     >
@@ -79,7 +78,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <div className={`p-3 rounded-xl shrink-0 ${iconConfig.bgColor} ${iconConfig.textColor}`}>
           <Icon className="w-6 h-6" />
         </div>
-        <div className="text-sm text-slate-600 leading-relaxed pt-1">{message}</div>
+        <div className="text-sm text-[#475569] leading-relaxed pt-1">{message}</div>
       </div>
     </Modal>
   );

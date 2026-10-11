@@ -2,9 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Core Color Tokens */
+  --color-primary: #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-primary-soft: #EEF2FF;
+  --color-page: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-border: #E2E8F0;
+  --color-text: #0F172A;
+  --color-body: #475569;
+  --color-muted: #64748B;
+
+  /* Status Colors */
+  --status-present: #16A34A;
+  --status-present-bg: #DCFCE7;
+  --status-absent: #DC2626;
+  --status-absent-bg: #FEE2E2;
+  --status-warning: #D97706;
+  --status-warning-bg: #FEF3C7;
+  --status-leave: #0284C7;
+  --status-leave-bg: #E0F2FE;
+  --status-holiday: #7C3AED;
+  --status-holiday-bg: #EDE9FE;
+  --status-wfh: #0D9488;
+  --status-wfh-bg: #CCFBF1;
+  --status-neutral: #94A3B8;
+  --status-neutral-bg: #F1F5F9;
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--color-page);
+    color: var(--color-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text);
   }
 }
 

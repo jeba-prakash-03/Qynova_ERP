@@ -4,6 +4,8 @@ import axiosClient from '../../../shared/api/axiosClient';
 import { Modal } from '../../../shared/components/Modal';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { FormField } from '../../../shared/components/FormField';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
+import { Button } from '../../../shared/components/Button';
 import { Can } from '../../../shared/components/Can';
 import { useToast } from '../../../shared/context/ToastContext';
 import { useAuth } from '../../../shared/context/AuthContext';
@@ -224,34 +226,34 @@ export const HolidaysPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <CalendarDays className="w-7 h-7 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-[#0F172A] flex items-center gap-2">
+            <CalendarDays className="w-7 h-7 text-[#4F46E5]" />
             Holidays & Work Calendar
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-[#64748B] text-sm mt-1">
             Configure company and public holidays, shift timings, and official working days.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Tab buttons */}
-          <div className="bg-gray-100 p-1 rounded-lg flex text-sm font-medium">
+          <div className="bg-[#F1F5F9] p-1 rounded-xl flex text-sm font-medium border border-[#E2E8F0]">
             <button
               onClick={() => setActiveTab('holidays')}
-              className={`px-3 py-1.5 rounded-md transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg transition-all ${
                 activeTab === 'holidays'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900'
+                  ? 'bg-white text-[#4F46E5] shadow-sm font-semibold'
+                  : 'text-[#475569] hover:text-[#0F172A]'
               }`}
             >
               Holidays List
             </button>
             <button
               onClick={() => setActiveTab('settings')}
-              className={`px-3 py-1.5 rounded-md transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg transition-all ${
                 activeTab === 'settings'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900'
+                  ? 'bg-white text-[#4F46E5] shadow-sm font-semibold'
+                  : 'text-[#475569] hover:text-[#0F172A]'
               }`}
             >
               Shift & Calendar Settings
@@ -260,42 +262,42 @@ export const HolidaysPage: React.FC = () => {
 
           {activeTab === 'holidays' && (
             <Can permission="holidays.create">
-              <button
+              <Button
+                variant="primary"
+                leftIcon={<Plus className="w-4 h-4" />}
                 onClick={() => {
                   setFormData({ date: '', name: '', type: 'public' });
                   setIsCreateModalOpen(true);
                 }}
-                className="btn btn-primary flex items-center gap-2 text-sm"
               >
-                <Plus className="w-4 h-4" />
                 Add Holiday
-              </button>
+              </Button>
             </Can>
           )}
         </div>
       </div>
 
       {/* Working days banner */}
-      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-[#EEF2FF] border border-[#C7D2FE] rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-indigo-600 text-white rounded-lg shadow-sm">
+          <div className="p-2.5 bg-[#4F46E5] text-white rounded-lg shadow-sm">
             <CalendarCheck className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="font-semibold text-gray-900 text-sm">
+            <h4 className="font-semibold text-[#0F172A] text-sm">
               Official Working Days Calculation
             </h4>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-[#475569]">
               Contract formula: Total Calendar Days − Weekly Off Days − Public/Company Holidays
             </p>
           </div>
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right">
-            <span className="text-xs text-gray-500 uppercase tracking-wider block">
+            <span className="text-xs text-[#64748B] uppercase tracking-wider block">
               {new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })}
             </span>
-            <span className="text-xl font-bold text-indigo-700">
+            <span className="text-xl font-bold text-[#4F46E5]">
               {workingDaysData?.count ?? '--'} Working Days
             </span>
           </div>
@@ -305,13 +307,13 @@ export const HolidaysPage: React.FC = () => {
       {activeTab === 'holidays' ? (
         <div className="space-y-4">
           {/* Filters Bar */}
-          <div className="card p-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-gray-700">Year:</label>
+              <label className="text-sm font-medium text-[#475569]">Year:</label>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="input py-1.5 text-sm"
+                className="px-3 py-1.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               >
                 {[2024, 2025, 2026, 2027].map((y) => (
                   <option key={y} value={y}>
@@ -320,11 +322,11 @@ export const HolidaysPage: React.FC = () => {
                 ))}
               </select>
 
-              <label className="text-sm font-medium text-gray-700 ml-4">Type:</label>
+              <label className="text-sm font-medium text-[#475569] ml-4">Type:</label>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="input py-1.5 text-sm"
+                className="px-3 py-1.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               >
                 <option value="">All Types</option>
                 <option value="public">Public</option>
@@ -333,19 +335,19 @@ export const HolidaysPage: React.FC = () => {
               </select>
             </div>
 
-            <div className="text-sm text-gray-500">
-              Total Holidays in {selectedYear}: <span className="font-semibold">{holidays.length}</span>
+            <div className="text-sm text-[#64748B]">
+              Total Holidays in {selectedYear}: <span className="font-semibold text-[#0F172A]">{holidays.length}</span>
             </div>
           </div>
 
           {/* Holidays Grid / List */}
           {isLoadingHolidays ? (
-            <div className="card p-12 text-center text-gray-400">Loading holidays...</div>
+            <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-12 text-center text-[#64748B]">Loading holidays...</div>
           ) : holidays.length === 0 ? (
-            <div className="card p-12 text-center">
-              <CalendarDays className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <h3 className="text-base font-semibold text-gray-900">No holidays found</h3>
-              <p className="text-sm text-gray-500 mt-1">
+            <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-12 text-center">
+              <CalendarDays className="w-12 h-12 text-[#94A3B8] mx-auto mb-3" />
+              <h3 className="text-base font-semibold text-[#0F172A]">No holidays found</h3>
+              <p className="text-sm text-[#64748B] mt-1">
                 No holidays recorded for {selectedYear} matching your filters.
               </p>
             </div>
@@ -357,34 +359,22 @@ export const HolidaysPage: React.FC = () => {
                 const monthName = dateObj.toLocaleDateString('en-US', { month: 'short' });
                 const dayNum = dateObj.getDate();
 
-                const badgeColor =
-                  h.type === 'public'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : h.type === 'company'
-                    ? 'bg-blue-50 text-blue-700 border-blue-200'
-                    : 'bg-amber-50 text-amber-700 border-amber-200';
-
                 return (
                   <div
                     key={h.id}
-                    className="card p-4 hover:shadow-md transition-shadow border border-gray-100 flex items-center justify-between"
+                    className="bg-white rounded-xl p-4 border border-[#E2E8F0] shadow-sm flex items-center justify-between hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center gap-3">
-                      {/* Date Badge */}
-                      <div className="bg-indigo-50 text-indigo-700 rounded-lg p-2.5 text-center min-w-[54px] border border-indigo-100">
+                      <div className="bg-[#EEF2FF] text-[#4F46E5] rounded-lg p-2.5 text-center min-w-[54px] border border-[#C7D2FE]">
                         <span className="text-xs uppercase font-semibold block">{monthName}</span>
                         <span className="text-lg font-bold leading-tight block">{dayNum}</span>
                       </div>
 
                       <div>
-                        <h4 className="font-medium text-gray-900 text-sm">{h.name}</h4>
+                        <h4 className="font-medium text-[#0F172A] text-sm">{h.name}</h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-gray-500">{dayName}</span>
-                          <span
-                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${badgeColor}`}
-                          >
-                            {h.type.toUpperCase()}
-                          </span>
+                          <span className="text-xs text-[#64748B]">{dayName}</span>
+                          <StatusBadge status="holiday" label={h.type.toUpperCase()} size="sm" />
                         </div>
                       </div>
                     </div>
@@ -393,7 +383,7 @@ export const HolidaysPage: React.FC = () => {
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => handleOpenEdit(h)}
-                          className="p-1.5 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-gray-50 transition-colors"
+                          className="p-1.5 text-[#64748B] hover:text-[#4F46E5] rounded-lg hover:bg-[#EEF2FF] transition-colors"
                           title="Edit"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -401,7 +391,7 @@ export const HolidaysPage: React.FC = () => {
                         <Can permission="holidays.delete">
                           <button
                             onClick={() => setDeleteTarget(h)}
-                            className="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-gray-50 transition-colors"
+                            className="p-1.5 text-[#64748B] hover:text-[#DC2626] rounded-lg hover:bg-[#FEE2E2] transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -417,10 +407,10 @@ export const HolidaysPage: React.FC = () => {
         </div>
       ) : (
         /* Work Settings Tab */
-        <div className="card p-6 max-w-2xl">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6 max-w-2xl">
           <div className="flex items-center gap-2 mb-6">
-            <Settings className="w-5 h-5 text-indigo-600" />
-            <h3 className="text-lg font-bold text-gray-900">Working Calendar & Shift Settings</h3>
+            <Settings className="w-5 h-5 text-[#4F46E5]" />
+            <h3 className="text-lg font-bold text-[#0F172A]">Working Calendar & Shift Settings</h3>
           </div>
 
           <form
@@ -438,7 +428,7 @@ export const HolidaysPage: React.FC = () => {
                   onChange={(e) =>
                     setSettingsForm({ ...settingsForm, shift_start: e.target.value })
                   }
-                  className="input"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                   required
                 />
               </FormField>
@@ -450,7 +440,7 @@ export const HolidaysPage: React.FC = () => {
                   onChange={(e) =>
                     setSettingsForm({ ...settingsForm, shift_end: e.target.value })
                   }
-                  className="input"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                   required
                 />
               </FormField>
@@ -469,7 +459,7 @@ export const HolidaysPage: React.FC = () => {
                       late_grace_minutes: Number(e.target.value),
                     })
                   }
-                  className="input"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                   required
                 />
               </FormField>
@@ -487,7 +477,7 @@ export const HolidaysPage: React.FC = () => {
                       min_hours_full_day: Number(e.target.value),
                     })
                   }
-                  className="input"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                   required
                 />
               </FormField>
@@ -505,7 +495,7 @@ export const HolidaysPage: React.FC = () => {
                       min_hours_half_day: Number(e.target.value),
                     })
                   }
-                  className="input"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                   required
                 />
               </FormField>
@@ -513,7 +503,7 @@ export const HolidaysPage: React.FC = () => {
 
             {/* Weekly Off Days Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#475569] mb-2">
                 Weekly Off Days (Non-Working)
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -526,30 +516,30 @@ export const HolidaysPage: React.FC = () => {
                       onClick={() => handleWeeklyOffToggle(idx)}
                       className={`p-2.5 rounded-lg border text-sm font-medium transition-all text-left flex items-center justify-between ${
                         isOff
-                          ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
-                          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                          ? 'bg-[#EEF2FF] border-[#C7D2FE] text-[#4F46E5]'
+                          : 'bg-white border-[#E2E8F0] text-[#475569] hover:bg-[#F8FAFC]'
                       }`}
                     >
                       <span>{dayName}</span>
-                      {isOff && <CheckCircle2 className="w-4 h-4 text-indigo-600" />}
+                      {isOff && <CheckCircle2 className="w-4 h-4 text-[#4F46E5]" />}
                     </button>
                   );
                 })}
               </div>
-              <p className="text-xs text-gray-500 mt-1.5">
+              <p className="text-xs text-[#64748B] mt-1.5">
                 Default IT corporate schedule: Saturday and Sunday are marked as off days.
               </p>
             </div>
 
             <Can permission="holidays.edit">
-              <div className="pt-4 border-t flex justify-end">
-                <button
+              <div className="pt-4 border-t border-[#E2E8F0] flex justify-end">
+                <Button
                   type="submit"
-                  disabled={updateSettingsMutation.isPending}
-                  className="btn btn-primary"
+                  variant="primary"
+                  isLoading={updateSettingsMutation.isPending}
                 >
-                  {updateSettingsMutation.isPending ? 'Saving...' : 'Save Settings'}
-                </button>
+                  Save Settings
+                </Button>
               </div>
             </Can>
           </form>
@@ -574,7 +564,7 @@ export const HolidaysPage: React.FC = () => {
               type="date"
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="input"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               required
             />
           </FormField>
@@ -585,7 +575,7 @@ export const HolidaysPage: React.FC = () => {
               placeholder="e.g. Independence Day, Annual Hackathon"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="input"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               required
             />
           </FormField>
@@ -599,7 +589,7 @@ export const HolidaysPage: React.FC = () => {
                   type: e.target.value as 'public' | 'company' | 'optional',
                 })
               }
-              className="input"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
             >
               <option value="public">Public (Mandatory Government Holiday)</option>
               <option value="company">Company (Internal Company Holiday)</option>
@@ -607,21 +597,17 @@ export const HolidaysPage: React.FC = () => {
             </select>
           </FormField>
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <button
-              type="button"
-              onClick={() => setIsCreateModalOpen(false)}
-              className="btn btn-secondary"
-            >
+          <div className="flex justify-end gap-3 pt-4 border-t border-[#E2E8F0]">
+            <Button variant="secondary" onClick={() => setIsCreateModalOpen(false)}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={createMutation.isPending}
-              className="btn btn-primary"
+              variant="primary"
+              isLoading={createMutation.isPending}
             >
-              {createMutation.isPending ? 'Saving...' : 'Create Holiday'}
-            </button>
+              Create Holiday
+            </Button>
           </div>
         </form>
       </Modal>
@@ -646,7 +632,7 @@ export const HolidaysPage: React.FC = () => {
               type="date"
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="input"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               required
             />
           </FormField>
@@ -656,7 +642,7 @@ export const HolidaysPage: React.FC = () => {
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="input"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
               required
             />
           </FormField>
@@ -670,7 +656,7 @@ export const HolidaysPage: React.FC = () => {
                   type: e.target.value as 'public' | 'company' | 'optional',
                 })
               }
-              className="input"
+              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
             >
               <option value="public">Public</option>
               <option value="company">Company</option>
@@ -678,21 +664,17 @@ export const HolidaysPage: React.FC = () => {
             </select>
           </FormField>
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <button
-              type="button"
-              onClick={() => setEditingHoliday(null)}
-              className="btn btn-secondary"
-            >
+          <div className="flex justify-end gap-3 pt-4 border-t border-[#E2E8F0]">
+            <Button variant="secondary" onClick={() => setEditingHoliday(null)}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={updateMutation.isPending}
-              className="btn btn-primary"
+              variant="primary"
+              isLoading={updateMutation.isPending}
             >
-              {updateMutation.isPending ? 'Saving...' : 'Update Holiday'}
-            </button>
+              Update Holiday
+            </Button>
           </div>
         </form>
       </Modal>
@@ -712,3 +694,5 @@ export const HolidaysPage: React.FC = () => {
     </div>
   );
 };
+
+export default HolidaysPage;
