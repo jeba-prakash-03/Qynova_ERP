@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import axiosClient from '../../../shared/api/axiosClient';
 import { DataTable, Column } from '../../../shared/components/DataTable';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
+import { Button } from '../../../shared/components/Button';
 import { Can } from '../../../shared/components/Can';
 import { useToast } from '../../../shared/context/ToastContext';
 import { UserPlus, Eye, Edit2, Trash2, Building2, Briefcase, Filter } from 'lucide-react';
@@ -77,7 +79,7 @@ export const EmployeeListPage: React.FC = () => {
       accessorKey: 'employee_code',
       sortable: true,
       cell: (row) => (
-        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-[#EEF2FF] text-[#4F46E5] border border-[#C7D2FE]">
           {row.employee_code}
         </span>
       ),
@@ -88,7 +90,7 @@ export const EmployeeListPage: React.FC = () => {
       sortable: true,
       cell: (row) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
+          <div className="w-8 h-8 rounded-full bg-[#F1F5F9] text-[#475569] flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
             {row.photo_url ? (
               <img src={row.photo_url} alt="avatar" className="w-full h-full object-cover" />
             ) : (
@@ -96,10 +98,10 @@ export const EmployeeListPage: React.FC = () => {
             )}
           </div>
           <div>
-            <div className="font-bold text-slate-900 leading-tight">
+            <div className="font-bold text-[#0F172A] leading-tight">
               {row.first_name} {row.last_name}
             </div>
-            <div className="text-xs text-slate-400">{row.email}</div>
+            <div className="text-xs text-[#64748B]">{row.email}</div>
           </div>
         </div>
       ),
@@ -108,42 +110,23 @@ export const EmployeeListPage: React.FC = () => {
       header: 'Department & Role',
       cell: (row) => (
         <div>
-          <div className="font-semibold text-slate-800 text-xs">
+          <div className="font-semibold text-[#475569] text-xs">
             {row.department_name || '—'}
           </div>
-          <div className="text-xs text-slate-400">{row.designation_name || '—'}</div>
+          <div className="text-xs text-[#64748B]">{row.designation_name || '—'}</div>
         </div>
       ),
     },
     {
       header: 'Lifecycle Stage',
       accessorKey: 'lifecycle_stage',
-      cell: (row) => {
-        const stageColors: Record<string, string> = {
-          candidate: 'bg-slate-100 text-slate-700',
-          onboarding: 'bg-blue-50 text-blue-700 border border-blue-200',
-          probation: 'bg-amber-50 text-amber-700 border border-amber-200',
-          confirmed: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-          active: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-          resigned: 'bg-orange-50 text-orange-700 border border-orange-200',
-          relieved: 'bg-slate-100 text-slate-500',
-        };
-        return (
-          <span
-            className={`text-[11px] px-2 py-0.5 rounded-full font-bold capitalize ${
-              stageColors[row.lifecycle_stage] || 'bg-slate-100 text-slate-700'
-            }`}
-          >
-            {row.lifecycle_stage?.replace('_', ' ')}
-          </span>
-        );
-      },
+      cell: (row) => <StatusBadge status={row.lifecycle_stage} size="sm" />,
     },
     {
       header: 'Type',
       accessorKey: 'employment_type',
       cell: (row) => (
-        <span className="text-xs text-slate-600 capitalize">
+        <span className="text-xs text-[#475569] capitalize">
           {row.employment_type?.replace('_', ' ')}
         </span>
       ),
@@ -151,17 +134,7 @@ export const EmployeeListPage: React.FC = () => {
     {
       header: 'Status',
       accessorKey: 'status',
-      cell: (row) => (
-        <span
-          className={`text-[11px] px-2 py-0.5 rounded-full font-bold capitalize ${
-            row.status === 'active'
-              ? 'bg-emerald-50 text-emerald-700'
-              : 'bg-rose-50 text-rose-700'
-          }`}
-        >
-          {row.status}
-        </span>
-      ),
+      cell: (row) => <StatusBadge status={row.status} size="sm" />,
     },
     {
       header: 'Actions',
@@ -169,7 +142,7 @@ export const EmployeeListPage: React.FC = () => {
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => navigate(`/employees/${row.id}`)}
-            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+            className="p-1.5 text-[#64748B] hover:text-[#4F46E5] hover:bg-[#EEF2FF] rounded-lg transition"
             title="View Details"
           >
             <Eye className="w-4 h-4" />
@@ -177,7 +150,7 @@ export const EmployeeListPage: React.FC = () => {
           <Can permission="employees.edit">
             <button
               onClick={() => navigate(`/employees/${row.id}/edit`)}
-              className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+              className="p-1.5 text-[#64748B] hover:text-[#D97706] hover:bg-[#FEF3C7] rounded-lg transition"
               title="Edit Profile"
             >
               <Edit2 className="w-4 h-4" />
@@ -188,7 +161,7 @@ export const EmployeeListPage: React.FC = () => {
               onClick={() =>
                 setDeleteTarget({ id: row.id, name: `${row.first_name} ${row.last_name}` })
               }
-              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+              className="p-1.5 text-[#64748B] hover:text-[#DC2626] hover:bg-[#FEE2E2] rounded-lg transition"
               title="Delete Profile"
             >
               <Trash2 className="w-4 h-4" />
@@ -204,19 +177,17 @@ export const EmployeeListPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Employees Directory</h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">Employees Directory</h1>
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1">
             Browse and manage all registered company personnel, departments, and onboarding statuses.
           </p>
         </div>
 
         <Can permission="employees.create">
-          <Link
-            to="/employees/new"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-indigo-600/30 transition"
-          >
-            <UserPlus className="w-4 h-4" />
-            Add New Employee
+          <Link to="/employees/new">
+            <Button variant="primary" leftIcon={<UserPlus className="w-4 h-4" />}>
+              Add New Employee
+            </Button>
           </Link>
         </Can>
       </div>
@@ -257,7 +228,7 @@ export const EmployeeListPage: React.FC = () => {
                 setDepartmentId(e.target.value);
                 setPage(1);
               }}
-              className="text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="text-xs bg-white border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
             >
               <option value="">All Departments</option>
               {departments.map((d: any) => (
@@ -273,7 +244,7 @@ export const EmployeeListPage: React.FC = () => {
                 setLifecycleStage(e.target.value);
                 setPage(1);
               }}
-              className="text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="text-xs bg-white border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
             >
               <option value="">All Lifecycle Stages</option>
               <option value="onboarding">Onboarding</option>
@@ -290,7 +261,7 @@ export const EmployeeListPage: React.FC = () => {
                 setEmploymentType(e.target.value);
                 setPage(1);
               }}
-              className="text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="text-xs bg-white border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
             >
               <option value="">All Types</option>
               <option value="full_time">Full Time</option>

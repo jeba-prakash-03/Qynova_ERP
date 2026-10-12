@@ -8,6 +8,7 @@ import {
   refreshTokenSchema,
   changePasswordSchema,
   forgotPasswordSchema,
+  resetPasswordSchema,
 } from './auth.schema';
 
 const router = Router();
@@ -41,6 +42,12 @@ router.post(
   '/forgot-password',
   validate({ body: forgotPasswordSchema }),
   authController.forgotPassword
+);
+
+router.post(
+  '/reset-password',
+  validate({ body: resetPasswordSchema }),
+  authController.resetPassword
 );
 
 router.get(

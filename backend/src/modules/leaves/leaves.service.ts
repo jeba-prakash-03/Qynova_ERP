@@ -13,6 +13,10 @@ import {
 import { BadRequestError, ForbiddenError, NotFoundError } from '../../shared/errors/app-error';
 import { getWorkingDays, holidaysService } from '../holidays/holidays.service';
 import { notificationService } from '../../shared/services/notification.service';
+import {
+  leaveAppliedEmailTemplate,
+  leaveStatusEmailTemplate,
+} from '../../shared/services/email.templates';
 import { getTodayKolkata, timeStringToMinutes } from '../../shared/utils/date.util';
 import { SYSTEM_ROLES } from '../../shared/constants/roles';
 
@@ -397,6 +401,18 @@ export class LeavesService {
       }
 
       if (notifyUserId && employee) {
+        const reviewUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/leaves/approvals`;
+        const emailHtml = leaveAppliedEmailTemplate({
+          managerName: 'Manager',
+          employeeName: `${employee.first_name} ${employee.last_name}`,
+          leaveType: leaveType.name,
+          days: daysCount,
+          fromDate: data.from_date,
+          toDate: data.to_date,
+          reason: data.reason,
+          reviewUrl,
+        });
+
         await notificationService.notify({
           eventKey: `leave.applied:req:${createdRequest!.id}`,
           userIds: notifyUserId,
@@ -404,6 +420,11 @@ export class LeavesService {
           title: 'New Leave Request',
           message: `${employee.first_name} ${employee.last_name} applied for ${daysCount} day(s) of ${leaveType.name} (${data.from_date} to ${data.to_date})`,
           link: '/leaves/approvals',
+          emailDetails: {
+            eventType: 'leave_request',
+            subject: `New Leave Request from ${employee.first_name} ${employee.last_name}`,
+            html: emailHtml,
+          },
         });
       }
     } catch {
@@ -562,6 +583,16 @@ export class LeavesService {
             ? `Leave ${request.from_date} to ${request.to_date} partly approved: ${approvedDaysCount} of ${request.days} days approved.`
             : `Your leave request for ${approvedDaysCount} day(s) from ${request.from_date} to ${request.to_date} has been approved.`;
 
+        const portalUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/leaves/my`;
+        const emailHtml = leaveStatusEmailTemplate({
+          employeeName: `${employee.first_name} ${employee.last_name}`,
+          status: derivedStatus,
+          leaveType: request.leave_type_name || 'Leave',
+          days: approvedDaysCount,
+          decisionNote: dto.decision_note,
+          portalUrl,
+        });
+
         await notificationService.notify({
           eventKey: `leave.${derivedStatus}:req:${request.id}`,
           userIds: employee.user_id,
@@ -569,6 +600,11 @@ export class LeavesService {
           title: derivedStatus === 'partially_approved' ? 'Leave Partially Approved' : 'Leave Request Approved',
           message: notifMsg,
           link: '/leaves/my',
+          emailDetails: {
+            eventType: 'leave_status',
+            subject: `Leave Request ${derivedStatus === 'partially_approved' ? 'Partially Approved' : 'Approved'}`,
+            html: emailHtml,
+          },
         });
       }
     } catch {
@@ -675,6 +711,16 @@ export class LeavesService {
     // 4. Notify applicant employee
     try {
       if (employee?.user_id) {
+        const portalUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/leaves/my`;
+        const emailHtml = leaveStatusEmailTemplate({
+          employeeName: `${employee.first_name} ${employee.last_name}`,
+          status: 'rejected',
+          leaveType: request.leave_type_name || 'Leave',
+          days: request.days,
+          decisionNote: dto.decision_note,
+          portalUrl,
+        });
+
         await notificationService.notify({
           eventKey: `leave.rejected:req:${request.id}`,
           userIds: employee.user_id,
@@ -682,6 +728,11 @@ export class LeavesService {
           title: 'Leave Request Rejected',
           message: `Your leave request for ${request.from_date} to ${request.to_date} was rejected. Reason: ${dto.decision_note}`,
           link: '/leaves/my',
+          emailDetails: {
+            eventType: 'leave_status',
+            subject: 'Leave Request Rejected',
+            html: emailHtml,
+          },
         });
       }
     } catch {

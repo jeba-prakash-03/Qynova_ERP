@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import { errorHandler } from './shared/middleware/error.middleware';
+import db from './db/knex';
 import authRoutes from './modules/auth/auth.routes';
 import rolesRoutes from './modules/roles/roles.routes';
 import permissionsRoutes from './modules/permissions/permissions.routes';
@@ -24,14 +25,12 @@ import expensesRoutes from './modules/expenses/expenses.routes';
 import invoicesRoutes from './modules/invoices/invoices.routes';
 import financeRoutes from './modules/profitability/profitability.routes';
 import crmRoutes from './modules/crm/crm.routes';
-import {
-  initializeBusinessRegistries,
-  dashboardRouter,
-  reportsRouter,
-} from './modules/registry';
+import dashboardRoutes from './modules/registry/dashboard.routes';
+import reportsRoutes from './modules/registry/reports.routes';
+import assetsRoutes from './modules/assets/assets.routes';
+import pushRoutes from './modules/push/push.routes';
 
 export const createApp = (): Application => {
-  initializeBusinessRegistries();
   const app = express();
 
   // CORS Configuration
@@ -49,9 +48,23 @@ export const createApp = (): Application => {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-  // Health check
-  app.get('/health', (_req: Request, res: Response) => {
-    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  // Health check with actual DB connectivity validation
+  app.get('/health', async (_req: Request, res: Response) => {
+    try {
+      await db.raw('SELECT 1');
+      res.status(200).json({
+        status: 'ok',
+        database: 'connected',
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      res.status(503).json({
+        status: 'error',
+        database: 'disconnected',
+        error: err.message,
+        timestamp: new Date().toISOString(),
+      });
+    }
   });
 
   // API v1 Routes
@@ -79,8 +92,10 @@ export const createApp = (): Application => {
   app.use('/api/v1/invoices', invoicesRoutes);
   app.use('/api/v1/finance', financeRoutes);
   app.use('/api/v1/crm', crmRoutes);
-  app.use('/api/v1/dashboard', dashboardRouter);
-  app.use('/api/v1/reports', reportsRouter);
+  app.use('/api/v1/dashboard', dashboardRoutes);
+  app.use('/api/v1/reports', reportsRoutes);
+  app.use('/api/v1/assets', assetsRoutes);
+  app.use('/api/v1/push', pushRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

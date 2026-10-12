@@ -24,6 +24,41 @@ export class PayrollController {
     return sendSuccess(res, history);
   };
 
+  // Pre-run adjustments (Incentives, Bonus, Allowances, Overtime, PF, Other Deductions)
+  setAdjustment = async (req: Request, res: Response) => {
+    const { employee_id, month, incentives, bonus, allowances, overtime, pf, other_deductions, note } = req.body;
+    if (!employee_id || !month) {
+      throw new BadRequestError('employee_id and month are required');
+    }
+    const result = await payrollService.setPayrollAdjustment(
+      {
+        employee_id: Number(employee_id),
+        month,
+        incentives: incentives !== undefined ? Number(incentives) : undefined,
+        bonus: bonus !== undefined ? Number(bonus) : undefined,
+        allowances: allowances !== undefined ? Number(allowances) : undefined,
+        overtime: overtime !== undefined ? Number(overtime) : undefined,
+        pf: pf !== undefined && pf !== null ? Number(pf) : undefined,
+        other_deductions: other_deductions !== undefined ? Number(other_deductions) : undefined,
+        note,
+      },
+      req.user?.userId
+    );
+    return sendCreated(res, result, 'Payroll adjustment saved successfully');
+  };
+
+  getAdjustments = async (req: Request, res: Response) => {
+    const { month, employee_id } = req.query as { month: string; employee_id?: string };
+    if (!month) {
+      throw new BadRequestError('month query parameter is required (YYYY-MM)');
+    }
+    const list = await payrollService.getPayrollAdjustments(
+      month,
+      employee_id ? Number(employee_id) : undefined
+    );
+    return sendSuccess(res, list);
+  };
+
   // Generate / Recalculate Payroll
   generatePayroll = async (req: Request, res: Response) => {
     const { month } = req.body;
@@ -52,6 +87,17 @@ export class PayrollController {
     return sendSuccess(res, locked, 200, undefined, `Payroll for ${month} is locked`);
   };
 
+  // Update Payroll Run Status (Draft > Processed > Locked > Paid)
+  updateStatus = async (req: Request, res: Response) => {
+    const { month } = req.params;
+    const { status } = req.body;
+    if (!status || !['draft', 'processed', 'locked', 'paid'].includes(status)) {
+      throw new BadRequestError('Status must be draft, processed, locked, or paid');
+    }
+    const updated = await payrollService.updatePayrollRunStatus(month, status, req.user?.userId);
+    return sendSuccess(res, updated, 200, undefined, `Payroll for ${month} status updated to ${status}`);
+  };
+
   // Get My Payslips
   getMyPayslips = async (req: Request, res: Response) => {
     const employeeId = req.user?.employeeId;
@@ -60,6 +106,18 @@ export class PayrollController {
     }
     const payslips = await payrollService.getMyPayslips(employeeId);
     return sendSuccess(res, payslips);
+  };
+
+  // Download Payslip PDF
+  downloadPayslipPdf = async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    if (!id) {
+      throw new BadRequestError('Payslip ID is required');
+    }
+    const { buffer, filename } = await payrollService.generatePayslipPdf(id, req.user!);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(buffer);
   };
 }
 

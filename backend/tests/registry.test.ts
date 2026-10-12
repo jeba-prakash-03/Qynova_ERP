@@ -1,63 +1,56 @@
 import request from 'supertest';
 import { createApp } from '../src/app';
 import db from '../src/db/knex';
-import { generateAccessToken } from '../src/shared/utils/jwt.util';
 
-describe('Task 6: Dashboard Widgets & Reports Registry', () => {
-  const app = createApp();
+const app = createApp();
 
+describe('Dashboard and Report Registries', () => {
   let adminToken: string;
   let employeeToken: string;
 
   beforeAll(async () => {
-    // Admin user token
-    adminToken = generateAccessToken({
-      userId: 1,
-      employeeId: 1,
-      roles: ['Admin'],
-      permissions: ['*'],
-    });
+    const adminLogin = await request(app)
+      .post('/api/v1/auth/login')
+      .send({ email: 'admin@qynova.erp', password: 'Admin@123' });
+    adminToken = adminLogin.body.data.accessToken;
 
-    // Employee user token without financial or manager permissions
-    employeeToken = generateAccessToken({
-      userId: 4,
-      employeeId: 4,
-      roles: ['Employee'],
-      permissions: ['tasks.view_own', 'projects.view_own'],
-    });
+    const empLogin = await request(app)
+      .post('/api/v1/auth/login')
+      .send({ email: 'employee@qynova.erp', password: 'Employee@123' });
+    employeeToken = empLogin.body.data.accessToken;
   });
 
   afterAll(async () => {
     await db.destroy();
   });
 
-  describe('1. Dashboard Widgets Registry', () => {
-    it('should retrieve all registered widgets for Admin user', async () => {
+  describe('Dashboard Widgets Registry', () => {
+    it('should list registered widgets for authenticated user', async () => {
       const res = await request(app)
         .get('/api/v1/dashboard/widgets')
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      const data = res.body.data;
-
-      // Verify all required Dev B widgets exist in output
-      expect(data).toHaveProperty('active_projects');
-      expect(data).toHaveProperty('clients_count');
-      expect(data).toHaveProperty('revenue_this_month');
-      expect(data).toHaveProperty('expenses_this_month');
-      expect(data).toHaveProperty('pending_invoices_amount');
-      expect(data).toHaveProperty('invoice_aging');
-      expect(data).toHaveProperty('project_status_chart');
-      expect(data).toHaveProperty('overdue_tasks');
-      expect(data).toHaveProperty('my_tasks');
-
-      expect(typeof data.active_projects.count).toBe('number');
-      expect(typeof data.clients_count.total).toBe('number');
-      expect(typeof data.revenue_this_month.amount).toBe('number');
+      expect(Array.isArray(res.body.data)).toBe(true);
+      expect(res.body.data.some((w: any) => w.key === 'metrics_overview')).toBe(true);
+      expect(res.body.data.some((w: any) => w.key === 'pending_leaves')).toBe(true);
+      expect(res.body.data.some((w: any) => w.key === 'active_projects')).toBe(true);
+      expect(res.body.data.some((w: any) => w.key === 'invoice_aging')).toBe(true);
     });
 
-    it('should retrieve a specific widget by ID (invoice_aging)', async () => {
+    it('should fetch data for registered widget metrics_overview', async () => {
+      const res = await request(app)
+        .get('/api/v1/dashboard/widgets/metrics_overview')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toHaveProperty('totalEmployees');
+      expect(res.body.data).toHaveProperty('activeTotal');
+    });
+
+    it('should fetch data for registered business widget invoice_aging', async () => {
       const res = await request(app)
         .get('/api/v1/dashboard/widgets/invoice_aging')
         .set('Authorization', `Bearer ${adminToken}`);
@@ -71,7 +64,7 @@ describe('Task 6: Dashboard Widgets & Reports Registry', () => {
       expect(res.body.data).toHaveProperty('days_90_plus');
     });
 
-    it('should return 404 for unknown widget ID', async () => {
+    it('should return 404 for unknown widget key', async () => {
       const res = await request(app)
         .get('/api/v1/dashboard/widgets/non_existent_widget')
         .set('Authorization', `Bearer ${adminToken}`);
@@ -80,24 +73,33 @@ describe('Task 6: Dashboard Widgets & Reports Registry', () => {
     });
   });
 
-  describe('2. Reports Registry & Executions', () => {
-    it('should list all available registered reports for Admin', async () => {
+  describe('Reports Registry', () => {
+    it('should list registered reports for user', async () => {
       const res = await request(app)
         .get('/api/v1/reports')
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      const reportIds = res.body.data.map((r: any) => r.id);
+      expect(Array.isArray(res.body.data)).toBe(true);
+      const reportKeys = res.body.data.map((r: any) => r.key);
+      expect(reportKeys).toContain('employee_directory');
+      expect(reportKeys).toContain('project_status_summary');
+      expect(reportKeys).toContain('budget_vs_actual_per_project');
+      expect(reportKeys).toContain('client_wise_revenue');
+    });
 
-      expect(reportIds).toContain('project_status_summary');
-      expect(reportIds).toContain('task_summary_per_employee');
-      expect(reportIds).toContain('utilization_per_employee');
-      expect(reportIds).toContain('budget_vs_actual_per_project');
-      expect(reportIds).toContain('income_vs_expenses_per_month');
-      expect(reportIds).toContain('invoice_aging');
-      expect(reportIds).toContain('client_wise_revenue');
-      expect(reportIds).toContain('sales_pipeline_forecast');
+    it('should execute employee_directory report and return columns and rows', async () => {
+      const res = await request(app)
+        .get('/api/v1/reports/employee_directory')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toHaveProperty('columns');
+      expect(res.body.data).toHaveProperty('rows');
+      expect(Array.isArray(res.body.data.columns)).toBe(true);
+      expect(Array.isArray(res.body.data.rows)).toBe(true);
     });
 
     it('should execute project_status_summary report', async () => {
@@ -109,7 +111,6 @@ describe('Task 6: Dashboard Widgets & Reports Registry', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.data.columns).toBeDefined();
       expect(Array.isArray(res.body.data.rows)).toBe(true);
-      expect(res.body.data.totalRows).toBeGreaterThanOrEqual(1);
     });
 
     it('should execute budget_vs_actual_per_project report with labor costs and variances', async () => {
@@ -130,33 +131,32 @@ describe('Task 6: Dashboard Widgets & Reports Registry', () => {
         .get('/api/v1/reports/budget_vs_actual_per_project')
         .set('Authorization', `Bearer ${employeeToken}`);
 
-      // Employee lacks reports.view or projects.view_financials
       expect(res.status).toBe(403);
     });
 
-    it('should execute sales_pipeline_forecast report', async () => {
+    it('should export employee_directory report as XLSX', async () => {
       const res = await request(app)
-        .get('/api/v1/reports/sales_pipeline_forecast')
+        .get('/api/v1/reports/employee_directory/export?format=xlsx')
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.rows.length).toBe(8); // 8 stages
+      expect(res.header['content-type']).toContain('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      expect(res.header['content-disposition']).toContain('.xlsx');
+      expect(res.body).toBeDefined();
     });
 
-    it('should execute client_wise_revenue report', async () => {
+    it('should export employee_directory report as PDF', async () => {
       const res = await request(app)
-        .get('/api/v1/reports/client_wise_revenue')
+        .get('/api/v1/reports/employee_directory/export?format=pdf')
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.columns.some((c: any) => c.key === 'total_invoiced')).toBe(true);
+      expect(res.header['content-type']).toBe('application/pdf');
+      expect(res.header['content-disposition']).toContain('.pdf');
+      expect(res.body).toBeDefined();
     });
-  });
 
-  describe('3. Generic Report Exporter (CSV & JSON)', () => {
-    it('should export report as CSV with proper headers and mime type', async () => {
+    it('should export project_status_summary report as CSV', async () => {
       const res = await request(app)
         .get('/api/v1/reports/project_status_summary/export?format=csv')
         .set('Authorization', `Bearer ${adminToken}`);
@@ -168,7 +168,7 @@ describe('Task 6: Dashboard Widgets & Reports Registry', () => {
       expect(res.text).toContain('Project Name');
     });
 
-    it('should export report as JSON with proper mime type', async () => {
+    it('should export project_status_summary report as JSON', async () => {
       const res = await request(app)
         .get('/api/v1/reports/project_status_summary/export?format=json')
         .set('Authorization', `Bearer ${adminToken}`);

@@ -1,67 +1,109 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../../shared/utils/async-handler.util';
 import { sendSuccess } from '../../shared/utils/response.util';
-import { registryService } from './registry.service';
+import {
+  getDashboardWidgets,
+  executeDashboardWidget,
+  getReports,
+  executeReport,
+  getReportDefinition,
+  generateExcelReport,
+  generatePdfReport,
+} from '../../shared/registry';
+import { BadRequestError, NotFoundError } from '../../shared/errors/app-error';
 
 export class RegistryController {
-  private normalizeUser(req: Request) {
-    const user = req.user!;
-    return {
-      userId: user.userId,
-      employee_id: user.employeeId,
-      employeeId: user.employeeId,
-      roles: user.roles || [],
-      role: user.roles?.[0] || 'Employee',
-      permissions: user.permissions || [],
-    };
-  }
-
-  getDashboardWidgets = asyncHandler(async (req: Request, res: Response) => {
-    const user = this.normalizeUser(req);
-    const widgets = await registryService.getDashboardWidgets(user);
-    sendSuccess(res, widgets);
+  // ==========================================
+  // DASHBOARD WIDGETS
+  // ==========================================
+  public listWidgets = asyncHandler(async (req: Request, res: Response) => {
+    const widgets = getDashboardWidgets(req.user!);
+    return sendSuccess(res, widgets, 200, undefined, 'Dashboard widgets retrieved successfully');
   });
 
-  getDashboardWidgetById = asyncHandler(async (req: Request, res: Response) => {
-    const user = this.normalizeUser(req);
-    const { id } = req.params;
-    const widgetData = await registryService.getDashboardWidgetById(id, user);
-    sendSuccess(res, widgetData);
+  public getWidgetData = asyncHandler(async (req: Request, res: Response) => {
+    const { key } = req.params;
+    if (!key) {
+      throw new BadRequestError('Widget key is required');
+    }
+
+    const data = await executeDashboardWidget(key, req.user!, req.query);
+    return sendSuccess(res, data, 200, undefined, `Widget data for '${key}' retrieved successfully`);
   });
 
-  getAvailableReports = asyncHandler(async (req: Request, res: Response) => {
-    const user = this.normalizeUser(req);
-    const reports = registryService.getAvailableReports(user);
-    sendSuccess(res, reports);
+  // ==========================================
+  // REPORTS
+  // ==========================================
+  public listReports = asyncHandler(async (req: Request, res: Response) => {
+    const reports = getReports(req.user!);
+    return sendSuccess(res, reports, 200, undefined, 'Reports retrieved successfully');
   });
 
-  runReport = asyncHandler(async (req: Request, res: Response) => {
-    const user = this.normalizeUser(req);
-    const { id } = req.params;
-    const filters = {
-      fromDate: req.query.fromDate as string | undefined,
-      toDate: req.query.toDate as string | undefined,
-      ...req.query,
-    };
-    const result = await registryService.runReport(id, filters, user);
-    sendSuccess(res, result);
+  public getReportData = asyncHandler(async (req: Request, res: Response) => {
+    const { key } = req.params;
+    if (!key) {
+      throw new BadRequestError('Report key is required');
+    }
+
+    const reportData = await executeReport(key, req.query, req.user!);
+    return sendSuccess(res, reportData, 200, undefined, `Report '${key}' executed successfully`);
   });
 
-  exportReport = asyncHandler(async (req: Request, res: Response) => {
-    const user = this.normalizeUser(req);
-    const { id } = req.params;
-    const format = (req.query.format === 'json' ? 'json' : 'csv') as 'csv' | 'json';
-    const filters = {
-      fromDate: req.query.fromDate as string | undefined,
-      toDate: req.query.toDate as string | undefined,
-      ...req.query,
-    };
+  public exportReport = asyncHandler(async (req: Request, res: Response) => {
+    const { key } = req.params;
+    const { format = 'xlsx' } = req.query as { format?: string };
 
-    const exported = await registryService.exportReport(id, filters, format, user);
-    res.setHeader('Content-Type', exported.contentType);
-    res.setHeader('Content-Disposition', `attachment; filename="${exported.filename}"`);
-    res.send(exported.data);
+    if (!key) {
+      throw new BadRequestError('Report key is required');
+    }
+
+    const reportDef = getReportDefinition(key);
+    if (!reportDef) {
+      throw new NotFoundError(`Report '${key}' not found in registry`);
+    }
+
+    const reportData = await executeReport(key, req.query, req.user!);
+
+    if (format === 'pdf') {
+      const buffer = await generatePdfReport(reportDef, reportData, req.query);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${key}_${Date.now()}.pdf"`);
+      return res.send(buffer);
+    } else if (format === 'csv') {
+      const headerLine = reportDef.columns.map((c) => `"${c.header.replace(/"/g, '""')}"`).join(',');
+      const rows = reportData.rows.map((row) =>
+        reportDef.columns
+          .map((c) => {
+            const val = row[c.key];
+            if (val === null || val === undefined) return '""';
+            return `"${String(val).replace(/"/g, '""')}"`;
+          })
+          .join(',')
+      );
+      const csvContent = [headerLine, ...rows].join('\n');
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="${key}_${Date.now()}.csv"`);
+      return res.send(csvContent);
+    } else if (format === 'json') {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="${key}_${Date.now()}.json"`);
+      return res.send(JSON.stringify(reportData, null, 2));
+    } else {
+      const buffer = await generateExcelReport(reportDef, reportData, req.query);
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+      res.setHeader('Content-Disposition', `attachment; filename="${key}_${Date.now()}.xlsx"`);
+      return res.send(buffer);
+    }
   });
+
+  // Backwards compatibility aliases
+  public getDashboardWidgets = this.listWidgets;
+  public getDashboardWidgetById = this.getWidgetData;
+  public getAvailableReports = this.listReports;
+  public runReport = this.getReportData;
 }
 
 export const registryController = new RegistryController();

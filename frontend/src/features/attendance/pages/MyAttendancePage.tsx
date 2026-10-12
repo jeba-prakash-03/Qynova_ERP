@@ -4,6 +4,8 @@ import axiosClient from '../../../shared/api/axiosClient';
 import { useToast } from '../../../shared/context/ToastContext';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { Modal } from '../../../shared/components/Modal';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
+import { Button } from '../../../shared/components/Button';
 import {
   Clock,
   LogIn,
@@ -16,8 +18,6 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
-  Timer,
-  X,
 } from 'lucide-react';
 
 interface AttendanceBreak {
@@ -210,76 +210,74 @@ export const MyAttendancePage: React.FC = () => {
     ? new Date(user.employee.joining_date).toLocaleDateString('en-GB')
     : null;
 
+  const currentStatusString = isCheckedOut
+    ? 'COMPLETED'
+    : isCheckedIn
+    ? isOnBreak
+      ? 'WARNING'
+      : 'PRESENT'
+    : 'NOT_JOINED';
+
+  const currentStatusLabel = isCheckedOut
+    ? 'Completed'
+    : isCheckedIn
+    ? isOnBreak
+      ? 'On Break'
+      : 'Checked In'
+    : 'Not Checked In';
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
-          <Clock className="w-7 h-7 text-indigo-600" />
+          <Clock className="w-7 h-7 text-[#4F46E5]" />
           My Attendance
         </h1>
-        <p className="text-slate-500 text-sm mt-1">
+        <p className="text-[#64748B] text-sm mt-1">
           Punch in/out, view daily timer, and track your monthly work calendar.
         </p>
         {formattedJoiningDate && (
-          <p className="text-xs text-slate-600 font-semibold mt-1">
-            Joining Date: <span className="text-indigo-700">{formattedJoiningDate}</span>
+          <p className="text-xs text-[#475569] font-semibold mt-1">
+            Joining Date: <span className="text-[#4F46E5]">{formattedJoiningDate}</span>
           </p>
         )}
       </div>
 
       {/* BIG MAIN PUNCH CARD */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden p-6 sm:p-8">
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden p-6 sm:p-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           {/* Left: Date & Status */}
           <div className="space-y-2 text-center lg:text-left">
-            <div className="text-xs font-semibold uppercase tracking-wider text-indigo-600 flex items-center justify-center lg:justify-start gap-1.5">
+            <div className="text-xs font-semibold uppercase tracking-wider text-[#4F46E5] flex items-center justify-center lg:justify-start gap-1.5">
               <Calendar className="w-4 h-4" />
               <span>{todayDisplayDate}</span>
             </div>
             <div className="flex items-center justify-center lg:justify-start gap-3">
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                  isCheckedOut
-                    ? 'bg-slate-100 text-slate-700 border border-slate-300'
-                    : isCheckedIn
-                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                    : 'bg-amber-100 text-amber-800 border border-amber-300'
-                }`}
-              >
-                {isCheckedOut
-                  ? 'Completed'
-                  : isCheckedIn
-                  ? isOnBreak
-                    ? 'On Break'
-                    : 'Checked In'
-                  : 'Not Checked In'}
-              </span>
+              <StatusBadge status={currentStatusString} label={currentStatusLabel} size="md" />
 
               {attendance?.is_late && (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" /> Late
-                </span>
+                <StatusBadge status="warning" label="Late" size="sm" />
               )}
             </div>
 
             {isCheckedIn && (
-              <div className="text-xs text-slate-500 pt-1">
-                Checked in at: <strong className="text-slate-800 font-mono">{formatTimeStr(attendance?.check_in)}</strong>
+              <div className="text-xs text-[#64748B] pt-1">
+                Checked in at: <strong className="text-[#0F172A] font-mono">{formatTimeStr(attendance?.check_in)}</strong>
               </div>
             )}
           </div>
 
           {/* Center: Running Timer Display */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl px-8 py-4 text-center min-w-[240px]">
-            <span className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">
+          <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl px-8 py-4 text-center min-w-[240px]">
+            <span className="text-[11px] uppercase font-bold text-[#64748B] tracking-wider">
               Work Timer Today
             </span>
-            <div className="text-3xl sm:text-4xl font-mono font-extrabold text-slate-900 mt-1">
+            <div className="text-3xl sm:text-4xl font-mono font-extrabold text-[#0F172A] mt-1">
               {isCheckedIn ? elapsedFormatted : '00:00:00'}
             </div>
             {attendance?.break_minutes ? (
-              <div className="text-[11px] text-amber-700 font-medium mt-1">
+              <div className="text-[11px] text-[#B45309] font-medium mt-1">
                 Total break: {attendance.break_minutes} mins
               </div>
             ) : null}
@@ -290,14 +288,14 @@ export const MyAttendancePage: React.FC = () => {
             {!isCheckedIn ? (
               <div className="w-full max-w-xs space-y-3">
                 {/* Office / WFH Toggle */}
-                <div className="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                <div className="flex bg-[#F1F5F9] p-1 rounded-xl text-xs font-semibold border border-[#E2E8F0]">
                   <button
                     type="button"
                     onClick={() => setWorkType('office')}
                     className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
                       workType === 'office'
-                        ? 'bg-white text-indigo-700 shadow-sm font-bold'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white text-[#4F46E5] shadow-sm font-bold'
+                        : 'text-[#475569] hover:text-[#0F172A]'
                     }`}
                   >
                     <Building2 className="w-3.5 h-3.5" />
@@ -308,8 +306,8 @@ export const MyAttendancePage: React.FC = () => {
                     onClick={() => setWorkType('wfh')}
                     className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
                       workType === 'wfh'
-                        ? 'bg-white text-teal-700 shadow-sm font-bold'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-white text-[#0F766E] shadow-sm font-bold'
+                        : 'text-[#475569] hover:text-[#0F172A]'
                     }`}
                   >
                     <Home className="w-3.5 h-3.5" />
@@ -317,54 +315,61 @@ export const MyAttendancePage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* ONE MAIN BUTTON: Check In */}
-                <button
+                {/* CHECK IN BUTTON */}
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                  isLoading={checkInMutation.isPending}
+                  leftIcon={<LogIn className="w-5 h-5" />}
                   onClick={() => checkInMutation.mutate()}
-                  disabled={checkInMutation.isPending}
-                  className="w-full py-3.5 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <LogIn className="w-5 h-5" />
-                  {checkInMutation.isPending ? 'Checking In...' : 'CHECK IN'}
-                </button>
+                  CHECK IN
+                </Button>
               </div>
             ) : !isCheckedOut ? (
               <div className="w-full max-w-xs space-y-3">
-                {/* ONE MAIN BUTTON: Check Out */}
-                <button
+                {/* CHECK OUT BUTTON */}
+                <Button
+                  variant="danger"
+                  size="lg"
+                  className="w-full"
+                  isLoading={checkOutMutation.isPending}
+                  leftIcon={<LogOut className="w-5 h-5" />}
                   onClick={() => checkOutMutation.mutate()}
-                  disabled={checkOutMutation.isPending}
-                  className="w-full py-3.5 px-6 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-base shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <LogOut className="w-5 h-5" />
-                  {checkOutMutation.isPending ? 'Checking Out...' : 'CHECK OUT'}
-                </button>
+                  CHECK OUT
+                </Button>
 
-                {/* Small secondary Break button showing total break time only */}
                 <div className="flex items-center justify-between gap-2 pt-1">
                   {isOnBreak ? (
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full"
+                      isLoading={endBreakMutation.isPending}
+                      leftIcon={<Coffee className="w-3.5 h-3.5" />}
                       onClick={() => endBreakMutation.mutate()}
-                      disabled={endBreakMutation.isPending}
-                      className="w-full py-1.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
                     >
-                      <Coffee className="w-3.5 h-3.5" />
-                      {endBreakMutation.isPending ? 'Resuming...' : 'End Break'}
-                    </button>
+                      End Break
+                    </Button>
                   ) : (
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full"
+                      isLoading={startBreakMutation.isPending}
+                      leftIcon={<Coffee className="w-3.5 h-3.5 text-[#D97706]" />}
                       onClick={() => startBreakMutation.mutate()}
-                      disabled={startBreakMutation.isPending}
-                      className="w-full py-1.5 px-3 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
                     >
-                      <Coffee className="w-3.5 h-3.5 text-amber-600" />
-                      {startBreakMutation.isPending ? 'Taking Break...' : 'Take Break'}
-                    </button>
+                      Take Break
+                    </Button>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="text-center p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
+              <div className="text-center p-3 bg-[#DCFCE7] border border-[#BBF7D0] rounded-xl text-[#15803D] text-xs font-semibold">
+                <CheckCircle2 className="w-5 h-5 text-[#16A34A] mx-auto mb-1" />
                 Punch Out Recorded
               </div>
             )}
@@ -373,67 +378,40 @@ export const MyAttendancePage: React.FC = () => {
       </div>
 
       {/* MONTHLY CALENDAR WITH COLOURED BADGES */}
-      <div className="bg-white rounded-xl border border-slate-200/90 shadow-sm p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-[#E2E8F0]">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-lg font-bold text-slate-900">Monthly Calendar</h2>
+            <Calendar className="w-5 h-5 text-[#4F46E5]" />
+            <h2 className="text-lg font-bold text-[#0F172A]">Monthly Calendar</h2>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={handlePrevMonth}
-              className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600"
-            >
+            <Button variant="secondary" size="sm" onClick={handlePrevMonth}>
               <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="text-sm font-semibold text-slate-800 font-mono px-2">
+            </Button>
+            <span className="text-sm font-semibold text-[#0F172A] font-mono px-2">
               {selectedMonth}
             </span>
-            <button
-              onClick={handleNextMonth}
-              className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600"
-            >
+            <Button variant="secondary" size="sm" onClick={handleNextMonth}>
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </div>
 
-        {/* Badges Legend */}
-        <div className="flex flex-wrap gap-3 text-xs font-medium text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-emerald-500"></span>
-            <span>Present (green)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-rose-500"></span>
-            <span>Absent (red)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-amber-500"></span>
-            <span>Half day (orange)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-blue-500"></span>
-            <span>Leave (blue)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-purple-500"></span>
-            <span>Holiday (purple)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-slate-400"></span>
-            <span>Weekend (grey)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-teal-500"></span>
-            <span>WFH (teal)</span>
-          </div>
+        {/* Badges Legend using StatusBadge */}
+        <div className="flex flex-wrap gap-2 text-xs font-medium text-[#475569] bg-[#F8FAFC] p-3 rounded-lg border border-[#E2E8F0]">
+          <StatusBadge status="present" label="Present" size="sm" />
+          <StatusBadge status="absent" label="Absent" size="sm" />
+          <StatusBadge status="half_day" label="Half Day" size="sm" />
+          <StatusBadge status="leave" label="Leave" size="sm" />
+          <StatusBadge status="holiday" label="Holiday" size="sm" />
+          <StatusBadge status="weekend" label="Weekend" size="sm" />
+          <StatusBadge status="wfh" label="WFH" size="sm" />
         </div>
 
         {/* Monthly Grid */}
         {isLoadingMonthly ? (
-          <div className="py-12 text-center text-slate-400 text-sm">Loading attendance calendar...</div>
+          <div className="py-12 text-center text-[#64748B] text-sm">Loading attendance calendar...</div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
             {Object.entries(monthlyData?.days || {}).map(([dateStr, dayInfo]: [string, any]) => {
@@ -442,49 +420,21 @@ export const MyAttendancePage: React.FC = () => {
               const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
               const record = monthlyData?.records?.[dateStr];
 
-              // Badge colours
-              let bgStyle = 'bg-slate-100 text-slate-700 border-slate-200';
-              let badgeText = 'Weekend';
-
-              if (dayInfo.status === 'not_joined') {
-                bgStyle = 'bg-slate-100/60 text-slate-400 border-slate-200/60 opacity-60';
-                badgeText = '-';
-              } else if (dayInfo.status === 'present') {
-                bgStyle = 'bg-emerald-50 text-emerald-800 border-emerald-200';
-                badgeText = 'Present';
-              } else if (dayInfo.status === 'wfh') {
-                bgStyle = 'bg-teal-50 text-teal-800 border-teal-200';
-                badgeText = 'WFH';
-              } else if (dayInfo.status === 'half_day') {
-                bgStyle = 'bg-amber-50 text-amber-800 border-amber-200';
-                badgeText = 'Half Day';
-              } else if (dayInfo.status === 'absent') {
-                bgStyle = 'bg-rose-50 text-rose-800 border-rose-200';
-                badgeText = 'Absent';
-              } else if (dayInfo.status === 'leave') {
-                bgStyle = 'bg-blue-50 text-blue-800 border-blue-200';
-                badgeText = 'Leave';
-              } else if (dayInfo.status === 'holiday') {
-                bgStyle = 'bg-purple-50 text-purple-800 border-purple-200';
-                badgeText = dayInfo.name || 'Holiday';
-              }
-
               return (
                 <div
                   key={dateStr}
-                  title={dayInfo.status === 'not_joined' ? 'Not joined yet' : ''}
                   onClick={() => setSelectedDayPopup({ date: dateStr, dayInfo, record })}
-                  className={`p-3 rounded-xl border text-left flex flex-col justify-between min-h-[80px] cursor-pointer hover:shadow-md transition-all ${bgStyle}`}
+                  className="p-3 rounded-xl border border-[#E2E8F0] bg-white text-left flex flex-col justify-between min-h-[85px] cursor-pointer hover:shadow-md transition-all hover:border-[#4F46E5]"
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold">{dayNum}</span>
-                    <span className="text-[10px] text-slate-500 uppercase">{dayOfWeek}</span>
+                    <span className="text-xs font-bold text-[#0F172A]">{dayNum}</span>
+                    <span className="text-[10px] text-[#64748B] uppercase">{dayOfWeek}</span>
                   </div>
 
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xs font-semibold truncate">{badgeText}</span>
+                  <div className="mt-2 flex flex-col items-start gap-1">
+                    <StatusBadge status={dayInfo.status} size="sm" />
                     {record?.is_late && (
-                      <span className="text-[9px] font-bold px-1 rounded bg-amber-200 text-amber-900">
+                      <span className="text-[9px] font-bold px-1 rounded bg-[#FEF3C7] text-[#B45309]">
                         LATE
                       </span>
                     )}
@@ -503,17 +453,15 @@ export const MyAttendancePage: React.FC = () => {
         title={`Attendance Detail: ${selectedDayPopup?.date}`}
       >
         {selectedDayPopup && (
-          <div className="space-y-3 text-sm text-slate-700">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <span className="font-medium text-slate-500">Status</span>
-              <span className="font-bold uppercase text-indigo-700">
-                {selectedDayPopup.dayInfo?.status?.replace('_', ' ') || 'Normal'}
-              </span>
+          <div className="space-y-3 text-sm text-[#475569]">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
+              <span className="font-medium text-[#64748B]">Status</span>
+              <StatusBadge status={selectedDayPopup.dayInfo?.status || 'normal'} />
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Check In</span>
-              <span className="font-mono font-semibold">
+              <span className="text-[#64748B]">Check In</span>
+              <span className="font-mono font-semibold text-[#0F172A]">
                 {selectedDayPopup.record?.check_in
                   ? new Date(selectedDayPopup.record.check_in).toLocaleTimeString('en-IN')
                   : '--'}
@@ -521,8 +469,8 @@ export const MyAttendancePage: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Check Out</span>
-              <span className="font-mono font-semibold">
+              <span className="text-[#64748B]">Check Out</span>
+              <span className="font-mono font-semibold text-[#0F172A]">
                 {selectedDayPopup.record?.check_out
                   ? new Date(selectedDayPopup.record.check_out).toLocaleTimeString('en-IN')
                   : '--'}
@@ -530,8 +478,8 @@ export const MyAttendancePage: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Net Hours</span>
-              <span className="font-mono font-semibold">
+              <span className="text-[#64748B]">Net Hours</span>
+              <span className="font-mono font-semibold text-[#0F172A]">
                 {selectedDayPopup.record?.working_minutes
                   ? `${(selectedDayPopup.record.working_minutes / 60).toFixed(1)} hrs`
                   : '0 hrs'}
@@ -539,14 +487,14 @@ export const MyAttendancePage: React.FC = () => {
             </div>
 
             {selectedDayPopup.dayInfo?.leave_details && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
+              <div className="p-3 bg-[#E0F2FE] border border-[#BAE6FD] rounded-lg text-xs text-[#0369A1]">
                 <strong>Leave Info:</strong> {selectedDayPopup.dayInfo.leave_details}
               </div>
             )}
 
             {selectedDayPopup.record?.is_late && (
-              <div className="p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <div className="p-2 bg-[#FEF3C7] border border-[#FDE68A] rounded-lg text-xs text-[#B45309] flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-[#D97706]" />
                 Checked in after shift grace period.
               </div>
             )}

@@ -1,0 +1,65 @@
+name: Qynova ERP CI Pipeline
+
+on:
+  push:
+    branches: [main, feature/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: qynova_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -prootpassword" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Monorepo Dependencies
+        run: npm ci
+
+      - name: Code Quality & Linting
+        run: npm run lint
+
+      - name: Run Database Migrations & Seeds
+        env:
+          NODE_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_NAME: qynova_test
+        run: |
+          npx knex --knexfile backend/src/db/knexfile.ts migrate:latest
+          npx knex --knexfile backend/src/db/knexfile.ts seed:run
+
+      - name: Execute Backend Test Suites
+        env:
+          NODE_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_NAME: qynova_test
+          JWT_SECRET: ci_test_secret_key_1234567890_min_32
+          JWT_REFRESH_SECRET: ci_test_refresh_key_1234567890_min_32
+        run: npm run test:backend
+
+      - name: Build Backend & Frontend Production Bundles
+        run: npm run build

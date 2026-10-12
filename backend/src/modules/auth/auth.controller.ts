@@ -43,6 +43,13 @@ export class AuthController {
     );
   });
 
+  public resetPassword = asyncHandler(async (req: Request, res: Response) => {
+    const ip = req.ip || (req.headers['x-forwarded-for'] as string);
+    const userAgent = req.headers['user-agent'];
+    await authService.resetPassword(req.body, ip, userAgent);
+    return sendSuccess(res, { reset: true }, 200, undefined, 'Password has been reset successfully');
+  });
+
   public me = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new UnauthorizedError();

@@ -168,4 +168,102 @@ describe('Payroll & Salary Module Connections (Phase 5)', () => {
       'Payroll for month 2026-10 is locked and cannot be recalculated.'
     );
   });
+
+  test('Test Case 4: Admin adds incentives, bonus, allowances, overtime, PF and other deductions before run', async () => {
+    // Unlock for testing adjustments
+    await db('payroll_runs').where({ month: '2026-10' }).del();
+    await db('payroll_items').where({ employee_id: employeeId }).del();
+    await db('leave_request_days').whereIn('leave_request_id', function () {
+      this.select('id').from('leave_requests').where({ employee_id: employeeId });
+    }).del();
+    await db('leave_requests').where({ employee_id: employeeId }).del();
+    await db('attendance').where({ employee_id: employeeId }).del();
+
+    // 1. Add adjustments via API
+    const adjRes = await request(app)
+      .post('/api/v1/payroll/adjustments')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        employee_id: employeeId,
+        month: '2026-10',
+        incentives: 5000,
+        bonus: 2000,
+        allowances: 3000,
+        overtime: 1500,
+        pf: 3600, // Explicit PF
+        other_deductions: 500,
+        note: 'Sprint performance bonus and travel allowance',
+      });
+
+    expect(adjRes.status).toBe(201);
+    expect(adjRes.body.data.incentives).toBe(5000);
+
+    // 2. Run payroll
+    const runRes = await request(app)
+      .post('/api/v1/payroll/generate')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ month: '2026-10' });
+
+    expect(runRes.status).toBe(200);
+    const item = runRes.body.data.items?.find((i: any) => i.employee_id === employeeId);
+    expect(item).toBeDefined();
+
+    // Gross = 30000 + 5000 + 2000 + 3000 + 1500 = 41500
+    expect(item.gross_earning).toBe(41500);
+    expect(item.pf_deduction).toBe(3600);
+    expect(item.other_deductions).toBe(500);
+    // Net = Gross - (PF + Other Deductions + LOP) = 41500 - (3600 + 500 + 0) = 37400
+    expect(item.net_salary).toBe(37400);
+  });
+
+  test('Test Case 5: Payslip PDF download returns valid binary PDF', async () => {
+    const item = await db('payroll_items').where({ employee_id: employeeId }).first();
+    expect(item).toBeDefined();
+
+    const pdfRes = await request(app)
+      .get(`/api/v1/payroll/payslips/${item.id}/pdf`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(pdfRes.status).toBe(200);
+    expect(pdfRes.header['content-type']).toBe('application/pdf');
+    expect(pdfRes.header['content-disposition']).toContain('.pdf');
+    expect(pdfRes.body).toBeDefined();
+  });
+
+  test('Test Case 6: Status transitions: draft > processed > locked > paid and locked payroll cannot change', async () => {
+    // Transition to processed
+    const statusProcessed = await request(app)
+      .post('/api/v1/payroll/runs/2026-10/status')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ status: 'processed' });
+    expect(statusProcessed.status).toBe(200);
+    expect(statusProcessed.body.data.status).toBe('processed');
+
+    // Transition to locked
+    const statusLocked = await request(app)
+      .post('/api/v1/payroll/runs/2026-10/status')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ status: 'locked' });
+    expect(statusLocked.status).toBe(200);
+    expect(statusLocked.body.data.status).toBe('locked');
+
+    // Locked payroll cannot change adjustments
+    const adjBlocked = await request(app)
+      .post('/api/v1/payroll/adjustments')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        employee_id: employeeId,
+        month: '2026-10',
+        incentives: 1000,
+      });
+    expect(adjBlocked.status).toBe(400);
+
+    // Transition to paid
+    const statusPaid = await request(app)
+      .post('/api/v1/payroll/runs/2026-10/status')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ status: 'paid' });
+    expect(statusPaid.status).toBe(200);
+    expect(statusPaid.body.data.status).toBe('paid');
+  });
 });

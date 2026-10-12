@@ -8,6 +8,8 @@ import {
 } from '../../shared/errors/app-error';
 import { auditService } from '../../shared/services/audit.service';
 import { notificationService } from '../../shared/services/notification.service';
+import { emailService } from '../../shared/services/email.service';
+import { welcomeEmailTemplate } from '../../shared/services/email.templates';
 import { getTodayKolkata } from '../../shared/utils/date.util';
 import {
   EmployeeRecord,
@@ -187,6 +189,29 @@ export class EmployeesService {
       link: '/me',
     });
 
+    // Notify HR / Admins of new joiner
+    try {
+      const hrUsers = await db('user_roles as ur')
+        .join('roles as r', 'ur.role_id', 'r.id')
+        .whereIn('r.name', ['Admin', 'HR'])
+        .select('ur.user_id');
+
+      const hrUserIds = Array.from(new Set(hrUsers.map((u) => Number(u.user_id))));
+      if (hrUserIds.length > 0) {
+        await notificationService.notify({
+          eventKey: `employee:${createdEmployeeId}:joined`,
+          userIds: hrUserIds,
+          type: 'info',
+          title: 'New Employee Joined',
+          message: `${createdEmployee.first_name} ${createdEmployee.last_name} (${createdEmployee.employee_code}) has joined the company.`,
+          link: `/employees/${createdEmployeeId}`,
+          eventType: 'employee_joined',
+        });
+      }
+    } catch {
+      // Non-fatal
+    }
+
     // TODO [Dev 2 Integration]: When Dev 2 merges payroll module:
     // if (input.initial_salary) {
     //   await salaryStructureService.createInitialSalary({
@@ -194,6 +219,25 @@ export class EmployeesService {
     //     ctc: input.initial_salary
     //   });
     // }
+
+    // Queue welcome email with temporary password
+    try {
+      const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login`;
+      const html = welcomeEmailTemplate({
+        employeeName: `${createdEmployee.first_name} ${createdEmployee.last_name}`,
+        email: createdEmployee.email,
+        temporaryPassword,
+        loginUrl,
+      });
+      await emailService.queueEmail({
+        to: createdEmployee.email,
+        subject: `Welcome to Qynova ERP, ${createdEmployee.first_name}!`,
+        html,
+        eventKey: `welcome:emp:${createdEmployee.id}`,
+      });
+    } catch (mailErr) {
+      console.error('[WELCOME_EMAIL_ERROR] Failed to queue welcome email:', mailErr);
+    }
 
     return {
       employee: createdEmployee,

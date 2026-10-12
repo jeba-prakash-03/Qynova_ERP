@@ -1,484 +1,423 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import axiosClient from '../../../shared/api/axiosClient';
+import { Button } from '../../../shared/components/Button';
+import { Loader } from '../../../shared/components/Loader';
+import { EmptyState } from '../../../shared/components/EmptyState';
+import { ErrorState } from '../../../shared/components/ErrorState';
 import {
   FileText,
+  FileSpreadsheet,
   Download,
   Filter,
   Calendar,
+  Building2,
+  Table as TableIcon,
   Search,
-  ArrowLeft,
-  ChevronRight,
-  TrendingUp,
-  FolderKanban,
-  CheckSquare,
-  DollarSign,
-  Users,
-  Target,
-  RefreshCw,
-  AlertCircle,
-  FileSpreadsheet,
 } from 'lucide-react';
-import { reportsApi } from '../api';
-import { ReportMetadata, ReportResult, ReportColumn } from '../types';
-import { Loader } from '../../../shared/components/Loader';
-import { useToast } from '../../../shared/context/ToastContext';
-import { Can } from '../../../shared/components/Can';
 
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  projects: <FolderKanban className="h-4 w-4" />,
-  tasks: <CheckSquare className="h-4 w-4" />,
-  finance: <DollarSign className="h-4 w-4" />,
-  sales: <Target className="h-4 w-4" />,
-  hr: <Users className="h-4 w-4" />,
-};
+interface ReportMeta {
+  key: string;
+  title: string;
+  group: string;
+  columns: Array<{
+    key: string;
+    header: string;
+    width?: number;
+    align?: 'left' | 'center' | 'right';
+    format?: string;
+  }>;
+}
 
-const CATEGORY_COLORS: Record<string, string> = {
-  projects: 'bg-blue-50 text-blue-700 border-blue-200',
-  tasks: 'bg-amber-50 text-amber-700 border-amber-200',
-  finance: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  sales: 'bg-purple-50 text-purple-700 border-purple-200',
-  hr: 'bg-rose-50 text-rose-700 border-rose-200',
-};
+interface ReportDataResponse {
+  title?: string;
+  columns: Array<{
+    key: string;
+    header: string;
+    align?: 'left' | 'center' | 'right';
+  }>;
+  rows: Record<string, any>[];
+  summary?: Record<string, any>;
+  totalRows?: number;
+}
 
 export const ReportsPage: React.FC = () => {
-  const { success, error: toastError } = useToast();
-
-  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Date filters
+  const [selectedReportKey, setSelectedReportKey] = useState<string>('');
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
+  const [departmentId, setDepartmentId] = useState<string>('');
+  const [exportingFormat, setExportingFormat] = useState<'xlsx' | 'pdf' | 'csv' | 'json' | null>(null);
 
   // Fetch available reports
   const {
     data: reports = [],
     isLoading: loadingReports,
     error: reportsError,
-  } = useQuery<ReportMetadata[]>({
+    refetch: refetchReports,
+  } = useQuery<ReportMeta[]>({
     queryKey: ['reports', 'list'],
-    queryFn: reportsApi.getAvailableReports,
+    queryFn: async () => {
+      const res = await axiosClient.get('/reports');
+      const list = res.data?.data || [];
+      if (list.length > 0 && !selectedReportKey) {
+        setSelectedReportKey(list[0].key);
+      }
+      return list;
+    },
   });
 
-  // Fetch selected report data
+  // Fetch departments for filter
+  const { data: departments = [] } = useQuery({
+    queryKey: ['departments', 'for-reports'],
+    queryFn: async () => {
+      try {
+        const res = await axiosClient.get('/departments');
+        return res.data?.data || [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  // Fetch report data
   const {
-    data: activeReportData,
-    isLoading: loadingReportData,
-    isFetching: fetchingReportData,
-    error: reportDataError,
-    refetch: refetchReportData,
-  } = useQuery<ReportResult>({
-    queryKey: ['reports', 'run', selectedReportId, fromDate, toDate],
-    queryFn: () =>
-      reportsApi.runReport(selectedReportId!, {
-        fromDate: fromDate || undefined,
-        toDate: toDate || undefined,
-      }),
-    enabled: Boolean(selectedReportId),
+    data: reportData,
+    isLoading: loadingData,
+    isFetching: fetchingData,
+    error: dataError,
+    refetch: refetchData,
+  } = useQuery<ReportDataResponse>({
+    queryKey: ['reports', 'data', selectedReportKey, fromDate, toDate, departmentId],
+    queryFn: async () => {
+      if (!selectedReportKey) return { columns: [], rows: [] };
+      const params = new URLSearchParams();
+      if (fromDate) params.append('from', fromDate);
+      if (toDate) params.append('to', toDate);
+      if (departmentId) params.append('department', departmentId);
+
+      const res = await axiosClient.get(`/reports/${selectedReportKey}?${params.toString()}`);
+      return res.data?.data || { columns: [], rows: [] };
+    },
+    enabled: Boolean(selectedReportKey),
   });
 
   // Handle Export
-  const exportMutation = useMutation({
-    mutationFn: async (format: 'csv' | 'json') => {
-      if (!selectedReportId) return;
-      const blob = await reportsApi.exportReport(selectedReportId, format, {
-        fromDate: fromDate || undefined,
-        toDate: toDate || undefined,
+  const handleExport = async (format: 'xlsx' | 'pdf' | 'csv' | 'json') => {
+    if (!selectedReportKey) return;
+    try {
+      setExportingFormat(format);
+      const params = new URLSearchParams();
+      if (fromDate) params.append('from', fromDate);
+      if (toDate) params.append('to', toDate);
+      if (departmentId) params.append('department', departmentId);
+      params.append('format', format);
+
+      const response = await axiosClient.get(`/reports/${selectedReportKey}/export?${params.toString()}`, {
+        responseType: format === 'json' ? 'json' : 'blob',
       });
 
-      // Create download link
+      let blob: Blob;
+      if (format === 'json') {
+        blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
+      } else {
+        const mimeTypes: Record<string, string> = {
+          pdf: 'application/pdf',
+          xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          csv: 'text/csv',
+        };
+        blob = new Blob([response.data], { type: mimeTypes[format] || 'application/octet-stream' });
+      }
+
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${selectedReportId}_${Date.now()}.${format}`;
-      document.body.appendChild(a);
-      a.click();
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${selectedReportKey}_${new Date().toISOString().split('T')[0]}.${format}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
       window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    },
-    onSuccess: (_, format) => {
-      success(`Report exported successfully as ${format.toUpperCase()}`);
-    },
-    onError: (err: any) => {
-      toastError(err.message || 'Failed to export report');
-    },
-  });
-
-  const formatCurrency = (amt: any) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(Number(amt || 0));
-  };
-
-  const renderCellValue = (column: ReportColumn, val: any) => {
-    if (val === null || val === undefined) return '—';
-
-    switch (column.format) {
-      case 'currency':
-        return <span className="font-semibold text-slate-800">{formatCurrency(val)}</span>;
-      case 'number':
-        return <span className="font-medium text-slate-700">{Number(val).toLocaleString()}</span>;
-      case 'percentage':
-        return <span className="font-semibold text-indigo-700">{val}</span>;
-      case 'status':
-        return (
-          <span className="inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-800 capitalize">
-            {String(val).replace(/_/g, ' ')}
-          </span>
-        );
-      case 'date':
-        return <span className="text-slate-600">{val}</span>;
-      default:
-        return <span>{String(val)}</span>;
+    } catch (err: any) {
+      console.error('Export failed:', err);
+      alert('Failed to export report. Please try again.');
+    } finally {
+      setExportingFormat(null);
     }
   };
 
-  const filteredReports = reports.filter((r) => {
-    if (selectedCategory !== 'all' && r.category !== selectedCategory) return false;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      return (
-        r.title.toLowerCase().includes(q) ||
-        r.description.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
+  // Group reports by their group field
+  const groupedReports = reports.reduce((acc, rep) => {
+    const grp = rep.group || 'General';
+    if (!acc[grp]) acc[grp] = [];
+    acc[grp].push(rep);
+    return acc;
+  }, {} as Record<string, ReportMeta[]>);
 
-  const selectedReportMeta = reports.find((r) => r.id === selectedReportId);
+  const selectedReport = reports.find((r) => r.key === selectedReportKey);
 
-  // Quick Date presets
-  const handleQuickPreset = (preset: 'this_month' | 'last_30' | 'clear') => {
-    if (preset === 'clear') {
-      setFromDate('');
-      setToDate('');
-      return;
-    }
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+  if (loadingReports) {
+    return <Loader size="lg" text="Loading available reports..." />;
+  }
 
-    if (preset === 'this_month') {
-      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
-        .toISOString()
-        .split('T')[0];
-      setFromDate(firstDay);
-      setToDate(todayStr);
-    } else if (preset === 'last_30') {
-      const past = new Date();
-      past.setDate(past.getDate() - 30);
-      setFromDate(past.toISOString().split('T')[0]);
-      setToDate(todayStr);
-    }
-  };
+  if (reportsError) {
+    return (
+      <ErrorState
+        title="Failed to Load Reports"
+        message="Could not retrieve available reports from registry."
+        onRetry={refetchReports}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Analytics & Reports Registry
-          </h1>
-          <p className="text-sm text-slate-500">
-            Comprehensive business reports with custom date filters and CSV/JSON exports.
+          <h1 className="text-2xl font-black text-[#0F172A] tracking-tight">Reports & Analytics</h1>
+          <p className="text-sm text-[#64748B] mt-1">
+            Standardized corporate reports registry with instant data preview, XLSX, PDF, and CSV exports.
           </p>
         </div>
 
-        {selectedReportId && (
-          <button
-            onClick={() => setSelectedReportId(null)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 transition"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to All Reports
-          </button>
+        {selectedReport && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="secondary"
+              onClick={() => handleExport('xlsx')}
+              isLoading={exportingFormat === 'xlsx'}
+              className="flex items-center gap-2"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+              <span>Export Excel</span>
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => handleExport('csv')}
+              isLoading={exportingFormat === 'csv'}
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4 text-blue-600" />
+              <span>Export CSV</span>
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => handleExport('pdf')}
+              isLoading={exportingFormat === 'pdf'}
+              className="flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4 text-white" />
+              <span>Export PDF</span>
+            </Button>
+          </div>
         )}
       </div>
 
-      {/* VIEW 1: REPORTS LISTING */}
-      {!selectedReportId && (
-        <div className="space-y-6">
-          {/* Categories & Search */}
-          <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-            {/* Category pills */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              {['all', 'projects', 'tasks', 'finance', 'sales', 'hr'].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition ${
-                    selectedCategory === cat
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+      {/* Main Grid: Left sidebar report selector + Right preview */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Report Selector Sidebar */}
+        <div className="lg:col-span-1 bg-white rounded-2xl border border-[#E2E8F0] p-4 shadow-xs space-y-4">
+          <div className="text-xs font-bold text-[#64748B] uppercase tracking-wider px-2">
+            Available Reports
+          </div>
+
+          <div className="space-y-4">
+            {Object.entries(groupedReports).map(([groupName, groupItems]) => (
+              <div key={groupName} className="space-y-1">
+                <div className="text-xs font-extrabold text-[#0F172A] px-2 py-1 bg-[#F8FAFC] rounded-lg">
+                  {groupName}
+                </div>
+                <div className="space-y-0.5">
+                  {groupItems.map((r) => {
+                    const isSelected = r.key === selectedReportKey;
+                    return (
+                      <button
+                        key={r.key}
+                        onClick={() => setSelectedReportKey(r.key)}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-[#EEF2FF] text-[#4F46E5]'
+                            : 'text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
+                        }`}
+                      >
+                        <span className="truncate">{r.title}</span>
+                        {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-[#4F46E5]" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Report Viewer & Filter Panel */}
+        <div className="lg:col-span-3 space-y-4">
+          {/* Filters Bar */}
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] p-4 shadow-xs flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-[#64748B]" />
+              <span className="text-xs font-bold text-[#0F172A]">Filters:</span>
             </div>
 
-            {/* Search */}
-            <div className="relative max-w-xs w-full">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-[#64748B]">From:</label>
               <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search reports..."
-                className="w-full rounded-lg border border-slate-300 pl-9 pr-3 py-1.5 text-xs focus:border-indigo-500 focus:outline-none"
+                type="date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="text-xs border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
               />
             </div>
-          </div>
 
-          {/* Loading state */}
-          {loadingReports && (
-            <div className="flex h-64 items-center justify-center rounded-xl border border-slate-200 bg-white">
-              <Loader text="Loading reports catalog..." />
-            </div>
-          )}
-
-          {/* Error state */}
-          {reportsError && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center text-rose-700">
-              <AlertCircle className="mx-auto h-8 w-8 text-rose-500" />
-              <h3 className="mt-2 font-semibold">Failed to load reports</h3>
-              <p className="mt-1 text-xs">{(reportsError as any)?.message || 'Network error'}</p>
-            </div>
-          )}
-
-          {/* Reports Grid */}
-          {!loadingReports && !reportsError && (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredReports.map((report) => {
-                const colorClass = CATEGORY_COLORS[report.category] || 'bg-slate-50 text-slate-700 border-slate-200';
-                const icon = CATEGORY_ICONS[report.category] || <FileText className="h-4 w-4" />;
-
-                return (
-                  <div
-                    key={report.id}
-                    onClick={() => setSelectedReportId(report.id)}
-                    className="group cursor-pointer rounded-xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-indigo-400 hover:shadow-md flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${colorClass}`}
-                        >
-                          {icon}
-                          {report.category}
-                        </span>
-                        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition" />
-                      </div>
-
-                      <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition">
-                        {report.title}
-                      </h3>
-                      <p className="mt-1.5 text-xs text-slate-500 line-clamp-3 leading-relaxed">
-                        {report.description}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                      <span>Permission: {report.permission}</span>
-                      <span className="font-semibold text-indigo-600 group-hover:underline">
-                        Run Report →
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* VIEW 2: ACTIVE REPORT VIEWER */}
-      {selectedReportId && selectedReportMeta && (
-        <div className="space-y-6">
-          {/* Header Card with Meta & Filters */}
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] font-semibold uppercase ${
-                      CATEGORY_COLORS[selectedReportMeta.category]
-                    }`}
-                  >
-                    {CATEGORY_ICONS[selectedReportMeta.category]}
-                    {selectedReportMeta.category}
-                  </span>
-                  <h2 className="text-xl font-bold text-slate-900">
-                    {selectedReportMeta.title}
-                  </h2>
-                </div>
-                <p className="mt-1 text-xs text-slate-500">
-                  {selectedReportMeta.description}
-                </p>
-              </div>
-
-              {/* Export actions */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => exportMutation.mutate('csv')}
-                  disabled={exportMutation.isPending || !activeReportData?.rows?.length}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50 transition"
-                >
-                  <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
-                  Export CSV
-                </button>
-                <button
-                  onClick={() => exportMutation.mutate('json')}
-                  disabled={exportMutation.isPending || !activeReportData?.rows?.length}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50 transition"
-                >
-                  <Download className="h-4 w-4 text-indigo-600" />
-                  Export JSON
-                </button>
-              </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-[#64748B]">To:</label>
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="text-xs border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+              />
             </div>
 
-            {/* Date Filters Bar */}
-            <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-600">From Date:</span>
-                <input
-                  type="date"
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                  className="rounded-lg border border-slate-300 px-2.5 py-1 text-xs focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-600">To Date:</span>
-                <input
-                  type="date"
-                  value={toDate}
-                  onChange={(e) => setToDate(e.target.value)}
-                  className="rounded-lg border border-slate-300 px-2.5 py-1 text-xs focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
-
-              {/* Quick Preset Buttons */}
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => handleQuickPreset('this_month')}
-                  className="rounded bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-200"
-                >
-                  This Month
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickPreset('last_30')}
-                  className="rounded bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-200"
-                >
-                  Last 30 Days
-                </button>
-                {(fromDate || toDate) && (
-                  <button
-                    type="button"
-                    onClick={() => handleQuickPreset('clear')}
-                    className="rounded text-[11px] font-medium text-indigo-600 hover:underline px-1"
-                  >
-                    Reset
-                  </button>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => refetchReportData()}
-                disabled={fetchingReportData}
-                className="ml-auto inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-[#64748B]">Department:</label>
+              <select
+                value={departmentId}
+                onChange={(e) => setDepartmentId(e.target.value)}
+                className="text-xs border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
               >
-                <RefreshCw className={`h-3 w-3 ${fetchingReportData ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
+                <option value="">All Departments</option>
+                {departments.map((d: any) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            {(fromDate || toDate || departmentId) && (
+              <button
+                onClick={() => {
+                  setFromDate('');
+                  setToDate('');
+                  setDepartmentId('');
+                }}
+                className="text-xs text-rose-600 hover:underline font-semibold ml-auto"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
 
-          {/* Report Data Table */}
-          {loadingReportData && (
-            <div className="flex h-64 items-center justify-center rounded-xl border border-slate-200 bg-white">
-              <Loader text="Generating report data..." />
+          {/* Table Preview Container */}
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TableIcon className="w-4 h-4 text-[#4F46E5]" />
+                <h3 className="text-sm font-bold text-[#0F172A]">
+                  {selectedReport?.title || 'Report Preview'}
+                </h3>
+              </div>
+              {fetchingData && <span className="text-xs text-[#64748B]">Updating data...</span>}
             </div>
-          )}
 
-          {reportDataError && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center text-rose-700">
-              <AlertCircle className="mx-auto h-8 w-8 text-rose-500" />
-              <h3 className="mt-2 font-semibold">Error Generating Report</h3>
-              <p className="mt-1 text-xs">{(reportDataError as any)?.message || 'Failed to fetch report rows'}</p>
-            </div>
-          )}
-
-          {!loadingReportData && !reportDataError && activeReportData && (
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-              {activeReportData.rows.length === 0 ? (
-                <div className="py-16 text-center text-slate-500">
-                  <FileText className="mx-auto h-10 w-10 text-slate-300" />
-                  <p className="mt-2 text-sm font-medium">No records found for the selected date criteria</p>
-                  <p className="text-xs text-slate-400">Try broadening your date filter range.</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-slate-600">
-                    <thead className="bg-slate-50 text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200">
-                      <tr>
-                        {activeReportData.columns.map((col) => (
-                          <th
+            {loadingData ? (
+              <div className="p-12">
+                <Loader size="md" text="Loading report preview..." />
+              </div>
+            ) : dataError ? (
+              <div className="p-8">
+                <ErrorState
+                  title="Failed to load preview"
+                  message="Could not fetch data for this report with selected filters."
+                  onRetry={refetchData}
+                />
+              </div>
+            ) : !reportData || reportData.rows.length === 0 ? (
+              <div className="p-12">
+                <EmptyState
+                  title="No records found"
+                  description="No report data matches the current date and department filters."
+                />
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-[#0F172A]">
+                  <thead className="bg-[#1E293B] text-white uppercase text-[10px] tracking-wider font-bold">
+                    <tr>
+                      {reportData.columns.map((col) => (
+                        <th
+                          key={col.key}
+                          className={`px-4 py-3 ${
+                            col.align === 'right'
+                              ? 'text-right'
+                              : col.align === 'center'
+                              ? 'text-center'
+                              : 'text-left'
+                          }`}
+                        >
+                          {col.header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E2E8F0]">
+                    {reportData.rows.map((row, idx) => (
+                      <tr
+                        key={idx}
+                        className={`transition hover:bg-[#F8FAFC] ${
+                          idx % 2 === 1 ? 'bg-[#F8FAFC]/50' : 'bg-white'
+                        }`}
+                      >
+                        {reportData.columns.map((col) => (
+                          <td
                             key={col.key}
-                            className={`px-4 py-3 ${
-                              col.format === 'currency' || col.format === 'number'
+                            className={`px-4 py-2.5 ${
+                              col.align === 'right'
                                 ? 'text-right'
+                                : col.align === 'center'
+                                ? 'text-center'
                                 : 'text-left'
                             }`}
                           >
-                            {col.label}
-                          </th>
+                            {row[col.key] !== undefined && row[col.key] !== null
+                              ? String(row[col.key])
+                              : '-'}
+                          </td>
                         ))}
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {activeReportData.rows.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50/80 transition">
-                          {activeReportData.columns.map((col) => (
-                            <td
-                              key={col.key}
-                              className={`px-4 py-3 ${
-                                col.format === 'currency' || col.format === 'number'
-                                  ? 'text-right'
-                                  : 'text-left'
-                              }`}
-                            >
-                              {renderCellValue(col, row[col.key])}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot className="bg-slate-50 text-xs font-semibold text-slate-700 border-t border-slate-200">
-                      <tr>
-                        <td
-                          colSpan={activeReportData.columns.length}
-                          className="px-4 py-2.5 text-right text-slate-500"
-                        >
-                          Total Records: {activeReportData.totalRows}
-                        </td>
+                    ))}
+
+                    {/* Summary row if present */}
+                    {reportData.summary && Object.keys(reportData.summary).length > 0 && (
+                      <tr className="bg-[#EEF2FF] font-bold text-[#4338CA]">
+                        {reportData.columns.map((col) => (
+                          <td
+                            key={col.key}
+                            className={`px-4 py-2.5 ${
+                              col.align === 'right'
+                                ? 'text-right'
+                                : col.align === 'center'
+                                ? 'text-center'
+                                : 'text-left'
+                            }`}
+                          >
+                            {reportData.summary?.[col.key] !== undefined
+                              ? String(reportData.summary[col.key])
+                              : ''}
+                          </td>
+                        ))}
                       </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
+
+export default ReportsPage;

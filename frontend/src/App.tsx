@@ -8,6 +8,7 @@ import { AppShell } from './shared/components/AppShell';
 import { LoginPage } from './features/auth/pages/LoginPage';
 import { ChangePasswordPage } from './features/auth/pages/ChangePasswordPage';
 import { ForgotPasswordPage } from './features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './features/auth/pages/ResetPasswordPage';
 
 // Dashboards
 import { AdminDashboard } from './features/dashboard/AdminDashboard';
@@ -56,9 +57,14 @@ import { FinanceOverviewPage } from './features/finance/pages/FinanceOverviewPag
 // CRM Module (Dev B)
 import { CrmPipelinePage } from './features/crm/pages/CrmPipelinePage';
 
-// Reports Registry Module (Dev B)
+// Reports & Registry
 import { ReportsPage } from './features/reports/pages/ReportsPage';
 
+// Assets Management (Dev A)
+import { AssetListPage } from './features/assets/pages/AssetListPage';
+import { AssetDetailPage } from './features/assets/pages/AssetDetailPage';
+import { MyAssetsPage } from './features/assets/pages/MyAssetsPage';
+import { NotificationSettingsPage } from './features/notifications/pages/NotificationSettingsPage';
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -68,14 +74,19 @@ const RootRedirect: React.FC = () => {
 };
 
 import ErrorBoundary from './shared/components/ErrorBoundary';
+import { PrivacyPolicyPage } from './features/legal/pages/PrivacyPolicyPage';
+import { TermsPage } from './features/legal/pages/TermsPage';
 
 export const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <Routes>
-      {/* Public Auth Routes */}
+      {/* Public Auth & Legal Routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
 
       {/* Mandatory Password Change Route */}
       <Route
@@ -363,16 +374,51 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Reports Registry Module (Dev B) */}
+        {/* Reports & Analytics */}
         <Route
           path="/reports"
           element={
-            <ProtectedRoute permission="reports.view">
+            <ProtectedRoute>
               <ReportsPage />
             </ProtectedRoute>
           }
         />
 
+        {/* Assets Management (Dev A) */}
+        <Route
+          path="/assets"
+          element={
+            <ProtectedRoute permission="assets.view">
+              <AssetListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/assets/:id"
+          element={
+            <ProtectedRoute permission="assets.view">
+              <AssetDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-assets"
+          element={
+            <ProtectedRoute requireEmployee>
+              <MyAssetsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Notification Settings (Dev A) */}
+        <Route
+          path="/settings/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationSettingsPage />
+            </ProtectedRoute>
+          }
+        />
         {/* Fallback & Root redirect */}
         <Route path="/" element={<RootRedirect />} />
         <Route path="*" element={<RootRedirect />} />

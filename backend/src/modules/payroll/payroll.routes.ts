@@ -20,39 +20,65 @@ router.get(
   asyncHandler(payrollController.getMyPayslips)
 );
 
-// 2. Set salary structure for an employee
+// 2. Download Payslip PDF (employee own or admin/hr)
+router.get(
+  '/payslips/:id/pdf',
+  asyncHandler(payrollController.downloadPayslipPdf)
+);
+
+// 3. Set salary structure for an employee
 router.post(
   '/salary',
   requirePermission('payroll.edit'),
   asyncHandler(payrollController.setSalaryStructure)
 );
 
-// 3. Get salary history for an employee
+// 4. Get salary history for an employee
 router.get(
   '/salary/:employeeId',
   requireAnyPermission('payroll.view', 'employees.view'),
   asyncHandler(payrollController.getSalaryHistory)
 );
 
-// 4. Generate / Recalculate payroll run
+// 5. Pre-run adjustments (Incentives, Bonus, Allowances, Overtime, PF, Other Deductions)
+router.get(
+  '/adjustments',
+  requirePermission('payroll.view'),
+  asyncHandler(payrollController.getAdjustments)
+);
+
+router.post(
+  '/adjustments',
+  requirePermission('payroll.edit'),
+  asyncHandler(payrollController.setAdjustment)
+);
+
+// 6. Generate / Recalculate payroll run
 router.post(
   '/generate',
   requirePermission('payroll.run'),
   asyncHandler(payrollController.generatePayroll)
 );
 
-// 5. Get payroll run for a month
+// 7. Get payroll run for a month
 router.get(
   '/runs/:month',
   requirePermission('payroll.view'),
   asyncHandler(payrollController.getPayrollRun)
 );
 
-// 6. Lock payroll run
+// 8. Lock payroll run
 router.post(
   '/runs/:month/lock',
   requirePermission('payroll.approve'),
   asyncHandler(payrollController.lockPayroll)
+);
+
+// 9. Update payroll run status (Draft > Processed > Locked > Paid)
+router.post(
+  '/runs/:month/status',
+  requirePermission('payroll.approve'),
+  asyncHandler(payrollController.updateStatus)
 );
 
 export default router;

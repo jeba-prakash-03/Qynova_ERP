@@ -58,6 +58,14 @@ export const ALL_SYSTEM_PERMISSIONS: PermissionDefinition[] = [
   { module: 'notifications', action: 'edit', name: 'notifications.edit', description: 'Edit notification status' },
   { module: 'notifications', action: 'delete', name: 'notifications.delete', description: 'Delete notifications' },
 
+  // Assets
+  { module: 'assets', action: 'view', name: 'assets.view', description: 'View company assets' },
+  { module: 'assets', action: 'view_own', name: 'assets.view_own', description: 'View own assigned assets' },
+  { module: 'assets', action: 'create', name: 'assets.create', description: 'Create asset' },
+  { module: 'assets', action: 'edit', name: 'assets.edit', description: 'Edit asset details' },
+  { module: 'assets', action: 'delete', name: 'assets.delete', description: 'Delete asset' },
+  { module: 'assets', action: 'assign', name: 'assets.assign', description: 'Assign or return assets' },
+
   // --- DEV 2 MODULES ---
   // Attendance
   { module: 'attendance', action: 'view', name: 'attendance.view', description: 'View company attendance' },

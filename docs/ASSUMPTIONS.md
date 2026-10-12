@@ -11,9 +11,24 @@
 | 7 | For Phase 5 salary_structures: `effective_from` date determines which row payroll uses. When a new structure is added, the previous one is NOT deleted. | Spec says "changes create a new row, keep history". |
 | 8 | The attendance export route (`/export`) has no permission guard. Assumption: requires `attendance.view` permission (added in Phase 1 fix). | Consistent with other admin attendance routes. |
 | 9 | Dev 3 modules (clients, projects, tasks, milestones, invoices, expenses, crm, contracts, reports) are disconnected from frontend navigation and RBAC grid. Timesheets uses a free-text task description with nullable project_id/task_id. No Dev 3 source files existed in frontend. | Task 3 specifications. |
+
+## Sprint Business Assumptions (Dev B)
+
+| # | Assumption | Rationale |
+|---|------------|-----------|
 | 10 | Added nullable project_id and task_id to timesheets table; created timesheetIntegrationService wrapper in projects module for getApprovedMinutesByProject/Task. | Dev A created timesheets table rather than timesheet_entries and did not export project/task minute aggregation methods. |
 | 11 | Tasks actual_hours aggregates approved minutes from timesheets; daily cron for due tomorrow task notifications runs at 08:00 Asia/Kolkata using node-cron with idempotent event keys. | Workflow server enforcement requires assignee project membership and subtask completion checks before resolving parents. |
 | 12 | `payrollService.getHourlyCost(employeeId)` was not implemented in Dev A payroll service. Implemented thin wrapper `payrollIntegrationService.getHourlyCost` in Dev B profitability module computing hourly cost from active salary structure CTC / (12 * 160 hrs). | Spec rule: "If a function does not exist, create a thin exported wrapper in MY module that reads through the existing service, and note it in docs/ASSUMPTIONS.md." |
 | 13 | Invoices daily cron runs at midnight Asia/Kolkata checking overdue invoices and notifying finance administrators with idempotent event keys `invoice-overdue-${id}-${today}`; email notifications record a clear TODO awaiting Dev A email queue. | Required in Task 4 invoice workflow. |
 | 14 | In CRM-Lite, converting a Won lead generates a new Client with unique sequence CL-XXXX and a primary contact from lead contact details, plus a new Project PRJ-XXXX in one atomic database transaction; converting requires won stage and blocks re-conversion. Moving to lost stage strictly requires a lost_reason. | Required in Task 5 CRM-Lite specifications. |
-| 15 | Dev A's dashboard and reports registries were not found merged into develop; implemented backend/src/shared/registry (registerDashboardWidget, registerReport) and registered all 9 business widgets and 8 analytical reports with date filters, RBAC guards, and generic CSV/JSON exporter. | Spec: "If a function does not exist, create a thin exported wrapper in MY module that reads through the existing service, and note it in docs/ASSUMPTIONS.md." |
+| 15 | Adapted Dev B widgets and reports into Dev A registry format (`backend/src/shared/registry/widget.registry.ts` and `report.registry.ts`), with business widgets registered in `business.widgets.ts` and analytical reports in `business.reports.ts`. | Spec: "If a function does not exist, create a thin exported wrapper in MY module that reads through the existing service, and note it in docs/ASSUMPTIONS.md." |
+
+## Sprint HR Assumptions (Dev A)
+
+| # | Assumption | Rationale |
+|---|------------|-----------|
+| 16 | Dashboard widgets and reports registries are mounted at `/api/v1/dashboard/widgets` and `/api/v1/reports`, with role/permission authorization. | Task 1 specification to decouple dashboard and reporting extensions for Dev B. |
+| 17 | PF deduction defaults to 12% of basic monthly salary unless explicitly overridden in payroll adjustments. | Standard statutory PF guideline in India when explicit breakdown is not specified. |
+| 18 | Email notifications use Nodemailer with dev fallback to structured console logging when SMTP host is unset or unconfigured. | Ensures outbox worker and background queues function reliably in development and test environments without an active SMTP server. |
+| 19 | Asset tags auto-generate with format `AST-YYYY-XXXX` if left blank on creation. Assets can only be deleted if in 'available' status. | Prevents loss of audit trail for assigned or maintained hardware. |
+| 20 | Database health check endpoint mounted at `/health` verifies live database connectivity with `SELECT 1` returning 200 OK or 503 Service Unavailable. | Standard Docker and cloud orchestrator health probe contract. |

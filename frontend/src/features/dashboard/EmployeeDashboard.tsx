@@ -4,26 +4,24 @@ import { Link } from 'react-router-dom';
 import axiosClient from '../../shared/api/axiosClient';
 import { Loader } from '../../shared/components/Loader';
 import { ErrorState } from '../../shared/components/ErrorState';
+import { StatusBadge } from '../../shared/components/StatusBadge';
 import {
   User,
-  Building2,
-  Briefcase,
-  Mail,
-  Phone,
-  Calendar,
   CreditCard,
   PhoneCall,
   FileText,
-  BadgeCheck,
-  MapPin,
-  Clock,
-  Sparkles,
   CheckSquare,
   ArrowUpRight,
+  LayoutDashboard,
 } from 'lucide-react';
+import {
+  EmployeeTodayAttendanceWidget,
+  EmployeeLeaveBalancesWidget,
+  EmployeeRecentItemsWidget,
+} from './widgets/EmployeeDashboardWidgets';
 
 export const EmployeeDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'tasks' | 'bank' | 'emergency' | 'documents'>('profile');
+  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'profile' | 'bank' | 'emergency' | 'documents'>('overview');
 
   const { data: employee, isLoading, error, refetch } = useQuery({
     queryKey: ['employees', 'me'],
@@ -33,11 +31,11 @@ export const EmployeeDashboard: React.FC = () => {
     },
   });
 
-  const { data: widgets } = useQuery({
-    queryKey: ['dashboard', 'my-widgets'],
+  const { data: myTasks } = useQuery({
+    queryKey: ['dashboard', 'widget', 'my_tasks'],
     queryFn: async () => {
       try {
-        const res = await axiosClient.get('/dashboard/widgets');
+        const res = await axiosClient.get('/dashboard/widgets/my_tasks');
         return res.data?.data || {};
       } catch {
         return {};
@@ -62,9 +60,9 @@ export const EmployeeDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Profile Header Hero */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-indigo-500/20 shrink-0">
+          <div className="w-20 h-20 rounded-2xl bg-[#4F46E5] flex items-center justify-center text-white text-2xl font-bold shrink-0">
             {employee.photo_url ? (
               <img
                 src={employee.photo_url}
@@ -77,17 +75,15 @@ export const EmployeeDashboard: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-[#0F172A]">
                 {employee.first_name} {employee.last_name}
               </h1>
-              <span className="font-mono text-xs px-2 py-0.5 rounded-md font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              <span className="font-mono text-xs px-2 py-0.5 rounded-md font-bold bg-[#EEF2FF] text-[#4F46E5] border border-[#C7D2FE]">
                 {employee.employee_code}
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 capitalize">
-                {employee.lifecycle_stage}
-              </span>
+              <StatusBadge status={employee.lifecycle_stage} />
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+            <p className="text-xs sm:text-sm text-[#64748B] mt-1 flex items-center gap-2 flex-wrap">
               <span>{employee.designation_name || 'Designation Pending'}</span>
               <span>•</span>
               <span>{employee.department_name || 'Department Pending'}</span>
@@ -95,21 +91,45 @@ export const EmployeeDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-start md:items-end text-xs text-slate-500 gap-1 bg-slate-50 px-4 py-3 rounded-2xl border border-slate-100">
-          <span className="font-semibold text-slate-700">Joined Company</span>
+        <div className="flex flex-col items-start md:items-end text-xs text-[#64748B] gap-1 bg-[#F8FAFC] px-4 py-3 rounded-2xl border border-[#E2E8F0]">
+          <span className="font-semibold text-[#0F172A]">Joined Company</span>
           <span className="font-medium">{new Date(employee.joining_date).toLocaleDateString()}</span>
-          <span className="capitalize text-[11px] text-slate-400">{employee.employment_type?.replace('_', ' ')}</span>
+          <span className="capitalize text-[11px] text-[#64748B]">{employee.employment_type?.replace('_', ' ')}</span>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-200 bg-white px-6 rounded-2xl shadow-sm gap-6">
+      <div className="flex border-b border-[#E2E8F0] bg-white px-6 rounded-2xl shadow-sm gap-6 overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'overview'
+              ? 'border-[#4F46E5] text-[#4F46E5]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
+          }`}
+        >
+          <LayoutDashboard className="w-4 h-4" />
+          Overview & Activity
+        </button>
+
+        <button
+          onClick={() => setActiveTab('tasks')}
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'tasks'
+              ? 'border-[#4F46E5] text-[#4F46E5]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
+          }`}
+        >
+          <CheckSquare className="w-4 h-4" />
+          My Tasks ({myTasks?.count ?? 0})
+        </button>
+
         <button
           onClick={() => setActiveTab('profile')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'profile'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-[#4F46E5] text-[#4F46E5]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
           }`}
         >
           <User className="w-4 h-4" />
@@ -117,23 +137,11 @@ export const EmployeeDashboard: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setActiveTab('tasks')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
-            activeTab === 'tasks'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <CheckSquare className="w-4 h-4" />
-          My Tasks ({widgets?.my_tasks?.count ?? 0})
-        </button>
-
-        <button
           onClick={() => setActiveTab('bank')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'bank'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-[#4F46E5] text-[#4F46E5]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
           }`}
         >
           <CreditCard className="w-4 h-4" />
@@ -142,10 +150,10 @@ export const EmployeeDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('emergency')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'emergency'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-[#4F46E5] text-[#4F46E5]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
           }`}
         >
           <PhoneCall className="w-4 h-4" />
@@ -154,85 +162,30 @@ export const EmployeeDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('documents')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'documents'
-              ? 'border-indigo-600 text-indigo-600'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'border-[#4F46E5] text-[#4F46E5]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
           }`}
         >
           <FileText className="w-4 h-4" />
-          Documents (Tab Placeholder)
+          Documents
         </button>
       </div>
 
       {/* Tab Panels */}
-      {activeTab === 'profile' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
-              Personal Information
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <span className="text-slate-400 block mb-0.5">Work Email</span>
-                <span className="font-semibold text-slate-800">{employee.email}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-0.5">Phone</span>
-                <span className="font-semibold text-slate-800">{employee.phone || '—'}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-0.5">Date of Birth</span>
-                <span className="font-semibold text-slate-800">{employee.date_of_birth || '—'}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-0.5">Experience</span>
-                <span className="font-semibold text-slate-800">{employee.experience_years} Years</span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-slate-400 block mb-0.5">Residential Address</span>
-                <span className="font-semibold text-slate-800">{employee.address || '—'}</span>
-              </div>
+      {activeTab === 'overview' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-1">
+              <EmployeeTodayAttendanceWidget />
+            </div>
+            <div className="md:col-span-2">
+              <EmployeeLeaveBalancesWidget />
             </div>
           </div>
-
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
-              Organization & Skills
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <span className="text-slate-400 block mb-0.5">Department</span>
-                <span className="font-semibold text-slate-800">{employee.department_name || '—'}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block mb-0.5">Designation</span>
-                <span className="font-semibold text-slate-800">{employee.designation_name || '—'}</span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-slate-400 block mb-0.5">Reporting Manager</span>
-                <span className="font-semibold text-slate-800">
-                  {employee.reporting_manager_name || 'Direct / Head of Department'}
-                </span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-slate-400 block mb-1.5">Tagged Skills</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {employee.skills && employee.skills.length > 0 ? (
-                    employee.skills.map((s: string, idx: number) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/60"
-                      >
-                        {s}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-slate-400 text-xs">No skills tagged</span>
-                  )}
-                </div>
-              </div>
-            </div>
+          <div>
+            <EmployeeRecentItemsWidget />
           </div>
         </div>
       )}
@@ -254,9 +207,9 @@ export const EmployeeDashboard: React.FC = () => {
             </Link>
           </div>
 
-          {widgets?.my_tasks?.items?.length > 0 ? (
+          {myTasks?.items?.length > 0 ? (
             <div className="divide-y divide-slate-100">
-              {widgets.my_tasks.items.map((t: any) => (
+              {myTasks.items.map((t: any) => (
                 <div key={t.id} className="py-3 flex items-center justify-between gap-4 text-xs">
                   <div>
                     <div className="flex items-center gap-2">
@@ -290,79 +243,118 @@ export const EmployeeDashboard: React.FC = () => {
         </div>
       )}
 
+      {activeTab === 'profile' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-[#0F172A] border-b border-[#E2E8F0] pb-3">
+              Personal Information
+            </h3>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <span className="text-[#64748B] block mb-0.5">Work Email</span>
+                <span className="font-semibold text-[#475569]">{employee.email}</span>
+              </div>
+              <div>
+                <span className="text-[#64748B] block mb-0.5">Phone</span>
+                <span className="font-semibold text-[#475569]">{employee.phone || '—'}</span>
+              </div>
+              <div>
+                <span className="text-[#64748B] block mb-0.5">Date of Birth</span>
+                <span className="font-semibold text-[#475569]">{employee.date_of_birth || '—'}</span>
+              </div>
+              <div>
+                <span className="text-[#64748B] block mb-0.5">Experience</span>
+                <span className="font-semibold text-[#475569]">{employee.experience_years} Years</span>
+              </div>
+              <div className="col-span-2">
+                <span className="text-[#64748B] block mb-0.5">Address</span>
+                <span className="font-semibold text-[#475569]">{employee.address || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-[#0F172A] border-b border-[#E2E8F0] pb-3">
+              Work & Hierarchy
+            </h3>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <span className="text-[#64748B] block mb-0.5">Department</span>
+                <span className="font-semibold text-[#475569]">{employee.department_name || '—'}</span>
+              </div>
+              <div>
+                <span className="text-[#64748B] block mb-0.5">Designation</span>
+                <span className="font-semibold text-[#475569]">{employee.designation_name || '—'}</span>
+              </div>
+              <div className="col-span-2">
+                <span className="text-[#64748B] block mb-0.5">Reporting Manager</span>
+                <span className="font-semibold text-[#475569]">
+                  {employee.reporting_manager_name || 'Direct / None'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {activeTab === 'bank' && (
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm max-w-xl">
-          <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">
-            Direct Deposit / Bank Account
+        <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm max-w-xl">
+          <h3 className="text-sm font-bold text-[#0F172A] border-b border-[#E2E8F0] pb-3 mb-4">
+            Bank Details
           </h3>
           {employee.bank_details ? (
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-slate-400 block mb-0.5">Account Holder</span>
-                <span className="font-semibold text-slate-800">{employee.bank_details.account_holder}</span>
+                <span className="text-[#64748B] block mb-0.5">Account Holder</span>
+                <span className="font-semibold text-[#475569]">{employee.bank_details.account_holder}</span>
               </div>
               <div>
-                <span className="text-slate-400 block mb-0.5">Bank Name</span>
-                <span className="font-semibold text-slate-800">{employee.bank_details.bank_name}</span>
+                <span className="text-[#64748B] block mb-0.5">Bank Name</span>
+                <span className="font-semibold text-[#475569]">{employee.bank_details.bank_name}</span>
               </div>
               <div>
-                <span className="text-slate-400 block mb-0.5">Account Number</span>
-                <span className="font-mono font-semibold text-slate-800">
-                  ••••••••{employee.bank_details.account_number.slice(-4)}
-                </span>
+                <span className="text-[#64748B] block mb-0.5">Account Number</span>
+                <span className="font-mono font-semibold text-[#475569]">{employee.bank_details.account_number}</span>
               </div>
               <div>
-                <span className="text-slate-400 block mb-0.5">IFSC Code</span>
-                <span className="font-mono font-semibold text-slate-800">{employee.bank_details.ifsc}</span>
+                <span className="text-[#64748B] block mb-0.5">IFSC Code</span>
+                <span className="font-mono font-semibold text-[#475569]">{employee.bank_details.ifsc}</span>
               </div>
             </div>
           ) : (
-            <p className="text-xs text-slate-400 py-4">No bank details registered yet.</p>
+            <p className="text-xs text-[#64748B] py-4">No bank details added.</p>
           )}
         </div>
       )}
 
       {activeTab === 'emergency' && (
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm max-w-2xl">
-          <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">
+        <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm max-w-2xl">
+          <h3 className="text-sm font-bold text-[#0F172A] border-b border-[#E2E8F0] pb-3 mb-4">
             Emergency Contacts
           </h3>
           {employee.emergency_contacts && employee.emergency_contacts.length > 0 ? (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-[#E2E8F0]">
               {employee.emergency_contacts.map((contact: any, index: number) => (
                 <div key={index} className="py-3 flex items-center justify-between gap-4 text-xs">
                   <div>
-                    <span className="font-bold text-slate-900">{contact.contact_name}</span>
-                    <span className="text-slate-400 ml-2">({contact.relationship})</span>
-                    {contact.address && <p className="text-[11px] text-slate-400 mt-0.5">{contact.address}</p>}
+                    <span className="font-bold text-[#0F172A]">{contact.contact_name}</span>
+                    <span className="text-[#64748B] ml-2">({contact.relationship})</span>
                   </div>
                   <div className="text-right">
-                    <span className="font-mono font-semibold text-slate-700">{contact.phone}</span>
-                    {contact.alt_phone && (
-                      <span className="font-mono text-slate-400 block text-[10px]">{contact.alt_phone}</span>
-                    )}
+                    <span className="font-mono font-semibold text-[#475569]">{contact.phone}</span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-slate-400 py-4">No emergency contacts registered.</p>
+            <p className="text-xs text-[#64748B] py-4">No emergency contacts registered.</p>
           )}
         </div>
       )}
 
       {activeTab === 'documents' && (
-        <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm text-center max-w-xl">
-          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
-            <FileText className="w-6 h-6" />
-          </div>
-          <h3 className="text-sm font-bold text-slate-900 mb-1">Documents Repository</h3>
-          <p className="text-xs text-slate-500 mb-4">
-            Employee identification, contracts, offer letters, and policy acknowledgements. (Document module foundation tab placeholder).
-          </p>
-          <span className="text-[11px] px-2.5 py-1 rounded-full font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-            Document Vault Active
-          </span>
+        <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm">
+          <p className="text-xs text-[#64748B]">Document vault section.</p>
         </div>
       )}
     </div>

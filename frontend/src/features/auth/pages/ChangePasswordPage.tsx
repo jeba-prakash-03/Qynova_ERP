@@ -1,34 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { authApi } from '../api';
-import { useToast } from '../../../shared/context/ToastContext';
+import { AuthLayout } from '../components/AuthLayout';
 import { FormField } from '../../../shared/components/FormField';
-import { KeyRound, ShieldAlert, Check } from 'lucide-react';
+import { Button } from '../../../shared/components/Button';
+import {
+  Eye,
+  EyeOff,
+  Check,
+  AlertCircle,
+  KeyRound,
+} from 'lucide-react';
 
 export const ChangePasswordPage: React.FC = () => {
   const { user, updateUser, getRedirectPath } = useAuth();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [showOldPass, setShowOldPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { success } = useToast();
   const navigate = useNavigate();
+  const appName = import.meta.env.VITE_APP_NAME || 'Qynova ERP';
 
+  useEffect(() => {
+    document.title = `Set New Password | ${appName}`;
+  }, [appName]);
+
+  // Complexity rules
   const rules = [
-    { label: 'At least 8 characters long', valid: newPassword.length >= 8 },
-    { label: 'At least 1 uppercase letter (A-Z)', valid: /[A-Z]/.test(newPassword) },
-    { label: 'At least 1 lowercase letter (a-z)', valid: /[a-z]/.test(newPassword) },
-    { label: 'At least 1 number (0-9)', valid: /[0-9]/.test(newPassword) },
+    { id: 'len', label: '8+ characters long', valid: newPassword.length >= 8 },
+    { id: 'upper', label: 'At least 1 uppercase letter (A-Z)', valid: /[A-Z]/.test(newPassword) },
+    { id: 'lower', label: 'At least 1 lowercase letter (a-z)', valid: /[a-z]/.test(newPassword) },
+    { id: 'num', label: 'At least 1 number (0-9)', valid: /[0-9]/.test(newPassword) },
     {
+      id: 'diff',
       label: 'Different from current password',
       valid: newPassword.length > 0 && oldPassword.length > 0 && newPassword !== oldPassword,
     },
   ];
 
   const allRulesValid = rules.every((r) => r.valid);
+
+  // Strength score: 0 to 4
+  const calculateStrength = (): { score: number; label: string; color: string } => {
+    if (!newPassword) return { score: 0, label: '', color: 'bg-slate-200' };
+    let score = 0;
+    if (newPassword.length >= 8) score++;
+    if (/[A-Z]/.test(newPassword)) score++;
+    if (/[a-z]/.test(newPassword)) score++;
+    if (/[0-9]/.test(newPassword) || /[^A-Za-z0-9]/.test(newPassword)) score++;
+
+    switch (score) {
+      case 1:
+        return { score: 1, label: 'Weak', color: 'bg-rose-500' };
+      case 2:
+        return { score: 2, label: 'Fair', color: 'bg-amber-500' };
+      case 3:
+        return { score: 3, label: 'Good', color: 'bg-indigo-500' };
+      case 4:
+        return { score: 4, label: 'Strong', color: 'bg-emerald-500' };
+      default:
+        return { score: 0, label: '', color: 'bg-slate-200' };
+    }
+  };
+
+  const strength = calculateStrength();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +83,7 @@ export const ChangePasswordPage: React.FC = () => {
     }
 
     if (!allRulesValid) {
-      setErrorMsg('Please satisfy all password complexity rules below');
+      setErrorMsg('Please satisfy all password complexity requirements');
       return;
     }
 
@@ -48,115 +91,190 @@ export const ChangePasswordPage: React.FC = () => {
 
     try {
       await authApi.changePassword({ oldPassword, newPassword });
-      success('Password changed successfully! Welcome to Qynova ERP.');
 
       if (user) {
         updateUser({ ...user, must_change_password: false });
-        navigate(getRedirectPath(user));
+        navigate(getRedirectPath(user), { replace: true });
       } else {
-        navigate('/login');
+        navigate('/login', { replace: true });
       }
     } catch (err: any) {
-      setErrorMsg(err.response?.data?.message || 'Failed to update password');
+      const msg =
+        err.response?.data?.errors?.[0]?.message ||
+        err.response?.data?.message ||
+        'Failed to update password. Please check your current password.';
+      setErrorMsg(msg);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto py-10">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-200">
-        <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-4">
-          <KeyRound className="w-6 h-6" />
+    <AuthLayout
+      title="Set new password"
+      subtitle="Your account requires a new password before continuing"
+    >
+      {errorMsg && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-6 p-4 rounded-xl text-xs font-medium border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-2.5"
+        >
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <span className="leading-relaxed">{errorMsg}</span>
         </div>
+      )}
 
-        <h2 className="text-xl font-bold text-slate-900 mb-1">Update Your Password</h2>
-        <p className="text-xs text-slate-500 mb-6">
-          Set a secure permanent password for your employee account
-        </p>
-
-        {user?.must_change_password && (
-          <div className="mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-2.5 text-xs">
-            <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold">Password Reset Required:</span> You are currently using a temporary password. You must update it before accessing system features.
-            </div>
-          </div>
-        )}
-
-        {errorMsg && (
-          <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium">
-            {errorMsg}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Current / Temporary Password" required>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Current Password */}
+        <FormField
+          label="Current / temporary password"
+          htmlFor="current-password"
+          required
+        >
+          <div className="relative">
             <input
-              type="password"
+              id="current-password"
+              type={showOldPass ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
+              disabled={isLoading}
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
               placeholder="••••••••"
-              required
-              className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+              className="w-full min-h-[44px] px-3.5 py-2.5 pr-11 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 transition"
             />
-          </FormField>
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={() => setShowOldPass(!showOldPass)}
+              aria-label={showOldPass ? 'Hide password' : 'Show password'}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] rounded-lg transition"
+            >
+              {showOldPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </FormField>
 
-          <FormField label="New Password" required>
+        {/* New Password */}
+        <FormField
+          label="New password"
+          htmlFor="new-password"
+          required
+        >
+          <div className="relative">
             <input
-              type="password"
+              id="new-password"
+              type={showNewPass ? 'text' : 'password'}
+              autoComplete="new-password"
+              required
+              disabled={isLoading}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="••••••••"
-              required
-              className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+              className="w-full min-h-[44px] px-3.5 py-2.5 pr-11 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 transition"
             />
-          </FormField>
-
-          {/* Live password complexity rules checklist */}
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
-            <span className="font-bold text-slate-700 block mb-1">Password Requirements:</span>
-            {rules.map((rule, idx) => (
-              <div
-                key={idx}
-                className={`flex items-center gap-2 ${
-                  rule.valid ? 'text-emerald-700 font-medium' : 'text-slate-400'
-                }`}
-              >
-                <div
-                  className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
-                    rule.valid ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
-                  }`}
-                >
-                  ✓
-                </div>
-                <span>{rule.label}</span>
-              </div>
-            ))}
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={() => setShowNewPass(!showNewPass)}
+              aria-label={showNewPass ? 'Hide password' : 'Show password'}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] rounded-lg transition"
+            >
+              {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
 
-          <FormField label="Confirm New Password" required>
+          {/* Strength Meter Bar */}
+          {newPassword.length > 0 && (
+            <div className="mt-2 space-y-1">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500">
+                <span>Password strength</span>
+                <span className={strength.color.replace('bg-', 'text-')}>
+                  {strength.label}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-1.5 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                {[1, 2, 3, 4].map((step) => (
+                  <div
+                    key={step}
+                    className={`h-full rounded-full transition-all duration-300 ${
+                      step <= strength.score ? strength.color : 'bg-slate-200'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </FormField>
+
+        {/* Confirm Password */}
+        <FormField
+          label="Confirm new password"
+          htmlFor="confirm-password"
+          required
+        >
+          <div className="relative">
             <input
-              type="password"
+              id="confirm-password"
+              type={showConfirmPass ? 'text' : 'password'}
+              autoComplete="new-password"
+              required
+              disabled={isLoading}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              required
-              className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+              className="w-full min-h-[44px] px-3.5 py-2.5 pr-11 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 transition"
             />
-          </FormField>
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={() => setShowConfirmPass(!showConfirmPass)}
+              aria-label={showConfirmPass ? 'Hide password' : 'Show password'}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] rounded-lg transition"
+            >
+              {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </FormField>
 
-          <button
-            type="submit"
-            disabled={isLoading || !allRulesValid}
-            className="w-full mt-4 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            {isLoading ? 'Updating...' : 'Set New Password'}
-            <Check className="w-4 h-4" />
-          </button>
-        </form>
-      </div>
-    </div>
+        {/* Live Rule Checklist */}
+        <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2 mt-1">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+            Password requirements:
+          </p>
+          {rules.map((rule) => (
+            <div
+              key={rule.id}
+              className={`flex items-center gap-2 text-xs transition-colors ${
+                rule.valid ? 'text-emerald-700 font-medium' : 'text-slate-500'
+              }`}
+            >
+              <div
+                className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-white ${
+                  rule.valid ? 'bg-emerald-500' : 'bg-slate-300'
+                }`}
+              >
+                <Check className="w-2.5 h-2.5" />
+              </div>
+              <span>{rule.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          isLoading={isLoading}
+          disabled={isLoading || !allRulesValid || newPassword !== confirmPassword}
+          className="w-full min-h-[44px] font-bold text-sm shadow-md shadow-indigo-500/20 mt-2"
+        >
+          {isLoading ? 'Updating password...' : 'Set new password'}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 };
 

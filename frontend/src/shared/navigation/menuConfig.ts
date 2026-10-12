@@ -18,6 +18,7 @@ import {
   CreditCard,
   TrendingUp,
   Target,
+  Laptop,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -48,6 +49,11 @@ export const MENU_CONFIG: MenuGroup[] = [
         title: 'Dashboard',
         path: '/dashboard',
         icon: LayoutDashboard,
+      },
+      {
+        title: 'Reports',
+        path: '/reports',
+        icon: FileText,
       },
     ],
   },
@@ -192,6 +198,23 @@ export const MENU_CONFIG: MenuGroup[] = [
     ],
   },
   {
+    groupTitle: 'Assets & Resources',
+    items: [
+      {
+        title: 'Company Assets',
+        path: '/assets',
+        icon: Laptop,
+        permission: 'assets.view',
+      },
+      {
+        title: 'My Assets',
+        path: '/my-assets',
+        icon: Laptop,
+        requireEmployee: true,
+      },
+    ],
+  },
+  {
     groupTitle: 'Security',
     items: [
       {
@@ -199,6 +222,16 @@ export const MENU_CONFIG: MenuGroup[] = [
         path: '/roles',
         icon: ShieldCheck,
         permission: 'roles.view',
+      },
+    ],
+  },
+  {
+    groupTitle: 'Preferences',
+    items: [
+      {
+        title: 'Notification Settings',
+        path: '/settings/notifications',
+        icon: Bell,
       },
     ],
   },

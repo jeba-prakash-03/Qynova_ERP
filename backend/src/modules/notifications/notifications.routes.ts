@@ -11,4 +11,11 @@ router.get('/unread-count', notificationsController.getUnreadCount);
 router.patch('/read-all', notificationsController.markAllAsRead);
 router.patch('/:id/read', notificationsController.markAsRead);
 
+// Preferences
+router.get('/preferences', notificationsController.getPreferences);
+router.put('/preferences', notificationsController.updatePreference);
+
+// Outbox trigger
+router.post('/process-outbox', notificationsController.processOutbox);
+
 export default router;

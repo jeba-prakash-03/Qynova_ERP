@@ -3,12 +3,21 @@ node_modules
 .pnp
 .pnp.js
 
-# Environment variables
+# Environment variables & Credentials
 .env
 .env.*
+!.env.example
+!*.env.example
 .env*.local
-.env.example
-*.env.example
+*firebase*.json
+*service-account*.json
+*serviceAccount*.json
+frontend/public/firebase-messaging-sw.js
+public/firebase-messaging-sw.js
+
+
+# Backups
+backups/
 
 # Logs
 npm-debug.log*
