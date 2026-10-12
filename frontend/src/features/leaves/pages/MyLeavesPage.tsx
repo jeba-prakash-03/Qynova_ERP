@@ -365,11 +365,10 @@ export const MyLeavesPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="text-right text-xs text-[#64748B] space-y-0.5">
-                      <div>Allocated: <strong className="text-[#0F172A]">{bal.allocated}</strong></div>
+                      <div>Available: <strong className="text-[#0F172A]">{bal.allocated}</strong></div>
                       <div>Used: <strong className="text-[#0F172A]">{bal.used}</strong></div>
-                      {bal.pending > 0 && (
-                        <div className="text-[#D97706]">Pending: <strong>{bal.pending}</strong></div>
-                      )}
+                      <div>Pending: <strong className="text-[#D97706]">{bal.pending}</strong></div>
+                      <div>Remaining: <strong className="text-[#16A34A]">{remaining}</strong></div>
                     </div>
                   </div>
                 </div>

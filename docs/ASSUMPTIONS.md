@@ -17,3 +17,4 @@
 | # | Assumption | Rationale |
 |---|------------|-----------|
 | 10 | Dashboard widgets and reports registries are mounted at `/api/v1/dashboard/widgets` and `/api/v1/reports`, with role/permission authorization. | Task 1 specification to decouple dashboard and reporting extensions for Dev B. |
+| 11 | PF deduction defaults to 12% of basic monthly salary unless explicitly overridden in payroll adjustments. | Standard statutory PF guideline in India when explicit breakdown is not specified. |

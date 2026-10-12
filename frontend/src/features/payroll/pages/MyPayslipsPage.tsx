@@ -1,10 +1,13 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axiosClient from '../../../shared/api/axiosClient';
-import { DollarSign, FileText, Calendar } from 'lucide-react';
+import { DollarSign, FileText, Calendar, Download } from 'lucide-react';
 import { StatusBadge } from '../../../shared/components/StatusBadge';
+import { useToast } from '../../../shared/context/ToastContext';
 
 export const MyPayslipsPage: React.FC = () => {
+  const { error } = useToast();
+
   const { data: payslips = [], isLoading } = useQuery({
     queryKey: ['payroll', 'me'],
     queryFn: async () => {
@@ -12,6 +15,25 @@ export const MyPayslipsPage: React.FC = () => {
       return res.data.data;
     },
   });
+
+  const handleDownloadPdf = async (itemId: number, month: string) => {
+    try {
+      const response = await axiosClient.get(`/payroll/payslips/${itemId}/pdf`, {
+        responseType: 'blob',
+      });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Payslip_${month}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      error('Failed to download payslip PDF');
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
@@ -21,7 +43,7 @@ export const MyPayslipsPage: React.FC = () => {
           My Payslips
         </h1>
         <p className="text-[#64748B] text-sm mt-1">
-          View your monthly salary statements, gross earnings, and LOP deductions.
+          View your monthly salary statements, gross earnings, PF/LOP deductions, and download PDF slips.
         </p>
       </div>
 
@@ -47,6 +69,7 @@ export const MyPayslipsPage: React.FC = () => {
                   <th className="py-3 px-4 text-center">LOP Days</th>
                   <th className="py-3 px-4 text-right">LOP Deduction</th>
                   <th className="py-3 px-4 text-right">Net Payout</th>
+                  <th className="py-3 px-4 text-center">Download</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E2E8F0] font-mono text-xs text-[#475569]">
@@ -70,6 +93,15 @@ export const MyPayslipsPage: React.FC = () => {
                     </td>
                     <td className="py-3.5 px-4 text-right font-bold text-[#15803D] text-sm">
                       ₹{Number(p.net_salary).toFixed(2)}
+                    </td>
+                    <td className="py-3.5 px-4 text-center">
+                      <button
+                        onClick={() => handleDownloadPdf(p.id, p.month)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#4F46E5] bg-[#EEF2FF] hover:bg-[#E0E7FF] rounded-lg transition"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>PDF</span>
+                      </button>
                     </td>
                   </tr>
                 ))}
