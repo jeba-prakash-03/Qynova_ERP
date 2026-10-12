@@ -63,6 +63,18 @@ export const MENU_CONFIG: MenuGroup[] = [
         icon: FolderKanban,
         permission: 'projects.view,projects.view_team,projects.view_own',
       },
+      {
+        title: 'Tasks',
+        path: '/tasks',
+        icon: CheckSquare,
+        permission: 'tasks.view,projects.view,projects.view_team,projects.view_own',
+      },
+      {
+        title: 'My Tasks',
+        path: '/tasks/my',
+        icon: CheckSquare,
+        requireEmployee: true,
+      },
     ],
   },
   {

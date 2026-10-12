@@ -248,11 +248,24 @@ export class ProjectsRepository {
       )
       .orderBy('projects.name', 'asc');
 
-    // Return structure for Dev 2 timesheets integration
-    return projects.map((p) => ({
-      ...p,
-      tasks: [], // Tasks placeholder for Dev 2 timesheets selection
-    }));
+    const hasTasksTable = await this.knex.schema.hasTable('tasks');
+    return Promise.all(
+      projects.map(async (p) => {
+        let tasks: any[] = [];
+        if (hasTasksTable) {
+          tasks = await this.knex('tasks')
+            .where({ project_id: p.id })
+            .where((b) => b.where({ assignee_id: employeeId }).orWhereNull('assignee_id'))
+            .whereNotIn('status', ['completed'])
+            .select('id', 'task_code', 'title', 'status', 'priority')
+            .orderBy('id', 'asc');
+        }
+        return {
+          ...p,
+          tasks,
+        };
+      })
+    );
   }
 
   public async create(data: CreateProjectInput): Promise<ProjectWithDetails> {

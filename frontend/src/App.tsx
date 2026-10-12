@@ -39,11 +39,13 @@ import { PayrollRunPage } from './features/payroll/pages/PayrollRunPage';
 import { MyPayslipsPage } from './features/payroll/pages/MyPayslipsPage';
 import { MyTimesheetsPage } from './features/timesheets/pages/MyTimesheetsPage';
 
-// Clients & Projects (Dev 3)
+// Clients & Projects & Tasks (Dev 3)
 import { ClientListPage } from './features/clients/pages/ClientListPage';
 import { ClientDetailPage } from './features/clients/pages/ClientDetailPage';
 import { ProjectListPage } from './features/projects/pages/ProjectListPage';
 import { ProjectDetailPage } from './features/projects/pages/ProjectDetailPage';
+import { TasksPage } from './features/tasks/pages/TasksPage';
+import { MyTasksPage } from './features/tasks/pages/MyTasksPage';
 
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
@@ -279,6 +281,24 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <ProjectDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Tasks Module (Dev 3) */}
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute>
+              <TasksPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks/my"
+          element={
+            <ProtectedRoute requireEmployee>
+              <MyTasksPage />
             </ProtectedRoute>
           }
         />

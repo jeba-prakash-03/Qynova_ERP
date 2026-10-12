@@ -39,6 +39,12 @@ import { ErrorState } from '../../../shared/components/ErrorState';
 import { EmptyState } from '../../../shared/components/EmptyState';
 import { useToast } from '../../../shared/context/ToastContext';
 import axiosClient from '../../../shared/api/axiosClient';
+import { tasksApi } from '../../tasks/api';
+import { Task, TaskStatus } from '../../tasks/types';
+import { TaskKanbanBoard } from '../../tasks/components/TaskKanbanBoard';
+import { TaskDrawer } from '../../tasks/components/TaskDrawer';
+import { TaskFormModal } from '../../tasks/components/TaskFormModal';
+import { Kanban, List } from 'lucide-react';
 
 type TabType =
   | 'overview'
@@ -117,6 +123,30 @@ export const ProjectDetailPage: React.FC = () => {
       return res.data.data;
     },
     enabled: isMemberModalOpen,
+  });
+
+  // Task Board State in Project
+  const [taskViewMode, setTaskViewMode] = useState<'kanban' | 'list'>('kanban');
+  const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+
+  const { data: projectTasksRes } = useQuery({
+    queryKey: ['tasks', { project_id: id }],
+    queryFn: () => tasksApi.getAll({ project_id: Number(id), limit: 100 }),
+    enabled: Boolean(id),
+  });
+  const projectTasks = projectTasksRes?.data || [];
+
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: ({ taskId, status }: { taskId: number; status: TaskStatus }) =>
+      tasksApi.updateStatus(taskId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+    onError: (err: any) => {
+      error(err.response?.data?.message || 'Failed to update task status');
+    },
   });
 
   // Mutations
@@ -235,7 +265,7 @@ export const ProjectDetailPage: React.FC = () => {
     { key: 'overview', label: 'Overview' },
     { key: 'team', label: 'Team', count: project.members?.length },
     { key: 'milestones', label: 'Milestones', count: project.milestones?.length },
-    { key: 'tasks', label: 'Tasks' },
+    { key: 'tasks', label: 'Tasks', count: projectTasks.length },
     { key: 'timesheets', label: 'Timesheets' },
     { key: 'expenses', label: 'Expenses' },
     { key: 'invoices', label: 'Invoices' },
@@ -691,21 +721,134 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* 4. TASKS TAB (PLACEHOLDER) */}
+      {/* 4. TASKS TAB */}
       {activeTab === 'tasks' && (
-        <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
-          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3">
-            <CheckSquare className="w-6 h-6" />
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">Project Tasks & Sprints</h3>
+              <p className="text-xs text-slate-500">
+                Track deliverables, code review workflow, and subtasks for {project.name}.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+                <button
+                  onClick={() => setTaskViewMode('kanban')}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold transition ${
+                    taskViewMode === 'kanban'
+                      ? 'bg-white text-indigo-600 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Kanban className="w-3.5 h-3.5" />
+                  Kanban
+                </button>
+                <button
+                  onClick={() => setTaskViewMode('list')}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold transition ${
+                    taskViewMode === 'list'
+                      ? 'bg-white text-indigo-600 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <List className="w-3.5 h-3.5" />
+                  List
+                </button>
+              </div>
+
+              <Can permission="tasks.create">
+                <button
+                  onClick={() => {
+                    setTaskToEdit(null);
+                    setIsTaskModalOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" /> New Task
+                </button>
+              </Can>
+            </div>
           </div>
-          <h3 className="text-lg font-bold text-slate-800">Task Board & Sprint Kanban</h3>
-          <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
-            Task execution, sprint board, and issue tracking are owned by{' '}
-            <strong>Dev 3 (Stage 2)</strong>. Project deliverables will be broken down into assignable
-            tasks here.
-          </p>
-          <div className="mt-4 inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-full border border-indigo-200">
-            Roadmap: Dev 3 Stage 2
-          </div>
+
+          {projectTasks.length === 0 ? (
+            <EmptyState
+              title="No Tasks for this Project"
+              description="Break down this project into sprint tasks, assign them to project members, and track code review progress."
+              action={{
+                label: 'Create First Task',
+                onClick: () => {
+                  setTaskToEdit(null);
+                  setIsTaskModalOpen(true);
+                },
+              }}
+            />
+          ) : taskViewMode === 'kanban' ? (
+            <TaskKanbanBoard
+              tasks={projectTasks}
+              onStatusChange={(taskId, status) =>
+                updateTaskStatusMutation.mutate({ taskId, status })
+              }
+              onCardClick={(task) => setActiveTaskId(task.id)}
+            />
+          ) : (
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px]">
+                  <tr>
+                    <th className="px-4 py-3">Code</th>
+                    <th className="px-4 py-3">Title</th>
+                    <th className="px-4 py-3">Assignee</th>
+                    <th className="px-4 py-3">Priority</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Due Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {projectTasks.map((t) => (
+                    <tr
+                      key={t.id}
+                      onClick={() => setActiveTaskId(t.id)}
+                      className="hover:bg-slate-50 cursor-pointer transition"
+                    >
+                      <td className="px-4 py-3 font-mono font-bold text-indigo-600">
+                        {t.task_code}
+                      </td>
+                      <td className="px-4 py-3 font-medium text-slate-800">{t.title}</td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {t.assignee_name || 'Unassigned'}
+                      </td>
+                      <td className="px-4 py-3 capitalize">{t.priority}</td>
+                      <td className="px-4 py-3 capitalize">{t.status.replace('_', ' ')}</td>
+                      <td className="px-4 py-3 text-slate-400">
+                        {t.due_date ? t.due_date.split('T')[0] : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <TaskDrawer
+            taskId={activeTaskId}
+            onClose={() => setActiveTaskId(null)}
+            onEdit={(task) => {
+              setActiveTaskId(null);
+              setTaskToEdit(task);
+              setIsTaskModalOpen(true);
+            }}
+          />
+
+          <TaskFormModal
+            isOpen={isTaskModalOpen}
+            onClose={() => {
+              setIsTaskModalOpen(false);
+              setTaskToEdit(null);
+            }}
+            taskToEdit={taskToEdit}
+            defaultProjectId={Number(id)}
+          />
         </div>
       )}
 
