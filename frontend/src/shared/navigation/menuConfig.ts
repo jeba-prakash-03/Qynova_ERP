@@ -15,6 +15,7 @@ import {
   Receipt,
   LucideIcon,
   Bell,
+  Laptop,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -130,6 +131,23 @@ export const MENU_CONFIG: MenuGroup[] = [
         title: 'My Payslips',
         path: '/payroll/payslips',
         icon: Banknote,
+        requireEmployee: true,
+      },
+    ],
+  },
+  {
+    groupTitle: 'Assets & Resources',
+    items: [
+      {
+        title: 'Company Assets',
+        path: '/assets',
+        icon: Laptop,
+        permission: 'assets.view',
+      },
+      {
+        title: 'My Assets',
+        path: '/my-assets',
+        icon: Laptop,
         requireEmployee: true,
       },
     ],

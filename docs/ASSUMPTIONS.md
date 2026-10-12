@@ -18,3 +18,7 @@
 |---|------------|-----------|
 | 10 | Dashboard widgets and reports registries are mounted at `/api/v1/dashboard/widgets` and `/api/v1/reports`, with role/permission authorization. | Task 1 specification to decouple dashboard and reporting extensions for Dev B. |
 | 11 | PF deduction defaults to 12% of basic monthly salary unless explicitly overridden in payroll adjustments. | Standard statutory PF guideline in India when explicit breakdown is not specified. |
+| 12 | Email notifications use Nodemailer with dev fallback to structured console logging when SMTP host is unset or unconfigured. | Ensures outbox worker and background queues function reliably in development and test environments without an active SMTP server. |
+| 13 | Asset tags auto-generate with format `AST-YYYY-XXXX` if left blank on creation. Assets can only be deleted if in 'available' status. | Prevents loss of audit trail for assigned or maintained hardware. |
+| 14 | Database health check endpoint mounted at `/health` verifies live database connectivity with `SELECT 1` returning 200 OK or 503 Service Unavailable. | Standard Docker and cloud orchestrator health probe contract. |
+

@@ -80,7 +80,7 @@ describe('Task 5: Email Outbox, Notifications & Forgot Password Suite', () => {
         eventKey,
       });
 
-      const processResult = await emailService.processOutbox(10);
+      const processResult = await emailService.processOutbox(100);
       expect(processResult.processed).toBeGreaterThanOrEqual(1);
       expect(processResult.sent).toBeGreaterThanOrEqual(1);
 

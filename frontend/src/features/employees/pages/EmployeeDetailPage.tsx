@@ -356,6 +356,37 @@ export const EmployeeDetailPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Offer Letter Action Banner when in offer_generated stage */}
+      {employee.lifecycle_stage === 'offer_generated' && (
+        <div className="bg-[#EEF2FF] border border-[#C7D2FE] rounded-3xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-[#4F46E5] text-white flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5 text-amber-300" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-[#0F172A]">Candidate is in Offer Generation Stage</h4>
+              <p className="text-xs text-[#475569] mt-0.5">
+                Generate and store official offer letter PDF before advancing to offer acceptance.
+              </p>
+            </div>
+          </div>
+          <Can permission="employees.edit">
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<FileText className="w-4 h-4" />}
+              onClick={() => {
+                setOfferDesignation(employee.designation_name || '');
+                setOfferJoiningDate(employee.joining_date || '');
+                setIsOfferModalOpen(true);
+              }}
+            >
+              Generate Offer Letter PDF
+            </Button>
+          </Can>
+        </div>
+      )}
+
       {/* Hero Card */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E2E8F0] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-5">

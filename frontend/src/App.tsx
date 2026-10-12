@@ -43,6 +43,11 @@ import { MyTimesheetsPage } from './features/timesheets/pages/MyTimesheetsPage';
 // Reports & Registry
 import { ReportsPage } from './features/reports/pages/ReportsPage';
 
+// Assets Management
+import { AssetListPage } from './features/assets/pages/AssetListPage';
+import { AssetDetailPage } from './features/assets/pages/AssetDetailPage';
+import { MyAssetsPage } from './features/assets/pages/MyAssetsPage';
+
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -252,6 +257,32 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <ReportsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Assets Management */}
+        <Route
+          path="/assets"
+          element={
+            <ProtectedRoute permission="assets.view">
+              <AssetListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/assets/:id"
+          element={
+            <ProtectedRoute permission="assets.view">
+              <AssetDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-assets"
+          element={
+            <ProtectedRoute requireEmployee>
+              <MyAssetsPage />
             </ProtectedRoute>
           }
         />
