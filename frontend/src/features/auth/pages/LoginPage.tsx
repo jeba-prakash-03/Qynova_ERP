@@ -1,198 +1,514 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
+import { z } from 'zod';
 import { useAuth } from '../../../shared/context/AuthContext';
+import { AuthLayout } from '../components/AuthLayout';
 import { FormField } from '../../../shared/components/FormField';
+import { Button } from '../../../shared/components/Button';
 import {
-  Layers,
-  ArrowRight,
-  ShieldCheck,
-  User,
-  Users,
-  Briefcase,
-  GraduationCap,
   Eye,
   EyeOff,
+  AlertCircle,
+  AlertTriangle,
+  RefreshCw,
+  CheckCircle2,
 } from 'lucide-react';
+
+// Validation schema for inline & submit checks
+const loginValidationSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Enter a valid work email')
+    .email('Enter a valid work email'),
+  password: z.string().min(1, 'Enter your password'),
+});
+
+// Conditionally load dev quick login in development mode only
+const isDevLoginEnabled =
+  Boolean(import.meta.env.DEV) && import.meta.env.VITE_SHOW_DEV_LOGIN === 'true';
+
+const LazyDevQuickLogin = isDevLoginEnabled
+  ? React.lazy(() => import('../components/DevQuickLogin'))
+  : null;
+
+interface AlertState {
+  type: 'error' | 'warning' | 'info' | 'success';
+  message: string;
+  canRetry?: boolean;
+}
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [capsLockOn, setCapsLockOn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login } = useAuth();
+  // Field-level error messages
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg(null);
+  // Single top inline alert
+  const [alert, setAlert] = useState<AlertState | null>(null);
+
+  // Failed attempts tracking (show reset hint after 3 failed attempts)
+  const [failedAttempts, setFailedAttempts] = useState(0);
+
+  // Lockout countdown timer in seconds
+  const [lockoutRemainingSec, setLockoutRemainingSec] = useState<number | null>(null);
+
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  const { login, user, isAuthenticated, isLoading: authLoading, getRedirectPath } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const appName = import.meta.env.VITE_APP_NAME || 'Qynova ERP';
+
+  // 1. Set document title
+  useEffect(() => {
+    document.title = `Sign in | ${appName}`;
+  }, [appName]);
+
+  // 2. Redirect already-authenticated users
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && user) {
+      if (user.must_change_password) {
+        navigate('/change-password', { replace: true });
+      } else {
+        const safeTarget = getSafeRedirectPath();
+        navigate(safeTarget || getRedirectPath(user), { replace: true });
+      }
+    }
+  }, [authLoading, isAuthenticated, user, authLoading]);
+
+  // 3. Handle incoming session expiration or logout messages
+  useEffect(() => {
+    const reasonParam = searchParams.get('reason');
+    const stateReason = (location.state as any)?.reason;
+    const reason = stateReason || reasonParam;
+
+    if (reason === 'expired') {
+      setAlert({
+        type: 'warning',
+        message: 'Your session expired. Please sign in again.',
+      });
+    } else if (reason === 'signed_out') {
+      setAlert({
+        type: 'success',
+        message: 'You have been signed out.',
+      });
+    }
+  }, [searchParams, location.state]);
+
+  // 4. Lockout countdown timer tick
+  useEffect(() => {
+    if (lockoutRemainingSec === null || lockoutRemainingSec <= 0) return;
+
+    const interval = setInterval(() => {
+      setLockoutRemainingSec((prev) => {
+        if (prev === null || prev <= 1) {
+          clearInterval(interval);
+          setAlert(null);
+          return null;
+        }
+        const updated = prev - 1;
+        const mins = Math.ceil(updated / 60);
+        setAlert({
+          type: 'error',
+          message: `Too many attempts. Try again in ${mins} minute${mins === 1 ? '' : 's'}.`,
+        });
+        return updated;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lockoutRemainingSec]);
+
+  // Helper to validate and extract safe same-origin redirect path
+  const getSafeRedirectPath = useCallback((): string | null => {
+    const stateTarget = (location.state as any)?.from?.pathname;
+    const queryTarget = searchParams.get('redirect') || searchParams.get('from');
+    const target = stateTarget || queryTarget;
+
+    if (
+      target &&
+      typeof target === 'string' &&
+      target.startsWith('/') &&
+      !target.startsWith('//') &&
+      !target.includes('://')
+    ) {
+      if (
+        !target.startsWith('/login') &&
+        !target.startsWith('/forgot-password') &&
+        !target.startsWith('/reset-password')
+      ) {
+        return target;
+      }
+    }
+    return null;
+  }, [location.state, searchParams]);
+
+  // Validate single field on blur
+  const handleBlur = (field: 'email' | 'password') => {
+    const result = loginValidationSchema.safeParse({ email, password });
+    if (!result.success) {
+      const issue = result.error.issues.find((i) => i.path[0] === field);
+      setFieldErrors((prev) => ({
+        ...prev,
+        [field]: issue ? issue.message : undefined,
+      }));
+    } else {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }
+  };
+
+  // Keyboard caps lock detection
+  const handleKeyModifierCheck = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    setCapsLockOn(e.getModifierState('CapsLock'));
+  };
+
+  const executeLogin = async (emailToSubmit: string, passToSubmit: string) => {
+    if (isLoading) return;
+
+    const trimmedEmail = emailToSubmit.trim().toLowerCase();
+
+    // 1. Zod Validation
+    const validation = loginValidationSchema.safeParse({
+      email: trimmedEmail,
+      password: passToSubmit,
+    });
+
+    if (!validation.success) {
+      const errorsMap: { email?: string; password?: string } = {};
+      let firstErrorField: 'email' | 'password' | null = null;
+
+      validation.error.issues.forEach((issue) => {
+        const fieldName = issue.path[0] as 'email' | 'password';
+        if (!errorsMap[fieldName]) {
+          errorsMap[fieldName] = issue.message;
+        }
+        if (!firstErrorField) {
+          firstErrorField = fieldName;
+        }
+      });
+
+      setFieldErrors(errorsMap);
+
+      if (firstErrorField === 'email') {
+        emailInputRef.current?.focus();
+      } else if (firstErrorField === 'password') {
+        passwordInputRef.current?.focus();
+      }
+      return;
+    }
+
+    // Clear validation errors and start loading
     setFieldErrors({});
+    setAlert(null);
     setIsLoading(true);
 
     try {
-      await login({ email, password });
-    } catch (err: any) {
-      if (err.response?.data) {
-        setErrorMsg(err.response.data.message || 'Login failed');
-        if (err.response.data.errors) {
-          const map: Record<string, string> = {};
-          err.response.data.errors.forEach((fe: any) => {
-            map[fe.field] = fe.message;
-          });
-          setFieldErrors(map);
+      await login({
+        email: trimmedEmail,
+        password: passToSubmit,
+      });
+
+      // Handle session-only vs persistent remember-me
+      if (!rememberMe) {
+        // If not remember-me, remove persistent refresh token from localStorage
+        const rt = localStorage.getItem('refreshToken');
+        if (rt) {
+          sessionStorage.setItem('refreshToken', rt);
+          localStorage.removeItem('refreshToken');
         }
-      } else {
-        setErrorMsg('Network error. Unable to reach server.');
       }
+
+      // Successful login navigation
+      const savedUser = JSON.parse(localStorage.getItem('user') || 'null');
+      if (savedUser?.must_change_password) {
+        navigate('/change-password');
+      } else {
+        const safeTarget = getSafeRedirectPath();
+        if (safeTarget) {
+          navigate(safeTarget);
+        } else if (savedUser) {
+          navigate(getRedirectPath(savedUser));
+        } else {
+          navigate('/admin');
+        }
+      }
+    } catch (err: any) {
+      // Clear password field and keep email
+      setPassword('');
+
+      const newFailedCount = failedAttempts + 1;
+      setFailedAttempts(newFailedCount);
+
+      const status = err.response?.status;
+      const responseData = err.response?.data;
+      const rawMessage = (responseData?.message || '').toLowerCase();
+      const firstErrorMessage = (responseData?.errors?.[0]?.message || '').toLowerCase();
+
+      // Check for rate limit / account lockout
+      if (
+        status === 429 ||
+        rawMessage.includes('locked') ||
+        firstErrorMessage.includes('locked')
+      ) {
+        const retryAfterHeader = err.response?.headers?.['retry-after'];
+        const retryAfterSeconds = retryAfterHeader
+          ? parseInt(retryAfterHeader, 10)
+          : 15 * 60; // 15 min default
+        setLockoutRemainingSec(retryAfterSeconds);
+        const mins = Math.ceil(retryAfterSeconds / 60);
+        setAlert({
+          type: 'error',
+          message: `Too many attempts. Try again in ${mins} minute${mins === 1 ? '' : 's'}.`,
+        });
+        return;
+      }
+
+      // Check for disabled or relieved account
+      if (
+        status === 403 ||
+        rawMessage.includes('disabled') ||
+        rawMessage.includes('contact hr') ||
+        firstErrorMessage.includes('disabled') ||
+        firstErrorMessage.includes('contact hr')
+      ) {
+        setAlert({
+          type: 'error',
+          message: 'Your account is not active. Contact HR or your administrator.',
+        });
+        return;
+      }
+
+      // Check for network or server connection errors
+      if (!err.response || err.code === 'ERR_NETWORK') {
+        setAlert({
+          type: 'error',
+          message: "We couldn't reach the server. Check your connection and try again.",
+          canRetry: true,
+        });
+        return;
+      }
+
+      // Default: Wrong credentials (uniform message whether email exists or not)
+      setAlert({
+        type: 'error',
+        message: 'Incorrect email or password.',
+      });
+
+      // Refocus password input after clearing
+      passwordInputRef.current?.focus();
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleQuickLogin = (demoEmail: string, demoPass: string) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    executeLogin(email, password);
+  };
+
+  const handleDevQuickSelect = (demoEmail: string, demoPass: string) => {
     setEmail(demoEmail);
     setPassword(demoPass);
-    setErrorMsg(null);
     setFieldErrors({});
+    setAlert(null);
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600/25 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-md w-full relative z-10">
-        {/* Brand Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-xl shadow-indigo-500/30 mb-4">
-            <Layers className="w-8 h-8" />
-          </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">Qynova ERP</h1>
-          <p className="text-sm text-slate-400 mt-1">Enterprise Resource Planning Platform</p>
-        </div>
-
-        {/* Card */}
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
-          <h2 className="text-xl font-bold text-slate-900 mb-1">Sign in to your account</h2>
-          <p className="text-xs text-slate-500 mb-6">Enter your organizational credentials to continue</p>
-
-          {errorMsg && (
-            <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium">
-              {errorMsg}
-            </div>
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to your Qynova account"
+    >
+      {/* SINGLE INLINE ALERT ABOVE FORM */}
+      {alert && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className={`mb-6 p-4 rounded-xl text-xs font-medium border flex items-start gap-3 transition-all ${
+            alert.type === 'error'
+              ? 'bg-rose-50 border-rose-200 text-rose-800'
+              : alert.type === 'warning'
+              ? 'bg-amber-50 border-amber-200 text-amber-800'
+              : alert.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-indigo-50 border-indigo-200 text-indigo-800'
+          }`}
+        >
+          {alert.type === 'error' && (
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          )}
+          {alert.type === 'warning' && (
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          )}
+          {alert.type === 'success' && (
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField label="Email Address" error={fieldErrors['email']} required>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@qynova.erp"
-                required
-                className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
-              />
-            </FormField>
+          <div className="flex-1">
+            <p className="leading-relaxed">{alert.message}</p>
 
-            <FormField label="Password" error={fieldErrors['password']} required>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="w-full px-3.5 py-2.5 pr-10 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </FormField>
-
-            <div className="flex items-center justify-between text-xs pt-1">
-              <span className="text-slate-400">Locked out after 5 attempts</span>
-              <Link
-                to="/forgot-password"
-                className="text-indigo-600 hover:text-indigo-800 font-semibold transition"
+            {/* Try Again button on network error */}
+            {alert.canRetry && (
+              <button
+                type="button"
+                onClick={() => executeLogin(email, password)}
+                className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
               >
-                Forgot password?
-              </Link>
-            </div>
+                <RefreshCw className="w-3.5 h-3.5" />
+                Try again
+              </button>
+            )}
 
-            <button
-              type="submit"
+            {/* Hint after 3 failed attempts */}
+            {failedAttempts >= 3 && alert.type === 'error' && !alert.canRetry && (
+              <p className="mt-2 text-[11px] text-rose-700/90 font-normal">
+                Forgot your password?{' '}
+                <Link
+                  to="/forgot-password"
+                  className="font-semibold underline hover:text-rose-900 ml-0.5"
+                >
+                  Reset it
+                </Link>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* LOGIN FORM */}
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+        {/* Work Email */}
+        <FormField
+          label="Work email"
+          htmlFor="work-email"
+          error={fieldErrors.email}
+          required
+        >
+          <input
+            ref={emailInputRef}
+            id="work-email"
+            type="email"
+            inputMode="email"
+            autoComplete="username"
+            autoFocus
+            disabled={isLoading}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => handleBlur('email')}
+            placeholder="name@company.com"
+            className={`w-full min-h-[44px] px-3.5 py-2.5 text-sm bg-white border rounded-xl text-slate-900 placeholder:text-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 disabled:text-slate-400 ${
+              fieldErrors.email ? 'border-rose-300 ring-1 ring-rose-300' : 'border-slate-200'
+            }`}
+          />
+        </FormField>
+
+        {/* Password */}
+        <FormField
+          label="Password"
+          htmlFor="current-password"
+          error={fieldErrors.password}
+          required
+        >
+          <div className="relative">
+            <input
+              ref={passwordInputRef}
+              id="current-password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 disabled:opacity-50"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => {
+                setCapsLockOn(false);
+                handleBlur('password');
+              }}
+              onKeyDown={handleKeyModifierCheck}
+              onKeyUp={handleKeyModifierCheck}
+              placeholder="••••••••"
+              className={`w-full min-h-[44px] px-3.5 py-2.5 pr-11 text-sm bg-white border rounded-xl text-slate-900 placeholder:text-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 disabled:text-slate-400 ${
+                fieldErrors.password
+                  ? 'border-rose-300 ring-1 ring-rose-300'
+                  : 'border-slate-200'
+              }`}
+            />
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] min-w-[32px] min-h-[32px] flex items-center justify-center transition"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
-              <ArrowRight className="w-4 h-4" />
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
-          </form>
+          </div>
 
-          {/* Quick Demo Switcher for fast evaluation */}
-          {(import.meta as any).env?.DEV !== false && (
-            <div className="mt-8 pt-6 border-t border-slate-100">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 text-center">
-                Quick Test Credentials
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('admin@qynova.erp', 'Admin@123')}
-                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
-                >
-                  <ShieldCheck className="w-4 h-4 text-indigo-600" />
-                  <span className="font-bold">Admin</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('hr@qynova.erp', 'Hr@123')}
-                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
-                >
-                  <Users className="w-4 h-4 text-pink-600" />
-                  <span className="font-bold">HR</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('manager@qynova.erp', 'Manager@123')}
-                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
-                >
-                  <Briefcase className="w-4 h-4 text-amber-600" />
-                  <span className="font-bold">Manager</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('employee@qynova.erp', 'Employee@123')}
-                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition"
-                >
-                  <User className="w-4 h-4 text-emerald-600" />
-                  <span className="font-bold">Employee</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('intern@qynova.erp', 'Intern@123')}
-                  className="p-2 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 flex flex-col items-center gap-1 text-slate-700 transition col-span-2 sm:col-span-1"
-                >
-                  <GraduationCap className="w-4 h-4 text-blue-600" />
-                  <span className="font-bold">Intern</span>
-                </button>
-              </div>
+          {/* Caps Lock Warning */}
+          {capsLockOn && (
+            <div
+              role="status"
+              className="flex items-center gap-1.5 text-xs text-amber-600 font-medium mt-1 animate-fadeIn"
+            >
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <span>Caps Lock is on</span>
             </div>
           )}
+        </FormField>
+
+        {/* Remember Me & Forgot Password Row */}
+        <div className="flex items-center justify-between text-xs pt-0.5">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600">
+            <input
+              type="checkbox"
+              id="remember-me"
+              disabled={isLoading}
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-[#4F46E5] focus:ring-2 focus:outline-none cursor-pointer"
+            />
+            <span>Remember me</span>
+          </label>
+
+          <Link
+            to="/forgot-password"
+            className="font-semibold text-indigo-600 hover:text-indigo-800 transition focus:outline-none focus:ring-2 focus:ring-[#4F46E5] rounded px-1 py-0.5"
+          >
+            Forgot password?
+          </Link>
         </div>
-      </div>
-    </div>
+
+        {/* Primary Submit Button */}
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          isLoading={isLoading}
+          disabled={isLoading}
+          className="w-full min-h-[44px] font-bold text-sm shadow-md shadow-indigo-500/20"
+        >
+          {isLoading ? 'Signing in...' : 'Sign in'}
+        </Button>
+      </form>
+
+      {/* DEV QUICK LOGIN (Excluded in production bundle) */}
+      {isDevLoginEnabled && LazyDevQuickLogin && (
+        <React.Suspense fallback={null}>
+          <LazyDevQuickLogin
+            onSelect={handleDevQuickSelect}
+            disabled={isLoading}
+          />
+        </React.Suspense>
+      )}
+    </AuthLayout>
   );
 };
 

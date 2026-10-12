@@ -14,7 +14,7 @@ interface AuthContextType {
   getRedirectPath: (user: UserAuth) => string;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const getRoleRedirectPath = (user: UserAuth): string => {
   if (user.roles.includes('Admin') || user.roles.includes('HR')) {

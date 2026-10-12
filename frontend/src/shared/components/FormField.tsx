@@ -2,6 +2,7 @@ import React from 'react';
 
 interface FormFieldProps {
   label?: string;
+  htmlFor?: string;
   error?: string;
   helperText?: string;
   required?: boolean;
@@ -11,6 +12,7 @@ interface FormFieldProps {
 
 export const FormField: React.FC<FormFieldProps> = ({
   label,
+  htmlFor,
   error,
   helperText,
   required = false,
@@ -20,9 +22,12 @@ export const FormField: React.FC<FormFieldProps> = ({
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
       {label && (
-        <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+        <label
+          htmlFor={htmlFor}
+          className="text-xs font-semibold uppercase tracking-wider text-slate-600 flex items-center gap-1 cursor-pointer"
+        >
           {label}
-          {required && <span className="text-rose-500 font-bold">*</span>}
+          {required && <span className="text-rose-500 font-bold" aria-hidden="true">*</span>}
         </label>
       )}
       {children}

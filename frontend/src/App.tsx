@@ -58,15 +58,19 @@ const RootRedirect: React.FC = () => {
 };
 
 import ErrorBoundary from './shared/components/ErrorBoundary';
+import { PrivacyPolicyPage } from './features/legal/pages/PrivacyPolicyPage';
+import { TermsPage } from './features/legal/pages/TermsPage';
 
 export const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <Routes>
-      {/* Public Auth Routes */}
+      {/* Public Auth & Legal Routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
 
       {/* Mandatory Password Change Route */}
       <Route
