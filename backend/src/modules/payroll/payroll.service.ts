@@ -624,10 +624,24 @@ export class PayrollService {
       doc.on('error', (err) => reject(err));
     });
 
+    // Load Company Settings for Letterhead & Footer
+    const companySettings = await db('company_settings').where({ id: 1 }).first();
+    const companyName = companySettings?.legal_name || companySettings?.company_name || process.env.APP_NAME || 'ERP Enterprise';
+    const companyAddress = [companySettings?.address_line1, companySettings?.city, companySettings?.state, companySettings?.pincode]
+      .filter(Boolean)
+      .join(', ') || 'Corporate Office';
+    const contactLine = [companySettings?.email || companySettings?.support_email, companySettings?.website, companySettings?.phone]
+      .filter(Boolean)
+      .join(' | ');
+    const payslipFooter = companySettings?.payslip_footer_text || 'This is a computer-generated payslip and does not require a physical signature.';
+    const currency = companySettings?.currency || 'INR';
+
     // Brand Header
-    doc.fillColor('#0F172A').fontSize(20).font('Helvetica-Bold').text('QYNOVA TECHNOLOGIES', 40, 40);
-    doc.fontSize(9).font('Helvetica').fillColor('#64748B').text('Tech Park, Guindy, Chennai, Tamil Nadu - 600032');
-    doc.text('hr@qynova.erp | www.qynova.com');
+    doc.fillColor('#0F172A').fontSize(18).font('Helvetica-Bold').text(companyName.toUpperCase(), 40, 40);
+    doc.fontSize(8.5).font('Helvetica').fillColor('#64748B').text(companyAddress);
+    if (contactLine) {
+      doc.text(contactLine);
+    }
 
     // Title Badge
     doc.rect(360, 40, 195, 34).fill('#EEF2FF');
@@ -672,10 +686,10 @@ export class PayrollService {
 
     doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(9);
     doc.text('EARNINGS', 50, tableTop + 6);
-    doc.text('AMOUNT (INR)', 210, tableTop + 6, { align: 'right', width: 70 });
+    doc.text(`AMOUNT (${currency})`, 210, tableTop + 6, { align: 'right', width: 70 });
 
     doc.text('DEDUCTIONS', 50 + colWidth + 15, tableTop + 6);
-    doc.text('AMOUNT (INR)', 210 + colWidth + 15, tableTop + 6, { align: 'right', width: 70 });
+    doc.text(`AMOUNT (${currency})`, 210 + colWidth + 15, tableTop + 6, { align: 'right', width: 70 });
 
     // Table Rows
     let currentY = tableTop + 28;
@@ -732,11 +746,11 @@ export class PayrollService {
 
     doc.font('Helvetica-Bold').fontSize(11).fillColor('#15803D');
     doc.text('NET SALARY PAYOUT:', 60, currentY + 16);
-    doc.fontSize(16).text(`INR ${Number(item.net_salary).toFixed(2)}`, 320, currentY + 14, { align: 'right', width: 220 });
+    doc.fontSize(16).text(`${currency} ${Number(item.net_salary).toFixed(2)}`, 320, currentY + 14, { align: 'right', width: 220 });
 
     // Footer Signoff
     doc.font('Helvetica').fontSize(8).fillColor('#64748B');
-    doc.text('This is a computer-generated document and does not require a physical signature.', 40, 750, { align: 'center', width: 515 });
+    doc.text(payslipFooter, 40, 750, { align: 'center', width: 515 });
 
     doc.end();
 

@@ -6,6 +6,7 @@ import {
   Receipt,
   ShieldCheck,
 } from 'lucide-react';
+import { useBranding } from '../../../shared/hooks/useBranding';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -18,9 +19,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   title,
   subtitle,
 }) => {
-  const appName = import.meta.env.VITE_APP_NAME || 'Qynova ERP';
-  const logoUrl = import.meta.env.VITE_APP_LOGO_URL;
-  const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'support@qynova.com';
+  const { appName, logoUrl, tagline, supportEmail, isConfigured, isLoading } = useBranding();
 
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-white selection:bg-indigo-500 selection:text-white">
@@ -41,23 +40,42 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
 
         {/* Brand Logo & Name at the Top */}
         <div className="relative z-10 flex items-center gap-3">
-          {logoUrl ? (
-            <img src={logoUrl} alt={appName} className="h-9 w-auto object-contain" />
-          ) : (
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30">
-              <Layers className="w-5 h-5" />
+          {isLoading ? (
+            <div className="flex items-center gap-3 animate-pulse">
+              <div className="w-10 h-10 rounded-xl bg-slate-800" />
+              <div className="h-6 w-32 rounded bg-slate-800" />
             </div>
+          ) : (
+            <>
+              {logoUrl ? (
+                <img src={logoUrl} alt={appName} className="h-9 w-auto object-contain" />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                  <Layers className="w-5 h-5" />
+                </div>
+              )}
+              <div className="flex flex-col">
+                <span className="text-xl font-extrabold tracking-tight text-white">
+                  {appName}
+                </span>
+                {!isConfigured && (
+                  <Link
+                    to="/login"
+                    className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium"
+                  >
+                    Set up your company
+                  </Link>
+                )}
+              </div>
+            </>
           )}
-          <span className="text-xl font-extrabold tracking-tight text-white">
-            {appName}
-          </span>
         </div>
 
         {/* Middle Feature Content */}
         <div className="relative z-10 my-auto py-12 max-w-md space-y-8">
           <div>
             <h1 className="text-3xl xl:text-4xl font-extrabold text-white tracking-tight leading-snug">
-              Run your people, time and payroll in one place.
+              {tagline || 'Run your people, time and payroll in one place.'}
             </h1>
             <p className="mt-3 text-sm text-slate-400 leading-relaxed">
               Unified enterprise workspace built for modern organizations, teams, and finance operations.
@@ -106,7 +124,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
 
         {/* Left Bottom Footer */}
         <div className="relative z-10 text-xs text-slate-500">
-          © 2026 Qynova. All rights reserved.
+          © {new Date().getFullYear()} {appName}. All rights reserved.
         </div>
       </div>
 

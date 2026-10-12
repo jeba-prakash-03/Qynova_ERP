@@ -32,3 +32,10 @@
 | 18 | Email notifications use Nodemailer with dev fallback to structured console logging when SMTP host is unset or unconfigured. | Ensures outbox worker and background queues function reliably in development and test environments without an active SMTP server. |
 | 19 | Asset tags auto-generate with format `AST-YYYY-XXXX` if left blank on creation. Assets can only be deleted if in 'available' status. | Prevents loss of audit trail for assigned or maintained hardware. |
 | 20 | Database health check endpoint mounted at `/health` verifies live database connectivity with `SELECT 1` returning 200 OK or 503 Service Unavailable. | Standard Docker and cloud orchestrator health probe contract. |
+
+## Final Polish Assumptions
+
+| # | Assumption | Rationale |
+|---|------------|-----------|
+| 21 | Company settings uses a singleton row (`id = 1`) in `company_settings`. Public branding assets (logo, favicon, signature) are served via `/api/v1/public/branding/file/:filename` without authentication, and branding metadata via `/api/v1/public/branding`. Updating company settings requires `settings.company.edit` and records backend audit logs. | Phase 1 requirement: singleton table, public branding for login page, audited updates. |
+

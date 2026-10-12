@@ -1127,7 +1127,7 @@ export const EmployeeDetailPage: React.FC = () => {
       >
         <div className="space-y-4 text-xs">
           <p className="text-[#64748B]">
-            Generates an official Qynova ERP Offer Letter in PDF format.
+            Generates an official Offer Letter in PDF format.
           </p>
 
           <div>

@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoginPage } from '../pages/LoginPage';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
 import { AuthContext } from '../../../shared/context/AuthContext';
@@ -47,6 +48,15 @@ describe('Qynova ERP - Enterprise Login Experience Suite', () => {
     mockGetRedirectPath = vi.fn().mockReturnValue('/admin');
   });
 
+  const createTestQueryClient = () =>
+    new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+
   const renderLoginPage = (
     initialEntries = ['/login'],
     authOverrides = {}
@@ -60,18 +70,22 @@ describe('Qynova ERP - Enterprise Login Experience Suite', () => {
       ...authOverrides,
     };
 
+    const queryClient = createTestQueryClient();
+
     return render(
-      <AuthContext.Provider value={authContextValue as any}>
-        <MemoryRouter initialEntries={initialEntries}>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/admin" element={<div>Admin Dashboard</div>} />
-            <Route path="/change-password" element={<div>Change Password Page</div>} />
-            <Route path="/reports" element={<div>Reports Page</div>} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          </Routes>
-        </MemoryRouter>
-      </AuthContext.Provider>
+      <QueryClientProvider client={queryClient}>
+        <AuthContext.Provider value={authContextValue as any}>
+          <MemoryRouter initialEntries={initialEntries}>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/admin" element={<div>Admin Dashboard</div>} />
+              <Route path="/change-password" element={<div>Change Password Page</div>} />
+              <Route path="/reports" element={<div>Reports Page</div>} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            </Routes>
+          </MemoryRouter>
+        </AuthContext.Provider>
+      </QueryClientProvider>
     );
   };
 

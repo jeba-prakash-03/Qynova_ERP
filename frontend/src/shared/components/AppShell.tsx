@@ -4,6 +4,7 @@ import { useAuth, getRoleRedirectPath } from '../context/AuthContext';
 import { MENU_CONFIG } from '../navigation/menuConfig';
 import { NotificationBell } from '../../features/notifications/NotificationBell';
 import { PushNotificationBanner } from './PushNotificationBanner';
+import { useBranding } from '../hooks/useBranding';
 import {
   Menu,
   X,
@@ -19,6 +20,7 @@ import {
 
 export const AppShell: React.FC = () => {
   const { user, logout } = useAuth();
+  const { appName, logoUrl, isConfigured } = useBranding();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -91,16 +93,25 @@ export const AppShell: React.FC = () => {
           </button>
 
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-              <Layers className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                QYNOVA
+            {logoUrl ? (
+              <img src={logoUrl} alt={appName} className="h-8 max-w-[120px] object-contain" />
+            ) : (
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                <Layers className="w-5 h-5" />
+              </div>
+            )}
+            <div className="flex flex-col">
+              <span className="font-extrabold text-base tracking-tight text-slate-900 leading-tight">
+                {appName}
               </span>
-              <span className="ml-1 text-xs px-1.5 py-0.5 rounded font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200/60">
-                ERP
-              </span>
+              {!isConfigured && isAdmin && (
+                <NavLink
+                  to="/settings"
+                  className="text-[10px] text-indigo-600 hover:text-indigo-700 font-semibold underline"
+                >
+                  Set up your company
+                </NavLink>
+              )}
             </div>
           </div>
         </div>
@@ -261,7 +272,7 @@ export const AppShell: React.FC = () => {
 
           {/* Footer Environment Tag */}
           <div className="p-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-[11px] text-slate-400">
-            <span className="font-semibold text-slate-600">Qynova ERP</span>
+            <span className="font-semibold text-slate-600 truncate max-w-[180px]">{appName}</span>
             <span>v1.0.0</span>
           </div>
         </aside>

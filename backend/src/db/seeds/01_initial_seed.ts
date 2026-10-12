@@ -76,6 +76,8 @@ export async function seed(knex: Knex): Promise<void> {
     'assets.view', 'assets.create', 'assets.edit', 'assets.delete', 'assets.assign', 'assets.view_own',
     'clients.view', 'projects.view',
     'reports.view',
+    'settings.view',
+    'offer_letters.view', 'offer_letters.create', 'offer_letters.edit', 'offer_letters.send', 'offer_letter_templates.manage',
     'notifications.view', 'notifications.create',
   ];
   const hrRolePerms = hrPermNames
@@ -103,6 +105,7 @@ export async function seed(knex: Knex): Promise<void> {
     'crm.view', 'crm.view_own', 'crm.create', 'crm.edit',
     'payroll.view_own', 'payslips.view_own',
     'assets.view_own',
+    'offer_letters.view_own',
     'notifications.view',
   ];
   const managerRolePerms = managerPermNames
@@ -126,6 +129,7 @@ export async function seed(knex: Knex): Promise<void> {
     'expenses.view_own', 'expenses.create',
     'payroll.view_own', 'payslips.view_own',
     'assets.view_own',
+    'offer_letters.view_own',
     'notifications.view',
   ];
   const employeeRolePerms = employeePermNames
@@ -147,6 +151,7 @@ export async function seed(knex: Knex): Promise<void> {
     'tasks.view_own', 'tasks.edit',
     'payroll.view_own', 'payslips.view_own',
     'assets.view_own',
+    'offer_letters.view_own',
     'notifications.view',
   ];
   const internRolePerms = internPermNames

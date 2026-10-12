@@ -222,16 +222,20 @@ export class EmployeesService {
 
     // Queue welcome email with temporary password
     try {
+      const companySettings = await db('company_settings').where({ id: 1 }).first();
+      const companyName = companySettings?.company_name || process.env.APP_NAME || 'ERP Portal';
       const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login`;
       const html = welcomeEmailTemplate({
         employeeName: `${createdEmployee.first_name} ${createdEmployee.last_name}`,
         email: createdEmployee.email,
         temporaryPassword,
         loginUrl,
+        companyName,
+        footerText: companySettings?.email_footer_text,
       });
       await emailService.queueEmail({
         to: createdEmployee.email,
-        subject: `Welcome to Qynova ERP, ${createdEmployee.first_name}!`,
+        subject: `Welcome to ${companyName}, ${createdEmployee.first_name}!`,
         html,
         eventKey: `welcome:emp:${createdEmployee.id}`,
       });

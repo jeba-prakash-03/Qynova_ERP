@@ -1,4 +1,9 @@
-export function baseLayout(title: string, bodyContent: string): string {
+export function baseLayout(
+  title: string,
+  bodyContent: string,
+  companyName: string = process.env.APP_NAME || 'ERP Portal',
+  footerText?: string | null
+): string {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -21,13 +26,14 @@ export function baseLayout(title: string, bodyContent: string): string {
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">QYNOVA <span>ERP</span></div>
+      <div class="logo">${companyName}</div>
     </div>
     <div class="content">
       ${bodyContent}
     </div>
     <div class="footer">
-      © ${new Date().getFullYear()} Qynova ERP. All rights reserved.<br>
+      © ${new Date().getFullYear()} ${companyName}. All rights reserved.<br>
+      ${footerText ? `${footerText}<br>` : ''}
       This is an automated system notification.
     </div>
   </div>
@@ -40,9 +46,12 @@ export function welcomeEmailTemplate(params: {
   email: string;
   temporaryPassword: string;
   loginUrl: string;
+  companyName?: string;
+  footerText?: string | null;
 }): string {
+  const companyName = params.companyName || process.env.APP_NAME || 'ERP Portal';
   const content = `
-    <h2 style="color: #0F172A; margin-top: 0;">Welcome to Qynova, ${params.employeeName}!</h2>
+    <h2 style="color: #0F172A; margin-top: 0;">Welcome to ${companyName}, ${params.employeeName}!</h2>
     <p>Your employee account has been created. You can now log in to the employee portal using the temporary credentials below:</p>
     
     <div class="card">
@@ -52,20 +61,23 @@ export function welcomeEmailTemplate(params: {
 
     <p style="color: #DC2626; font-size: 12px;"><strong>Important:</strong> You will be required to change your temporary password on your first login.</p>
 
-    <a href="${params.loginUrl}" class="btn">Log In to Qynova Portal</a>
+    <a href="${params.loginUrl}" class="btn">Log In to Portal</a>
   `;
-  return baseLayout('Welcome to Qynova ERP', content);
+  return baseLayout(`Welcome to ${companyName}`, content, companyName, params.footerText);
 }
 
 export function passwordResetEmailTemplate(params: {
   employeeName: string;
   resetUrl: string;
   expiresInMinutes: number;
+  companyName?: string;
+  footerText?: string | null;
 }): string {
+  const companyName = params.companyName || process.env.APP_NAME || 'ERP Portal';
   const content = `
     <h2 style="color: #0F172A; margin-top: 0;">Password Reset Request</h2>
     <p>Hello ${params.employeeName},</p>
-    <p>We received a request to reset your password for Qynova ERP. Click the button below to choose a new password:</p>
+    <p>We received a request to reset your password for ${companyName}. Click the button below to choose a new password:</p>
 
     <a href="${params.resetUrl}" class="btn">Reset Password</a>
 
@@ -74,7 +86,7 @@ export function passwordResetEmailTemplate(params: {
       If you did not request this reset, you can safely ignore this email.
     </p>
   `;
-  return baseLayout('Reset Your Password', content);
+  return baseLayout('Reset Your Password', content, companyName, params.footerText);
 }
 
 export function leaveAppliedEmailTemplate(params: {

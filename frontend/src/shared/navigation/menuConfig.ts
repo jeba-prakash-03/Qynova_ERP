@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Target,
   Laptop,
+  Settings,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -222,6 +223,12 @@ export const MENU_CONFIG: MenuGroup[] = [
   {
     groupTitle: 'Preferences',
     items: [
+      {
+        title: 'Settings',
+        path: '/settings',
+        icon: Settings,
+        permission: 'settings.view',
+      },
       {
         title: 'Notification Settings',
         path: '/settings/notifications',

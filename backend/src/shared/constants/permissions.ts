@@ -199,4 +199,18 @@ export const ALL_SYSTEM_PERMISSIONS: PermissionDefinition[] = [
   // Reports
   { module: 'reports', action: 'view', name: 'reports.view', description: 'View analytics and reports' },
   { module: 'reports', action: 'export', name: 'reports.export', description: 'Export reports' },
+
+  // Settings
+  { module: 'settings', action: 'view', name: 'settings.view', description: 'View system settings' },
+  { module: 'settings', action: 'edit', name: 'settings.edit', description: 'Edit general settings' },
+  { module: 'settings', action: 'company_edit', name: 'settings.company.edit', description: 'Edit company settings and branding' },
+
+  // Offer Letters
+  { module: 'offer_letters', action: 'view', name: 'offer_letters.view', description: 'View all offer letters' },
+  { module: 'offer_letters', action: 'view_own', name: 'offer_letters.view_own', description: 'View own offer letter' },
+  { module: 'offer_letters', action: 'create', name: 'offer_letters.create', description: 'Generate offer letter' },
+  { module: 'offer_letters', action: 'edit', name: 'offer_letters.edit', description: 'Edit offer letter' },
+  { module: 'offer_letters', action: 'send', name: 'offer_letters.send', description: 'Send offer letter by email' },
+  { module: 'offer_letters', action: 'templates_manage', name: 'offer_letter_templates.manage', description: 'Manage offer letter templates' },
 ];
+

@@ -29,6 +29,7 @@ import dashboardRoutes from './modules/registry/dashboard.routes';
 import reportsRoutes from './modules/registry/reports.routes';
 import assetsRoutes from './modules/assets/assets.routes';
 import pushRoutes from './modules/push/push.routes';
+import settingsRoutes, { publicBrandingRouter } from './modules/settings/settings.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -96,6 +97,8 @@ export const createApp = (): Application => {
   app.use('/api/v1/reports', reportsRoutes);
   app.use('/api/v1/assets', assetsRoutes);
   app.use('/api/v1/push', pushRoutes);
+  app.use('/api/v1/public/branding', publicBrandingRouter);
+  app.use('/api/v1/settings', settingsRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

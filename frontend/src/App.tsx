@@ -65,6 +65,7 @@ import { AssetListPage } from './features/assets/pages/AssetListPage';
 import { AssetDetailPage } from './features/assets/pages/AssetDetailPage';
 import { MyAssetsPage } from './features/assets/pages/MyAssetsPage';
 import { NotificationSettingsPage } from './features/notifications/pages/NotificationSettingsPage';
+import { SettingsPage } from './features/settings/pages/SettingsPage';
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -406,6 +407,16 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute requireEmployee>
               <MyAssetsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* System & Company Settings */}
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute permission="settings.view">
+              <SettingsPage />
             </ProtectedRoute>
           }
         />

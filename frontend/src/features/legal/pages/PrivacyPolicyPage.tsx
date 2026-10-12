@@ -2,9 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, ArrowLeft } from 'lucide-react';
 
+import { useBranding } from '../../../shared/hooks/useBranding';
+
 export const PrivacyPolicyPage: React.FC = () => {
-  const appName = import.meta.env.VITE_APP_NAME || 'Qynova ERP';
-  const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'support@qynova.com';
+  const { appName, supportEmail } = useBranding();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-6">
@@ -47,7 +48,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             <ArrowLeft className="w-4 h-4" />
             Back to Sign in
           </Link>
-          <span className="text-xs text-slate-400">© 2026 Qynova</span>
+          <span className="text-xs text-slate-400">© {new Date().getFullYear()} {appName}</span>
         </div>
       </div>
     </div>
