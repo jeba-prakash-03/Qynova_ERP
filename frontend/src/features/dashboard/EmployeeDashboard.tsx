@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import axiosClient from '../../shared/api/axiosClient';
 import { Loader } from '../../shared/components/Loader';
 import { ErrorState } from '../../shared/components/ErrorState';
@@ -17,16 +18,30 @@ import {
   MapPin,
   Clock,
   Sparkles,
+  CheckSquare,
+  ArrowUpRight,
 } from 'lucide-react';
 
 export const EmployeeDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'bank' | 'emergency' | 'documents'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'tasks' | 'bank' | 'emergency' | 'documents'>('profile');
 
   const { data: employee, isLoading, error, refetch } = useQuery({
     queryKey: ['employees', 'me'],
     queryFn: async () => {
       const res = await axiosClient.get('/employees/me');
       return res.data.data;
+    },
+  });
+
+  const { data: widgets } = useQuery({
+    queryKey: ['dashboard', 'my-widgets'],
+    queryFn: async () => {
+      try {
+        const res = await axiosClient.get('/dashboard/widgets');
+        return res.data?.data || {};
+      } catch {
+        return {};
+      }
     },
   });
 
@@ -99,6 +114,18 @@ export const EmployeeDashboard: React.FC = () => {
         >
           <User className="w-4 h-4" />
           General Profile
+        </button>
+
+        <button
+          onClick={() => setActiveTab('tasks')}
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+            activeTab === 'tasks'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <CheckSquare className="w-4 h-4" />
+          My Tasks ({widgets?.my_tasks?.count ?? 0})
         </button>
 
         <button
@@ -207,6 +234,59 @@ export const EmployeeDashboard: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === 'tasks' && (
+        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm max-w-3xl">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">
+                My Assigned Tasks
+              </h3>
+              <p className="text-xs text-slate-400">Tasks assigned to you pending completion</p>
+            </div>
+            <Link
+              to="/tasks/my"
+              className="text-xs font-semibold text-indigo-600 hover:underline inline-flex items-center gap-1"
+            >
+              My Tasks Board <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          {widgets?.my_tasks?.items?.length > 0 ? (
+            <div className="divide-y divide-slate-100">
+              {widgets.my_tasks.items.map((t: any) => (
+                <div key={t.id} className="py-3 flex items-center justify-between gap-4 text-xs">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-700">{t.task_code}</span>
+                      <span className="font-semibold text-slate-900">{t.title}</span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          t.priority === 'urgent'
+                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                            : t.priority === 'high'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                            : 'bg-slate-100 text-slate-700'
+                        }`}
+                      >
+                        {t.priority}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      {t.project_name} • Due: {t.due_date || 'No due date'}
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 capitalize">
+                    {t.status.replace(/_/g, ' ')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400 py-6 text-center">No open tasks assigned to you right now.</p>
+          )}
         </div>
       )}
 

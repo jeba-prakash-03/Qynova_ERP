@@ -106,3 +106,18 @@ export interface PipelineOverview {
   weighted_forecast: number;
   stage_summaries: StageSummary[];
 }
+
+export const LEAD_STAGES_CONFIG: Record<
+  LeadStage,
+  { label: string; defaultProbability: number }
+> = {
+  lead: { label: 'New Lead', defaultProbability: 10 },
+  contact: { label: 'Contact Made', defaultProbability: 20 },
+  requirement: { label: 'Requirement Scoped', defaultProbability: 30 },
+  meeting: { label: 'Discovery / Demo', defaultProbability: 40 },
+  proposal: { label: 'Proposal Sent', defaultProbability: 60 },
+  negotiation: { label: 'Negotiation', defaultProbability: 80 },
+  won: { label: 'Won & Ready', defaultProbability: 100 },
+  lost: { label: 'Lost / Closed', defaultProbability: 0 },
+};
+

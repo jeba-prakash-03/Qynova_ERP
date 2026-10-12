@@ -24,8 +24,14 @@ import expensesRoutes from './modules/expenses/expenses.routes';
 import invoicesRoutes from './modules/invoices/invoices.routes';
 import financeRoutes from './modules/profitability/profitability.routes';
 import crmRoutes from './modules/crm/crm.routes';
+import {
+  initializeBusinessRegistries,
+  dashboardRouter,
+  reportsRouter,
+} from './modules/registry';
 
 export const createApp = (): Application => {
+  initializeBusinessRegistries();
   const app = express();
 
   // CORS Configuration
@@ -73,6 +79,8 @@ export const createApp = (): Application => {
   app.use('/api/v1/invoices', invoicesRoutes);
   app.use('/api/v1/finance', financeRoutes);
   app.use('/api/v1/crm', crmRoutes);
+  app.use('/api/v1/dashboard', dashboardRouter);
+  app.use('/api/v1/reports', reportsRouter);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

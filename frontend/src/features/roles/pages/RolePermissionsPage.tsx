@@ -73,12 +73,23 @@ export const RolePermissionsPage: React.FC = () => {
     'au' + 'dit_logs',
     'au' + 'dit',
     'contracts',
-    'reports',
   ];
   const modules = Array.from(new Set(allPermissions.map((p) => p.module)))
     .filter((m) => !hiddenModules.includes(m))
     .sort();
-  const actions = ['view', 'view_own', 'view_team', 'create', 'edit', 'delete', 'approve', 'export', 'assign', 'run'];
+  const actions = [
+    'view',
+    'view_own',
+    'view_team',
+    'view_financials',
+    'create',
+    'edit',
+    'delete',
+    'approve',
+    'export',
+    'assign',
+    'run',
+  ];
 
   // Map of `${module}:${action}` -> permission object
   const permMap = new Map<string, any>();

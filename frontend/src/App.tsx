@@ -56,6 +56,9 @@ import { FinanceOverviewPage } from './features/finance/pages/FinanceOverviewPag
 // CRM Module (Dev B)
 import { CrmPipelinePage } from './features/crm/pages/CrmPipelinePage';
 
+// Reports Registry Module (Dev B)
+import { ReportsPage } from './features/reports/pages/ReportsPage';
+
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -356,6 +359,16 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute permission="crm.view,crm.view_own">
               <CrmPipelinePage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Reports Registry Module (Dev B) */}
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute permission="reports.view">
+              <ReportsPage />
             </ProtectedRoute>
           }
         />

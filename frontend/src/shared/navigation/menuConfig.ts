@@ -102,6 +102,12 @@ export const MENU_CONFIG: MenuGroup[] = [
         icon: TrendingUp,
         permission: 'projects.view_financials',
       },
+      {
+        title: 'Reports & Analytics',
+        path: '/reports',
+        icon: FileText,
+        permission: 'reports.view',
+      },
     ],
   },
   {
