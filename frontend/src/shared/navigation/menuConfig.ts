@@ -15,6 +15,8 @@ import {
   Receipt,
   LucideIcon,
   Bell,
+  CreditCard,
+  TrendingUp,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -74,6 +76,24 @@ export const MENU_CONFIG: MenuGroup[] = [
         path: '/tasks/my',
         icon: CheckSquare,
         requireEmployee: true,
+      },
+      {
+        title: 'Invoices',
+        path: '/invoices',
+        icon: Receipt,
+        permission: 'invoices.view,invoices.view_team,invoices.view_own',
+      },
+      {
+        title: 'Expenses',
+        path: '/expenses',
+        icon: CreditCard,
+        permission: 'expenses.view,expenses.view_team,expenses.view_own',
+      },
+      {
+        title: 'Finance Overview',
+        path: '/finance',
+        icon: TrendingUp,
+        permission: 'projects.view_financials',
       },
     ],
   },

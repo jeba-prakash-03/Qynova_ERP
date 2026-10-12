@@ -126,4 +126,13 @@ router.delete(
   projectsController.deleteMilestone
 );
 
+// --- Profitability & Financials ---
+import { profitabilityController } from '../profitability/profitability.controller';
+router.get(
+  '/:id/profitability',
+  validate({ params: projectIdParamSchema }),
+  profitabilityController.getProjectProfitability
+);
+
 export default router;
+

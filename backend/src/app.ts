@@ -20,6 +20,9 @@ import timesheetsRoutes from './modules/timesheets/timesheets.routes';
 import clientsRoutes from './modules/clients/clients.routes';
 import projectsRoutes from './modules/projects/projects.routes';
 import tasksRoutes from './modules/tasks/tasks.routes';
+import expensesRoutes from './modules/expenses/expenses.routes';
+import invoicesRoutes from './modules/invoices/invoices.routes';
+import financeRoutes from './modules/profitability/profitability.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -65,6 +68,9 @@ export const createApp = (): Application => {
   app.use('/api/v1/clients', clientsRoutes);
   app.use('/api/v1/projects', projectsRoutes);
   app.use('/api/v1/tasks', tasksRoutes);
+  app.use('/api/v1/expenses', expensesRoutes);
+  app.use('/api/v1/invoices', invoicesRoutes);
+  app.use('/api/v1/finance', financeRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

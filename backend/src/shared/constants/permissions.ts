@@ -130,6 +130,7 @@ export const ALL_SYSTEM_PERMISSIONS: PermissionDefinition[] = [
   { module: 'projects', action: 'edit', name: 'projects.edit', description: 'Edit project' },
   { module: 'projects', action: 'delete', name: 'projects.delete', description: 'Delete project' },
   { module: 'projects', action: 'export', name: 'projects.export', description: 'Export projects' },
+  { module: 'projects', action: 'view_financials', name: 'projects.view_financials', description: 'View project financial metrics and profitability' },
 
   // Tasks
   { module: 'tasks', action: 'view', name: 'tasks.view', description: 'View tasks' },

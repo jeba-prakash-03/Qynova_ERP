@@ -47,6 +47,12 @@ import { ProjectDetailPage } from './features/projects/pages/ProjectDetailPage';
 import { TasksPage } from './features/tasks/pages/TasksPage';
 import { MyTasksPage } from './features/tasks/pages/MyTasksPage';
 
+// Finance & Expenses & Invoices (Dev 3)
+import { ExpensesPage } from './features/expenses/pages/ExpensesPage';
+import { InvoiceListPage } from './features/invoices/pages/InvoiceListPage';
+import { InvoiceDetailPage } from './features/invoices/pages/InvoiceDetailPage';
+import { FinanceOverviewPage } from './features/finance/pages/FinanceOverviewPage';
+
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -299,6 +305,44 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute requireEmployee>
               <MyTasksPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Expenses Module (Dev 3) */}
+        <Route
+          path="/expenses"
+          element={
+            <ProtectedRoute>
+              <ExpensesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Invoices Module (Dev 3) */}
+        <Route
+          path="/invoices"
+          element={
+            <ProtectedRoute>
+              <InvoiceListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoices/:id"
+          element={
+            <ProtectedRoute>
+              <InvoiceDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Finance Overview Module (Dev 3) */}
+        <Route
+          path="/finance"
+          element={
+            <ProtectedRoute permission="projects.view_financials">
+              <FinanceOverviewPage />
             </ProtectedRoute>
           }
         />

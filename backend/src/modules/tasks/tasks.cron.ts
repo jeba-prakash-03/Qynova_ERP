@@ -18,3 +18,6 @@ export const startTasksCron = () => {
     }
   });
 };
+
+export const initTasksCron = startTasksCron;
+

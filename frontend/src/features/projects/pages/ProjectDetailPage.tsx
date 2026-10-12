@@ -44,7 +44,15 @@ import { Task, TaskStatus } from '../../tasks/types';
 import { TaskKanbanBoard } from '../../tasks/components/TaskKanbanBoard';
 import { TaskDrawer } from '../../tasks/components/TaskDrawer';
 import { TaskFormModal } from '../../tasks/components/TaskFormModal';
-import { Kanban, List } from 'lucide-react';
+import { expensesApi } from '../../expenses/api';
+import { Expense, EXPENSE_STATUS_CONFIG } from '../../expenses/types';
+import { ExpenseFormModal } from '../../expenses/components/ExpenseFormModal';
+import { invoicesApi } from '../../invoices/api';
+import { Invoice, INVOICE_STATUS_CONFIG } from '../../invoices/types';
+import { InvoiceFormModal } from '../../invoices/components/InvoiceFormModal';
+import { financeApi } from '../../finance/api';
+import { ProjectProfitability } from '../../finance/types';
+import { Kanban, List, Download, ExternalLink, ShieldAlert } from 'lucide-react';
 
 type TabType =
   | 'overview'
@@ -54,7 +62,8 @@ type TabType =
   | 'timesheets'
   | 'documents'
   | 'expenses'
-  | 'invoices';
+  | 'invoices'
+  | 'profitability';
 
 const ALL_STATUSES: ProjectStatus[] = [
   'lead',
@@ -234,6 +243,60 @@ export const ProjectDetailPage: React.FC = () => {
     setMilestoneAmount(0);
   };
 
+  // Financial State & Queries
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+
+  const {
+    data: projectExpenses = [],
+    isLoading: isLoadingExpenses,
+    refetch: refetchExpenses,
+  } = useQuery({
+    queryKey: ['expenses', 'project', id],
+    queryFn: async () => {
+      const res = await expensesApi.getAll({ project_id: id });
+      return res.data;
+    },
+    enabled: activeTab === 'expenses',
+  });
+
+  const {
+    data: projectInvoices = [],
+    isLoading: isLoadingInvoices,
+    refetch: refetchInvoices,
+  } = useQuery({
+    queryKey: ['invoices', 'project', id],
+    queryFn: async () => {
+      const res = await invoicesApi.getAll({ project_id: id });
+      return res.data;
+    },
+    enabled: activeTab === 'invoices',
+  });
+
+  const {
+    data: profitability,
+    isLoading: isLoadingProfitability,
+    error: profitabilityError,
+  } = useQuery<ProjectProfitability>({
+    queryKey: ['profitability', 'project', id],
+    queryFn: () => financeApi.getProjectProfitability(id!),
+    enabled: activeTab === 'profitability',
+    retry: false,
+  });
+
+  const createInvoiceFromMilestoneMutation = useMutation({
+    mutationFn: (milestoneId: number) => invoicesApi.createFromMilestone(milestoneId),
+    onSuccess: (inv) => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['project', id] });
+      success(`Invoice ${inv.invoice_number} created from milestone`);
+      setActiveTab('invoices');
+    },
+    onError: (err: any) => {
+      error(err.response?.data?.message || 'Failed to create invoice from milestone');
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="py-20 flex justify-center">
@@ -269,6 +332,7 @@ export const ProjectDetailPage: React.FC = () => {
     { key: 'timesheets', label: 'Timesheets' },
     { key: 'expenses', label: 'Expenses' },
     { key: 'invoices', label: 'Invoices' },
+    { key: 'profitability', label: 'Profitability' },
   ];
 
   const totalMilestonesAmount = project.milestones?.reduce(
@@ -695,6 +759,20 @@ export const ProjectDetailPage: React.FC = () => {
                       )}
                     </Can>
 
+                    {milestone.status === 'completed' && (
+                      <Can permission="invoices.create">
+                        <button
+                          onClick={() => createInvoiceFromMilestoneMutation.mutate(milestone.id)}
+                          disabled={createInvoiceFromMilestoneMutation.isPending}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-md text-xs font-semibold transition"
+                          title="Generate draft invoice from this milestone"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Generate Invoice</span>
+                        </button>
+                      </Can>
+                    )}
+
                     <Can permission="milestones.delete">
                       <button
                         onClick={() => deleteMilestoneMutation.mutate(milestone.id)}
@@ -890,37 +968,349 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* 7. EXPENSES TAB (PLACEHOLDER) */}
+      {/* 7. EXPENSES TAB */}
       {activeTab === 'expenses' && (
-        <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
-          <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3">
-            <Receipt className="w-6 h-6" />
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">Project Expenses & Reimbursables</h3>
+              <p className="text-xs text-slate-500">
+                Track direct expenses, software licenses, travel, and vendor claims attributed to {project.name}.
+              </p>
+            </div>
+            <Can permission="expenses.create">
+              <button
+                onClick={() => setIsExpenseModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold shadow-sm transition"
+              >
+                <Plus className="w-3.5 h-3.5" /> Claim Expense
+              </button>
+            </Can>
           </div>
-          <h3 className="text-lg font-bold text-slate-800">Project Expenses & Claims</h3>
-          <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
-            Team travel expenses, software license costs, and project reimbursements are owned by{' '}
-            <strong>Dev 3 (Stage 2)</strong>.
-          </p>
-          <div className="mt-4 inline-block px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200">
-            Roadmap: Dev 3 Stage 2
-          </div>
+
+          {isLoadingExpenses ? (
+            <div className="p-12 flex justify-center">
+              <Loader text="Loading project expenses..." />
+            </div>
+          ) : projectExpenses.length > 0 ? (
+            <div className="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-xs">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
+                  <tr>
+                    <th className="px-4 py-3">Code</th>
+                    <th className="px-4 py-3">Date</th>
+                    <th className="px-4 py-3">Category</th>
+                    <th className="px-4 py-3">Vendor / Purpose</th>
+                    <th className="px-4 py-3 text-right">Amount</th>
+                    <th className="px-4 py-3 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {projectExpenses.map((exp: Expense) => {
+                    const statusConf = EXPENSE_STATUS_CONFIG[exp.status];
+                    return (
+                      <tr key={exp.id} className="hover:bg-slate-50 transition">
+                        <td className="px-4 py-3 font-mono font-medium text-slate-900">
+                          {exp.expense_code}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {new Date(exp.date).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-slate-800">
+                          {exp.category}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {exp.vendor || exp.description || '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-slate-900">
+                          ₹{Number(exp.amount).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusConf.bg} ${statusConf.color} ${statusConf.border}`}
+                          >
+                            {statusConf.label}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="bg-white p-12 rounded-xl border border-slate-200 text-center">
+              <Receipt className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <h4 className="text-sm font-semibold text-slate-700">No project expenses found</h4>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                No expense claims have been charged to this project yet.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
       {/* 8. INVOICES TAB */}
       {activeTab === 'invoices' && (
-        <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
-          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-            <FileText className="w-6 h-6" />
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">Project Billing & Invoices</h3>
+              <p className="text-xs text-slate-500">
+                Milestone invoices and billing statements generated for {project.name}.
+              </p>
+            </div>
+            <Can permission="invoices.create">
+              <button
+                onClick={() => setIsInvoiceModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold shadow-sm transition"
+              >
+                <Plus className="w-3.5 h-3.5" /> Create Invoice
+              </button>
+            </Can>
           </div>
-          <h3 className="text-lg font-bold text-slate-800">Project Invoices & Billing</h3>
-          <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
-            View milestone-based and hourly invoices generated for this project.
-          </p>
-          <div className="mt-4 inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
-            Linked Milestones & Invoicing
-          </div>
+
+          {isLoadingInvoices ? (
+            <div className="p-12 flex justify-center">
+              <Loader text="Loading project invoices..." />
+            </div>
+          ) : projectInvoices.length > 0 ? (
+            <div className="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-xs">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
+                  <tr>
+                    <th className="px-4 py-3">Invoice #</th>
+                    <th className="px-4 py-3">Issue Date</th>
+                    <th className="px-4 py-3">Due Date</th>
+                    <th className="px-4 py-3 text-right">Total</th>
+                    <th className="px-4 py-3 text-right">Paid</th>
+                    <th className="px-4 py-3 text-right">Balance Due</th>
+                    <th className="px-4 py-3 text-center">Status</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {projectInvoices.map((inv: Invoice) => {
+                    const statusConf = INVOICE_STATUS_CONFIG[inv.status];
+                    return (
+                      <tr key={inv.id} className="hover:bg-slate-50 transition">
+                        <td className="px-4 py-3 font-mono font-bold text-indigo-600">
+                          <Link to={`/invoices/${inv.id}`} className="hover:underline">
+                            {inv.invoice_number}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {new Date(inv.issue_date).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {new Date(inv.due_date).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono font-medium text-slate-900">
+                          ₹{Number(inv.total).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono font-medium text-emerald-700">
+                          ₹{Number(inv.amount_paid).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-rose-700">
+                          ₹{Number(inv.balance_due).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusConf.bg} ${statusConf.color} ${statusConf.border}`}
+                          >
+                            {statusConf.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end space-x-2">
+                            <button
+                              onClick={() => invoicesApi.downloadPdf(inv.id, inv.invoice_number)}
+                              className="p-1 text-slate-400 hover:text-slate-700 transition"
+                              title="Download PDF"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
+                            <Link
+                              to={`/invoices/${inv.id}`}
+                              className="p-1 text-slate-400 hover:text-indigo-600 transition"
+                              title="View Invoice Details"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="bg-white p-12 rounded-xl border border-slate-200 text-center">
+              <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <h4 className="text-sm font-semibold text-slate-700">No project invoices found</h4>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                No invoices have been billed for this project yet. You can create an invoice or generate one from a completed milestone.
+              </p>
+            </div>
+          )}
         </div>
+      )}
+
+      {/* 9. PROFITABILITY TAB (FINANCIAL ACCESS GUARDED) */}
+      {activeTab === 'profitability' && (
+        <Can
+          permission="projects.view_financials"
+          fallback={
+            <div className="bg-white p-12 rounded-xl border border-slate-200 text-center">
+              <ShieldAlert className="w-12 h-12 text-amber-500 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-slate-800">Financial Visibility Shielded</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                Salary-derived labor costs and project profitability metrics are restricted. You require{' '}
+                <code className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded font-mono">
+                  projects.view_financials
+                </code>{' '}
+                permission to view financial data.
+              </p>
+            </div>
+          }
+        >
+          {isLoadingProfitability ? (
+            <div className="p-12 flex justify-center">
+              <Loader text="Computing project labor costs & profitability..." />
+            </div>
+          ) : profitability ? (
+            <div className="space-y-6">
+              {/* Top Financial KPI Cards */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {/* Revenue */}
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+                  <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <span>Revenue Realized</span>
+                    <DollarSign className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <p className="mt-2 text-xl font-bold font-mono text-emerald-700">
+                    ₹{profitability.revenue.toLocaleString()}
+                  </p>
+                  <p className="mt-1 text-[11px] text-slate-400">Total client payments received</p>
+                </div>
+
+                {/* Labor Cost */}
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+                  <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <span>Labor Cost (Hours Burn)</span>
+                    <Clock className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <p className="mt-2 text-xl font-bold font-mono text-amber-700">
+                    ₹{profitability.labor_cost.toLocaleString()}
+                  </p>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    Approved timesheet hours × hourly salary cost
+                  </p>
+                </div>
+
+                {/* Direct Expenses */}
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+                  <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <span>Project Expenses</span>
+                    <Receipt className="w-4 h-4 text-rose-600" />
+                  </div>
+                  <p className="mt-2 text-xl font-bold font-mono text-rose-700">
+                    ₹{profitability.project_expenses.toLocaleString()}
+                  </p>
+                  <p className="mt-1 text-[11px] text-slate-400">Approved operational claims</p>
+                </div>
+
+                {/* Net Profit */}
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
+                  <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <span>Net Profit</span>
+                    <TrendingUp
+                      className={`w-4 h-4 ${
+                        profitability.net_profit >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                      }`}
+                    />
+                  </div>
+                  <p
+                    className={`mt-2 text-xl font-bold font-mono ${
+                      profitability.net_profit >= 0 ? 'text-emerald-700' : 'text-rose-700'
+                    }`}
+                  >
+                    ₹{profitability.net_profit.toLocaleString()}
+                  </p>
+                  <p className="mt-1 text-[11px] font-semibold text-slate-600">
+                    Margin: {profitability.profit_margin_percent}% | Budget Burn: {profitability.budget_used_percent}%
+                  </p>
+                </div>
+              </div>
+
+              {/* Labor Breakdown Table */}
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+                <div className="border-b border-slate-200 bg-slate-50 px-4 py-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Labor Cost Breakdown by Team Member
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Hourly rate computed dynamically from active salary structures
+                  </p>
+                </div>
+
+                {profitability.labor_breakdown && profitability.labor_breakdown.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-100/75 border-b border-slate-200 text-slate-600 font-semibold uppercase">
+                        <tr>
+                          <th className="px-4 py-2.5">Team Member</th>
+                          <th className="px-4 py-2.5 text-right">Hourly Rate</th>
+                          <th className="px-4 py-2.5 text-right">Approved Hours</th>
+                          <th className="px-4 py-2.5 text-right">Total Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {profitability.labor_breakdown.map((item) => (
+                          <tr key={item.employee_id} className="hover:bg-slate-50 transition">
+                            <td className="px-4 py-3 font-medium text-slate-900">
+                              {item.employee_name}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono text-slate-600">
+                              ₹{item.hourly_rate.toFixed(2)}/hr
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono font-semibold text-slate-800">
+                              {item.hours} hrs
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono font-bold text-amber-700">
+                              ₹{item.cost.toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot className="border-t border-slate-200 bg-slate-50 font-bold">
+                        <tr>
+                          <td colSpan={3} className="px-4 py-2.5 text-right text-slate-700">
+                            Total Labor Cost:
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-mono text-amber-700">
+                            ₹{profitability.labor_cost.toLocaleString()}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-slate-400 text-xs">
+                    No approved timesheet hours logged for this project yet.
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white p-12 rounded-xl border border-slate-200 text-center">
+              <p className="text-xs text-slate-500">
+                Unable to calculate profitability data for this project.
+              </p>
+            </div>
+          )}
+        </Can>
       )}
 
       {/* Add Member Modal */}
@@ -1107,6 +1497,31 @@ export const ProjectDetailPage: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Claim Expense Modal */}
+      {isExpenseModalOpen && (
+        <ExpenseFormModal
+          isOpen={isExpenseModalOpen}
+          onClose={() => {
+            setIsExpenseModalOpen(false);
+            refetchExpenses();
+          }}
+          defaultProjectId={Number(id)}
+        />
+      )}
+
+      {/* Create Invoice Modal */}
+      {isInvoiceModalOpen && (
+        <InvoiceFormModal
+          isOpen={isInvoiceModalOpen}
+          onClose={() => {
+            setIsInvoiceModalOpen(false);
+            refetchInvoices();
+          }}
+          defaultClientId={project.client_id}
+          defaultProjectId={Number(id)}
+        />
+      )}
     </div>
   );
 };

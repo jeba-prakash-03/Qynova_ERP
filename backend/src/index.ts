@@ -13,6 +13,12 @@ const startServer = async () => {
     await db.raw('SELECT 1+1 AS result');
     console.log('[DATABASE] MySQL connection established successfully.');
 
+    // Initialize business cron jobs
+    const { initTasksCron } = await import('./modules/tasks/tasks.cron');
+    const { initInvoicesCron } = await import('./modules/invoices/invoices.cron');
+    initTasksCron();
+    initInvoicesCron();
+
     app.listen(PORT, () => {
       console.log(`[SERVER] Qynova ERP Backend running on http://localhost:${PORT}`);
       console.log(`[SERVER] API v1 base path: http://localhost:${PORT}/api/v1`);

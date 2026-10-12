@@ -9,8 +9,10 @@
     "start": "node dist/index.js",
     "migrate:make": "knex --knexfile src/db/knexfile.ts migrate:make -x ts",
     "migrate:latest": "knex --knexfile src/db/knexfile.ts migrate:latest",
+    "migrate:latest:test": "cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:latest",
     "migrate:rollback": "knex --knexfile src/db/knexfile.ts migrate:rollback",
     "seed:run": "knex --knexfile src/db/knexfile.ts seed:run",
+    "seed:run:test": "cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts seed:run",
     "db:reset:test": "cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:rollback --all && cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:latest && cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts seed:run",
     "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit",
     "lint": "eslint src/**/*.ts"
