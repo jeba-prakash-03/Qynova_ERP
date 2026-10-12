@@ -47,6 +47,7 @@ import { ReportsPage } from './features/reports/pages/ReportsPage';
 import { AssetListPage } from './features/assets/pages/AssetListPage';
 import { AssetDetailPage } from './features/assets/pages/AssetDetailPage';
 import { MyAssetsPage } from './features/assets/pages/MyAssetsPage';
+import { NotificationSettingsPage } from './features/notifications/pages/NotificationSettingsPage';
 
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
@@ -283,6 +284,16 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute requireEmployee>
               <MyAssetsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Notification Settings */}
+        <Route
+          path="/settings/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationSettingsPage />
             </ProtectedRoute>
           }
         />

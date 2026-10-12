@@ -2,6 +2,7 @@ import db from '../../db/knex';
 import { BadRequestError, NotFoundError, ForbiddenError } from '../../shared/errors/app-error';
 import { hasRole } from '../../shared/utils/rbac.util';
 import { SYSTEM_ROLES } from '../../shared/constants/roles';
+import notificationService from '../../shared/services/notification.service';
 
 export interface TimesheetEntry {
   id: number;
@@ -117,6 +118,26 @@ export class TimesheetsService {
       approver_employee_id: currentUser.employeeId || null,
       decision_note: note || (status === 'approved' ? 'Approved' : 'Rejected'),
     });
+
+    try {
+      const emp = await db('employees').where({ id: entry.employee_id }).first();
+      if (emp && emp.user_id) {
+        await notificationService.notify({
+          eventKey: `timesheet.${status}:${id}`,
+          userIds: Number(emp.user_id),
+          type: status === 'rejected' ? 'warning' : 'success',
+          title: status === 'rejected' ? 'Timesheet Rejected' : 'Timesheet Approved',
+          message:
+            status === 'rejected'
+              ? `Your timesheet entry for ${entry.date} was rejected. Reason: ${note || 'Rejected'}`
+              : `Your timesheet entry for ${entry.date} was approved.`,
+          link: '/timesheets/my',
+          eventType: 'timesheet_decision',
+        });
+      }
+    } catch {
+      // Non-fatal
+    }
 
     return (await db('timesheets').where({ id }).first())!;
   }

@@ -21,6 +21,7 @@ import timesheetsRoutes from './modules/timesheets/timesheets.routes';
 import dashboardRoutes from './modules/registry/dashboard.routes';
 import reportsRoutes from './modules/registry/reports.routes';
 import assetsRoutes from './modules/assets/assets.routes';
+import pushRoutes from './modules/push/push.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -80,6 +81,7 @@ export const createApp = (): Application => {
   app.use('/api/v1/dashboard', dashboardRoutes);
   app.use('/api/v1/reports', reportsRoutes);
   app.use('/api/v1/assets', assetsRoutes);
+  app.use('/api/v1/push', pushRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

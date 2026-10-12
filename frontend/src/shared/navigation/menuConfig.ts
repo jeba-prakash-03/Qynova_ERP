@@ -163,4 +163,14 @@ export const MENU_CONFIG: MenuGroup[] = [
       },
     ],
   },
+  {
+    groupTitle: 'Preferences',
+    items: [
+      {
+        title: 'Notification Settings',
+        path: '/settings/notifications',
+        icon: Bell,
+      },
+    ],
+  },
 ];

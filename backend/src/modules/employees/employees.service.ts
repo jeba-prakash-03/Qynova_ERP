@@ -189,6 +189,29 @@ export class EmployeesService {
       link: '/me',
     });
 
+    // Notify HR / Admins of new joiner
+    try {
+      const hrUsers = await db('user_roles as ur')
+        .join('roles as r', 'ur.role_id', 'r.id')
+        .whereIn('r.name', ['Admin', 'HR'])
+        .select('ur.user_id');
+
+      const hrUserIds = Array.from(new Set(hrUsers.map((u) => Number(u.user_id))));
+      if (hrUserIds.length > 0) {
+        await notificationService.notify({
+          eventKey: `employee:${createdEmployeeId}:joined`,
+          userIds: hrUserIds,
+          type: 'info',
+          title: 'New Employee Joined',
+          message: `${createdEmployee.first_name} ${createdEmployee.last_name} (${createdEmployee.employee_code}) has joined the company.`,
+          link: `/employees/${createdEmployeeId}`,
+          eventType: 'employee_joined',
+        });
+      }
+    } catch {
+      // Non-fatal
+    }
+
     // TODO [Dev 2 Integration]: When Dev 2 merges payroll module:
     // if (input.initial_salary) {
     //   await salaryStructureService.createInitialSalary({

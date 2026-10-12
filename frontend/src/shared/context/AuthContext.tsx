@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../../features/auth/types';
 import { authApi } from '../../features/auth/api';
+import { unregisterPushToken } from '../hooks/usePushNotifications';
 
 interface AuthContextType {
   user: UserAuth | null;
@@ -77,6 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = useCallback(async () => {
     const refreshToken = localStorage.getItem('refreshToken') || undefined;
     try {
+      await unregisterPushToken();
       await authApi.logout(refreshToken);
     } catch {
       // Ignore network errors on logout
