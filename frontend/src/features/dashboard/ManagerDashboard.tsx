@@ -2,7 +2,8 @@ import React from 'react';
 import { useAuth } from '../../shared/context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Button } from '../../shared/components/Button';
-import { Briefcase, Users, CalendarCheck, Clock, CheckCircle } from 'lucide-react';
+import { Users, BarChart3 } from 'lucide-react';
+import { WidgetRenderer } from './widgets/WidgetRenderer';
 
 export const ManagerDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -19,26 +20,53 @@ export const ManagerDashboard: React.FC = () => {
             Welcome, {user?.employee ? `${user.employee.first_name}` : user?.email.split('@')[0]}
           </h1>
           <p className="text-indigo-200 text-sm mt-1 max-w-xl">
-            Supervise team performance, review timesheets, and handle leave and project approvals.
+            Supervise direct reports, monitor daily team attendance, review timesheets, and approve leaves.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
+          <Link to="/reports">
+            <Button variant="secondary" leftIcon={<BarChart3 className="w-4 h-4" />}>
+              Team Reports
+            </Button>
+          </Link>
           <Link to="/me">
             <Button variant="primary">
-              My Self-Service Profile
+              My Profile
             </Button>
           </Link>
         </div>
       </div>
 
+      {/* Grid of Manager Widgets */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <WidgetRenderer
+          widgetKey="manager_team_attendance_today"
+          title="Team Attendance Today"
+        />
+
+        <WidgetRenderer
+          widgetKey="manager_pending_approvals"
+          title="Pending Approvals"
+        />
+      </div>
+
+      {/* 14-day Leave Calendar */}
+      <div>
+        <WidgetRenderer
+          widgetKey="manager_team_leave_calendar_14d"
+          title="Upcoming Team Leaves (14 Days)"
+        />
+      </div>
+
+      {/* Quick Nav Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-sm">
           <div className="w-10 h-10 rounded-xl bg-[#FEF3C7] text-[#B45309] flex items-center justify-center mb-4">
             <Users className="w-5 h-5" />
           </div>
           <h3 className="text-base font-bold text-[#0F172A]">Team Directory</h3>
-          <p className="text-xs text-[#64748B] mt-1 mb-4">View your direct reports and their contact details.</p>
+          <p className="text-xs text-[#64748B] mt-1 mb-4">View your direct reports and contact information.</p>
           <Link to="/employees" className="text-xs font-bold text-[#4F46E5] hover:underline">
             Browse Directory →
           </Link>
@@ -46,24 +74,24 @@ export const ManagerDashboard: React.FC = () => {
 
         <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-sm">
           <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center mb-4">
-            <CalendarCheck className="w-5 h-5" />
+            <Users className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-bold text-[#0F172A]">Leave Approvals</h3>
-          <p className="text-xs text-[#64748B] mt-1 mb-4">
-            Pending leave requests submitted by team members (Dev 2).
-          </p>
-          <span className="text-xs font-bold text-[#64748B]">Integrated by Dev 2</span>
+          <h3 className="text-base font-bold text-[#0F172A]">Attendance Sheet</h3>
+          <p className="text-xs text-[#64748B] mt-1 mb-4">Review daily logs and check-in times for your team.</p>
+          <Link to="/attendance" className="text-xs font-bold text-[#4F46E5] hover:underline">
+            Attendance Logs →
+          </Link>
         </div>
 
         <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-sm">
           <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] text-[#4F46E5] flex items-center justify-center mb-4">
-            <Clock className="w-5 h-5" />
+            <Users className="w-5 h-5" />
           </div>
-          <h3 className="text-base font-bold text-[#0F172A]">Timesheet Reviews</h3>
-          <p className="text-xs text-[#64748B] mt-1 mb-4">
-            Weekly timesheets awaiting manager sign-off (Dev 2 & 3).
-          </p>
-          <span className="text-xs font-bold text-[#64748B]">Integrated by Dev 2</span>
+          <h3 className="text-base font-bold text-[#0F172A]">Timesheet Approvals</h3>
+          <p className="text-xs text-[#64748B] mt-1 mb-4">Review weekly project and task logs submitted by team.</p>
+          <Link to="/timesheets" className="text-xs font-bold text-[#4F46E5] hover:underline">
+            View Timesheets →
+          </Link>
         </div>
       </div>
     </div>

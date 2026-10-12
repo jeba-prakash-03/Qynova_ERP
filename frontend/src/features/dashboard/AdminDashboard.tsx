@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import axiosClient from '../../shared/api/axiosClient';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, BarChart3 } from 'lucide-react';
 import { Loader } from '../../shared/components/Loader';
 import { Button } from '../../shared/components/Button';
 import { WidgetRenderer } from './widgets/WidgetRenderer';
@@ -27,9 +27,21 @@ export const AdminDashboard: React.FC = () => {
 
   const hasWidget = (key: string) => widgets.some((w) => w.key === key);
 
+  const primaryWidgetKeys = [
+    'metrics_overview',
+    'admin_live_stats',
+    'employee_growth_12m',
+    'headcount_by_department_chart',
+    'attendance_trend_30d',
+    'leave_by_type_chart',
+    'recent_employees',
+    'pending_leaves',
+    'department_distribution',
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Top Banner - Preserving Navy Dark (#0F172A) */}
+      {/* Top Banner */}
       <div className="bg-[#0F172A] rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -39,11 +51,16 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Organization Overview</h1>
           <p className="text-indigo-200 text-sm mt-1 max-w-xl">
-            Manage employees, departments and role access policies through registry-driven widgets.
+            Live workforce metrics, analytics charts, and approvals registry.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
+          <Link to="/reports">
+            <Button variant="secondary" leftIcon={<BarChart3 className="w-4 h-4" />}>
+              Reports Suite
+            </Button>
+          </Link>
           <Link to="/employees/new">
             <Button variant="primary" leftIcon={<UserPlus className="w-4 h-4" />}>
               Add Employee
@@ -56,12 +73,36 @@ export const AdminDashboard: React.FC = () => {
         <Loader text="Loading dashboard widgets..." />
       ) : (
         <>
-          {/* Top Overview Metrics Widget */}
+          {/* Real-time stats cards */}
+          {hasWidget('admin_live_stats') && (
+            <WidgetRenderer widgetKey="admin_live_stats" title="Today Pulse & Pending Approvals" />
+          )}
+
+          {/* Top Company Metrics */}
           {hasWidget('metrics_overview') && (
             <WidgetRenderer widgetKey="metrics_overview" title="Company Metrics Overview" />
           )}
 
-          {/* Grid for Cards */}
+          {/* Interactive Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {hasWidget('employee_growth_12m') && (
+              <WidgetRenderer widgetKey="employee_growth_12m" title="Employee Growth Trend" />
+            )}
+
+            {hasWidget('attendance_trend_30d') && (
+              <WidgetRenderer widgetKey="attendance_trend_30d" title="Attendance Trend" />
+            )}
+
+            {hasWidget('headcount_by_department_chart') && (
+              <WidgetRenderer widgetKey="headcount_by_department_chart" title="Headcount by Department" />
+            )}
+
+            {hasWidget('leave_by_type_chart') && (
+              <WidgetRenderer widgetKey="leave_by_type_chart" title="Leave Distribution" />
+            )}
+          </div>
+
+          {/* Detail Lists */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {hasWidget('recent_employees') && (
               <WidgetRenderer widgetKey="recent_employees" title="Recent Joiners" />
@@ -71,18 +112,9 @@ export const AdminDashboard: React.FC = () => {
               <WidgetRenderer widgetKey="pending_leaves" title="Pending Leave Approvals" />
             )}
 
-            {hasWidget('department_distribution') && (
-              <WidgetRenderer widgetKey="department_distribution" title="Department Distribution" />
-            )}
-
             {/* Any extra registered widgets (e.g. from Dev B) */}
             {widgets
-              .filter(
-                (w) =>
-                  !['metrics_overview', 'recent_employees', 'pending_leaves', 'department_distribution', 'today_attendance_summary'].includes(
-                    w.key
-                  )
-              )
+              .filter((w) => !primaryWidgetKeys.includes(w.key))
               .map((w) => (
                 <WidgetRenderer key={w.key} widgetKey={w.key} title={w.title} />
               ))}

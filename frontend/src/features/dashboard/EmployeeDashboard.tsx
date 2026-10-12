@@ -18,10 +18,16 @@ import {
   MapPin,
   Clock,
   Sparkles,
+  LayoutDashboard,
 } from 'lucide-react';
+import {
+  EmployeeTodayAttendanceWidget,
+  EmployeeLeaveBalancesWidget,
+  EmployeeRecentItemsWidget,
+} from './widgets/EmployeeDashboardWidgets';
 
 export const EmployeeDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'bank' | 'emergency' | 'documents'>('profile');
+  const [activeTab, setActiveTab] = useState<'overview' | 'profile' | 'bank' | 'emergency' | 'documents'>('overview');
 
   const { data: employee, isLoading, error, refetch } = useQuery({
     queryKey: ['employees', 'me'],
@@ -87,10 +93,22 @@ export const EmployeeDashboard: React.FC = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-[#E2E8F0] bg-white px-6 rounded-2xl shadow-sm gap-6">
+      <div className="flex border-b border-[#E2E8F0] bg-white px-6 rounded-2xl shadow-sm gap-6 overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'overview'
+              ? 'border-[#4F46E5] text-[#4F46E5]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
+          }`}
+        >
+          <LayoutDashboard className="w-4 h-4" />
+          Overview & Activity
+        </button>
+
         <button
           onClick={() => setActiveTab('profile')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'profile'
               ? 'border-[#4F46E5] text-[#4F46E5]'
               : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
@@ -102,7 +120,7 @@ export const EmployeeDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('bank')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'bank'
               ? 'border-[#4F46E5] text-[#4F46E5]'
               : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
@@ -114,7 +132,7 @@ export const EmployeeDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('emergency')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'emergency'
               ? 'border-[#4F46E5] text-[#4F46E5]'
               : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
@@ -126,7 +144,7 @@ export const EmployeeDashboard: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('documents')}
-          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 ${
+          className={`py-3.5 text-xs font-bold border-b-2 transition flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'documents'
               ? 'border-[#4F46E5] text-[#4F46E5]'
               : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
@@ -138,6 +156,22 @@ export const EmployeeDashboard: React.FC = () => {
       </div>
 
       {/* Tab Panels */}
+      {activeTab === 'overview' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-1">
+              <EmployeeTodayAttendanceWidget />
+            </div>
+            <div className="md:col-span-2">
+              <EmployeeLeaveBalancesWidget />
+            </div>
+          </div>
+          <div>
+            <EmployeeRecentItemsWidget />
+          </div>
+        </div>
+      )}
+
       {activeTab === 'profile' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm space-y-4">

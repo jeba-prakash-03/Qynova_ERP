@@ -10,8 +10,9 @@ export * from './widget.registry';
 export * from './report.registry';
 export * from './export.util';
 
-// Register HR reports suite
+// Register HR reports suite and chart widgets
 import './hr.reports';
+import './chart.widgets';
 
 // ==========================================
 // REGISTER BASE DASHBOARD WIDGETS
