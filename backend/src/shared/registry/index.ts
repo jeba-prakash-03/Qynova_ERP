@@ -10,6 +10,9 @@ export * from './widget.registry';
 export * from './report.registry';
 export * from './export.util';
 
+// Register HR reports suite
+import './hr.reports';
+
 // ==========================================
 // REGISTER BASE DASHBOARD WIDGETS
 // ==========================================
