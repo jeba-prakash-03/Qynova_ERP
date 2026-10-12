@@ -19,6 +19,26 @@ import {
   Coffee,
   Info,
 } from 'lucide-react';
+import ErrorBoundary from '../../../shared/components/ErrorBoundary';
+
+const safeFormatTime = (timeStr?: string | null, format: '12h' | '24h' = '12h'): string => {
+  if (!timeStr) return '--:--';
+  try {
+    const normalized = timeStr.includes(' ') && !timeStr.includes('T')
+      ? timeStr.replace(' ', 'T')
+      : timeStr;
+    const d = new Date(normalized);
+    if (isNaN(d.getTime())) {
+      const match = timeStr.match(/(\d{2}:\d{2})/);
+      return match ? match[1] : '--:--';
+    }
+    return format === '24h'
+      ? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+      : d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '--:--';
+  }
+};
 
 interface DailySheetItem {
   employee_id: number;
@@ -74,7 +94,11 @@ export const AttendanceSheetPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { success, error } = useToast();
   const { user } = useAuth();
-  const canEdit = user?.permissions.includes('attendance.edit') || user?.roles.includes('Admin') || user?.roles.includes('HR');
+  const canEdit = Boolean(
+    user?.permissions?.includes('attendance.edit') ||
+    user?.roles?.includes('Admin') ||
+    user?.roles?.includes('HR')
+  );
 
   // Fetch departments
   const { data: departments = [] } = useQuery({
@@ -163,17 +187,13 @@ export const AttendanceSheetPage: React.FC = () => {
 
   const handleOpenEdit = (item: DailySheetItem) => {
     setEditingItem(item);
-    const inTime = item.check_in
-      ? new Date(item.check_in).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-      : '09:30';
-    const outTime = item.check_out
-      ? new Date(item.check_out).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-      : '18:30';
+    const inTime = safeFormatTime(item.check_in, '24h');
+    const outTime = safeFormatTime(item.check_out, '24h');
 
     setEditForm({
       status: item.status,
-      check_in_time: inTime,
-      check_out_time: outTime,
+      check_in_time: inTime !== '--:--' ? inTime : '09:30',
+      check_out_time: outTime !== '--:--' ? outTime : '18:30',
       reason: '',
     });
   };
@@ -190,7 +210,8 @@ export const AttendanceSheetPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
+    <ErrorBoundary>
+      <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -343,20 +364,10 @@ export const AttendanceSheetPage: React.FC = () => {
                           <StatusBadge status={item.status} size="sm" />
                         </td>
                         <td className="py-3.5 px-4 font-mono text-xs">
-                          {item.check_in
-                            ? new Date(item.check_in).toLocaleTimeString('en-IN', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })
-                            : '--:--'}
+                          {safeFormatTime(item.check_in)}
                         </td>
                         <td className="py-3.5 px-4 font-mono text-xs">
-                          {item.check_out
-                            ? new Date(item.check_out).toLocaleTimeString('en-IN', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })
-                            : '--:--'}
+                          {safeFormatTime(item.check_out)}
                         </td>
                         <td className="py-3.5 px-4 font-semibold text-[#0F172A]">
                           {item.working_minutes > 0
@@ -408,17 +419,13 @@ export const AttendanceSheetPage: React.FC = () => {
                   <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
                     <span>Check In:</span>
                     <span className="font-mono font-semibold">
-                      {detailItem.check_in
-                        ? new Date(detailItem.check_in).toLocaleTimeString('en-IN')
-                        : '--'}
+                      {safeFormatTime(detailItem.check_in)}
                     </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
                     <span>Check Out:</span>
                     <span className="font-mono font-semibold">
-                      {detailItem.check_out
-                        ? new Date(detailItem.check_out).toLocaleTimeString('en-IN')
-                        : '--'}
+                      {safeFormatTime(detailItem.check_out)}
                     </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
@@ -508,10 +515,10 @@ export const AttendanceSheetPage: React.FC = () => {
                         {emp.department_name}
                       </td>
 
-                      {Array.from({ length: monthlyData.totalDays }, (_, i) => {
+                      {Array.from({ length: monthlyData?.totalDays || 30 }, (_, i) => {
                         const dayNum = (i + 1).toString().padStart(2, '0');
                         const dateKey = `${selectedMonth}-${dayNum}`;
-                        const dayInfo = emp.days[dateKey];
+                        const dayInfo = emp.days?.[dateKey];
                         const code = dayInfo?.statusCode || '-';
 
                         return (
@@ -629,7 +636,8 @@ export const AttendanceSheetPage: React.FC = () => {
           </div>
         </form>
       </Modal>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 

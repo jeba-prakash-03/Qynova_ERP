@@ -144,9 +144,9 @@ export const AppShell: React.FC = () => {
               >
                 <div className="px-4 py-2 border-b border-slate-100">
                   <p className="text-xs font-bold text-slate-800">{displayName}</p>
-                  <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                  <p className="text-[11px] text-slate-400 truncate">{user.email || ''}</p>
                   <div className="flex flex-wrap gap-1 mt-1.5">
-                    {user.roles.map((r) => (
+                    {(user.roles || []).map((r) => (
                       <span
                         key={r}
                         className="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-slate-100 text-slate-600"
