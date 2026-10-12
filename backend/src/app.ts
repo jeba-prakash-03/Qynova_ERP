@@ -17,6 +17,8 @@ import leaveTypesRoutes from './modules/leaves/leave-types.routes';
 import documentsRoutes from './modules/documents/documents.routes';
 import payrollRoutes from './modules/payroll/payroll.routes';
 import timesheetsRoutes from './modules/timesheets/timesheets.routes';
+import dashboardRoutes from './modules/registry/dashboard.routes';
+import reportsRoutes from './modules/registry/reports.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -59,6 +61,8 @@ export const createApp = (): Application => {
   app.use('/api/v1/documents', documentsRoutes);
   app.use('/api/v1/payroll', payrollRoutes);
   app.use('/api/v1/timesheets', timesheetsRoutes);
+  app.use('/api/v1/dashboard', dashboardRoutes);
+  app.use('/api/v1/reports', reportsRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

@@ -39,6 +39,9 @@ import { PayrollRunPage } from './features/payroll/pages/PayrollRunPage';
 import { MyPayslipsPage } from './features/payroll/pages/MyPayslipsPage';
 import { MyTimesheetsPage } from './features/timesheets/pages/MyTimesheetsPage';
 
+// Reports & Registry
+import { ReportsPage } from './features/reports/pages/ReportsPage';
+
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -237,6 +240,16 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute requireEmployee permission="timesheets.view_own">
               <MyTimesheetsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Reports & Analytics */}
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <ReportsPage />
             </ProtectedRoute>
           }
         />

@@ -11,3 +11,9 @@
 | 7 | For Phase 5 salary_structures: `effective_from` date determines which row payroll uses. When a new structure is added, the previous one is NOT deleted. | Spec says "changes create a new row, keep history". |
 | 8 | The attendance export route (`/export`) has no permission guard. Assumption: requires `attendance.view` permission (added in Phase 1 fix). | Consistent with other admin attendance routes. |
 | 9 | Dev 3 modules (clients, projects, tasks, milestones, invoices, expenses, crm, contracts, reports) are disconnected from frontend navigation and RBAC grid. Timesheets uses a free-text task description with nullable project_id/task_id. No Dev 3 source files existed in frontend. | Task 3 specifications. |
+
+## Sprint HR Assumptions (Dev A)
+
+| # | Assumption | Rationale |
+|---|------------|-----------|
+| 10 | Dashboard widgets and reports registries are mounted at `/api/v1/dashboard/widgets` and `/api/v1/reports`, with role/permission authorization. | Task 1 specification to decouple dashboard and reporting extensions for Dev B. |

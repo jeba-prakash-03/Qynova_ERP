@@ -46,6 +46,11 @@ export const MENU_CONFIG: MenuGroup[] = [
         path: '/dashboard',
         icon: LayoutDashboard,
       },
+      {
+        title: 'Reports',
+        path: '/reports',
+        icon: FileText,
+      },
     ],
   },
   {
