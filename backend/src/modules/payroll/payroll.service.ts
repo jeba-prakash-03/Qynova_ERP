@@ -4,6 +4,7 @@ import { getWorkingDays } from '../holidays/holidays.service';
 import { BadRequestError, NotFoundError, ForbiddenError } from '../../shared/errors/app-error';
 import { auditService } from '../../shared/services/audit.service';
 import { notificationService } from '../../shared/services/notification.service';
+import { payrollGeneratedEmailTemplate } from '../../shared/services/email.templates';
 import { TokenUserPayload } from '../../shared/utils/jwt.util';
 
 export interface SalaryStructure {
@@ -528,6 +529,43 @@ export class PayrollService {
         entityId: run.id,
         newValue: { month, status: targetStatus },
       });
+    }
+
+    if (targetStatus === 'paid' || targetStatus === 'processed') {
+      try {
+        const items = await db('payroll_items as pi')
+          .join('employees as e', 'pi.employee_id', 'e.id')
+          .where('pi.payroll_run_id', run.id)
+          .select('pi.id', 'pi.net_salary', 'e.user_id', 'e.first_name', 'e.last_name', 'e.email');
+
+        for (const item of items) {
+          if (item.user_id) {
+            const payslipUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/my-payslips`;
+            const html = payrollGeneratedEmailTemplate({
+              employeeName: `${item.first_name} ${item.last_name}`,
+              month,
+              netSalary: Number(item.net_salary),
+              payslipUrl,
+            });
+
+            await notificationService.notify({
+              eventKey: `payroll.${targetStatus}:${month}:item:${item.id}`,
+              userIds: item.user_id,
+              type: 'success',
+              title: `Payslip Available (${month})`,
+              message: `Your payslip for ${month} has been ${targetStatus}. Net salary: ₹${Number(item.net_salary).toLocaleString()}`,
+              link: '/my-payslips',
+              emailDetails: {
+                eventType: 'payroll_generated',
+                subject: `Your Payslip for ${month} is Ready`,
+                html,
+              },
+            });
+          }
+        }
+      } catch (err) {
+        console.error('[PAYROLL_NOTIF_ERROR]', err);
+      }
     }
 
     return this.getPayrollRunByMonth(month);

@@ -23,4 +23,8 @@ export const authApi = {
   forgotPassword: async (email: string): Promise<void> => {
     await axiosClient.post('/auth/forgot-password', { email });
   },
+
+  resetPassword: async (data: { token: string; newPassword: string }): Promise<void> => {
+    await axiosClient.post('/auth/reset-password', data);
+  },
 };

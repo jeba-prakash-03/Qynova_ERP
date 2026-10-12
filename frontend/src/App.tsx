@@ -8,6 +8,7 @@ import { AppShell } from './shared/components/AppShell';
 import { LoginPage } from './features/auth/pages/LoginPage';
 import { ChangePasswordPage } from './features/auth/pages/ChangePasswordPage';
 import { ForgotPasswordPage } from './features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './features/auth/pages/ResetPasswordPage';
 
 // Dashboards
 import { AdminDashboard } from './features/dashboard/AdminDashboard';
@@ -59,6 +60,7 @@ export const App: React.FC = () => {
       {/* Public Auth Routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* Mandatory Password Change Route */}
       <Route

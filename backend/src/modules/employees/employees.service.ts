@@ -8,6 +8,8 @@ import {
 } from '../../shared/errors/app-error';
 import { auditService } from '../../shared/services/audit.service';
 import { notificationService } from '../../shared/services/notification.service';
+import { emailService } from '../../shared/services/email.service';
+import { welcomeEmailTemplate } from '../../shared/services/email.templates';
 import { getTodayKolkata } from '../../shared/utils/date.util';
 import {
   EmployeeRecord,
@@ -194,6 +196,25 @@ export class EmployeesService {
     //     ctc: input.initial_salary
     //   });
     // }
+
+    // Queue welcome email with temporary password
+    try {
+      const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login`;
+      const html = welcomeEmailTemplate({
+        employeeName: `${createdEmployee.first_name} ${createdEmployee.last_name}`,
+        email: createdEmployee.email,
+        temporaryPassword,
+        loginUrl,
+      });
+      await emailService.queueEmail({
+        to: createdEmployee.email,
+        subject: `Welcome to Qynova ERP, ${createdEmployee.first_name}!`,
+        html,
+        eventKey: `welcome:emp:${createdEmployee.id}`,
+      });
+    } catch (mailErr) {
+      console.error('[WELCOME_EMAIL_ERROR] Failed to queue welcome email:', mailErr);
+    }
 
     return {
       employee: createdEmployee,
