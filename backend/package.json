@@ -11,8 +11,8 @@
     "migrate:latest": "knex --knexfile src/db/knexfile.ts migrate:latest",
     "migrate:rollback": "knex --knexfile src/db/knexfile.ts migrate:rollback",
     "seed:run": "knex --knexfile src/db/knexfile.ts seed:run",
-    "db:reset:test": "NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:rollback --all && NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:latest && NODE_ENV=test knex --knexfile src/db/knexfile.ts seed:run",
-    "test": "NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit",
+    "db:reset:test": "cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:rollback --all && cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:latest && cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts seed:run",
+    "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {
@@ -40,6 +40,7 @@
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
     "@typescript-eslint/parser": "^7.15.0",
+    "cross-env": "^10.1.0",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "prettier": "^3.3.2",

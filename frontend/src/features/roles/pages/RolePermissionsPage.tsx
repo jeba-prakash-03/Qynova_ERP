@@ -72,7 +72,6 @@ export const RolePermissionsPage: React.FC = () => {
   const hiddenModules = [
     'au' + 'dit_logs',
     'au' + 'dit',
-    'clients',
     'projects',
     'tasks',
     'milestones',

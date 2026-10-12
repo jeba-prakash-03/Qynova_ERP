@@ -78,11 +78,9 @@ export interface LeaveRequest {
   leave_type_code?: string;
   employee_name?: string;
   employee_code?: string;
-  department_name?: string;
-  approver_name?: string;
-  day_rows?: LeaveRequestDay[];
   department_name?: string | null;
   approver_name?: string | null;
+  day_rows?: LeaveRequestDay[];
   days_breakdown?: LeaveRequestDay[];
 }
 

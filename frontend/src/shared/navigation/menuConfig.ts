@@ -49,6 +49,17 @@ export const MENU_CONFIG: MenuGroup[] = [
     ],
   },
   {
+    groupTitle: 'Business',
+    items: [
+      {
+        title: 'Clients',
+        path: '/clients',
+        icon: Building,
+        permission: 'clients.view',
+      },
+    ],
+  },
+  {
     groupTitle: 'People',
     items: [
       {
