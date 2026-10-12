@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { crmController } from './crm.controller';
 import { authenticate } from '../../shared/middleware/auth.middleware';
-import { requirePermission } from '../../shared/middleware/permission.middleware';
+import { requirePermission, requireAnyPermission } from '../../shared/middleware/permission.middleware';
 import { validate } from '../../shared/middleware/validate.middleware';
 import {
   createLeadSchema,
@@ -18,20 +18,20 @@ router.use(authenticate);
 // Pipeline Overview & Forecasting
 router.get(
   '/pipeline',
-  requirePermission('crm.view,crm.view_own'),
+  requireAnyPermission('crm.view', 'crm.view_own'),
   crmController.getPipelineOverview
 );
 
 // Leads CRUD
 router.get(
   '/leads',
-  requirePermission('crm.view,crm.view_own'),
+  requireAnyPermission('crm.view', 'crm.view_own'),
   crmController.getLeads
 );
 
 router.get(
   '/leads/:id',
-  requirePermission('crm.view,crm.view_own'),
+  requireAnyPermission('crm.view', 'crm.view_own'),
   crmController.getLeadById
 );
 

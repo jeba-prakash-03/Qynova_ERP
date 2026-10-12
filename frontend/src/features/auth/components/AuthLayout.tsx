@@ -97,7 +97,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               <div>
                 <h2 className="text-sm font-semibold text-white">Role-based access</h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Granular permission matrices, security audit logs and zero-trust controls.
+                  Granular permission matrices, security activity logs and zero-trust controls.
                 </p>
               </div>
             </div>

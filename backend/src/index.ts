@@ -13,6 +13,24 @@ const startServer = async () => {
     await db.raw('SELECT 1+1 AS result');
     console.log('[DATABASE] MySQL connection established successfully.');
 
+    // In production or when AUTO_MIGRATE is true, ensure migrations and initial seeds are applied
+    if (process.env.AUTO_MIGRATE === 'true' || process.env.NODE_ENV === 'production') {
+      console.log('[DATABASE] Ensuring database migrations are up to date...');
+      await db.migrate.latest();
+      console.log('[DATABASE] Database migrations up to date.');
+
+      try {
+        const userCount = await db('users').count('* as c').first();
+        if (!userCount || Number(userCount.c) === 0) {
+          console.log('[DATABASE] Fresh database detected. Running initial seeds...');
+          await db.seed.run();
+          console.log('[DATABASE] Database seeding complete.');
+        }
+      } catch (seedErr) {
+        console.warn('[DATABASE] Seed check warning:', seedErr);
+      }
+    }
+
     // Initialize business cron jobs
     const { initTasksCron } = await import('./modules/tasks/tasks.cron');
     const { initInvoicesCron } = await import('./modules/invoices/invoices.cron');

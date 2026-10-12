@@ -2,11 +2,13 @@ import type { Knex } from 'knex';
 
 export async function seed(knex: Knex): Promise<void> {
   // Clear existing finance data
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 0;');
   await knex('payments').del();
   await knex('invoice_items').del();
   await knex('invoices').del();
   await knex('expenses').del();
   await knex('expense_categories').del();
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 1;');
 
   // 1. Seed Expense Categories
   const categories = [

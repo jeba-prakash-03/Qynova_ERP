@@ -60,6 +60,7 @@ export async function seed(knex: Knex): Promise<void> {
   const adminUserId = adminUser ? adminUser.id : 1;
 
   // 3. Clear existing clients and projects
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 0;');
   await knex('project_milestones').del();
   await knex('project_members').del();
   await knex('projects').del();
@@ -67,6 +68,7 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('client_addresses').del();
   await knex('client_contacts').del();
   await knex('clients').del();
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 1;');
 
   // 4. Seed 3 Clients
   // Client 1: Acme FinTech Solutions

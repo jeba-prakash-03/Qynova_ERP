@@ -93,7 +93,7 @@ export const EmployeeCreatePage: React.FC = () => {
     alt_phone: '',
     emergency_address: '',
 
-    // Dev 2 Salary Placeholder
+    // Default base salary fallback
     initial_salary: '50000',
   });
 

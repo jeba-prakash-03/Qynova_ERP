@@ -161,7 +161,7 @@ export const AdminDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* SECTION: Business & Operations Registry Widgets (Dev B) */}
+          {/* SECTION: Business & Operations Registry Widgets */}
           <div className="space-y-4 pt-6 border-t border-slate-200">
             <div className="flex items-center justify-between">
               <div>

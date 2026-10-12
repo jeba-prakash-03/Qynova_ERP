@@ -469,7 +469,7 @@ export const TaskDrawer: React.FC<TaskDrawerProps> = ({ taskId, onClose, onEdit 
               </div>
             </div>
 
-            {/* Audit History Timeline */}
+            {/* Activity History Timeline */}
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
                 <History className="w-3.5 h-3.5" /> Activity History ({task.history?.length || 0})

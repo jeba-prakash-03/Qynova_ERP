@@ -27,9 +27,9 @@ export const PrivacyPolicyPage: React.FC = () => {
           <p>
             All network communication requires TLS 1.3 encryption. Passwords and credentials are never stored in plaintext and are hashed using bcrypt. Access tokens are short-lived.
           </p>
-          <h2 className="text-base font-semibold text-slate-800">2. Compliance & Audit Logs</h2>
+          <h2 className="text-base font-semibold text-slate-800">2. Compliance & Activity Logs</h2>
           <p>
-            All critical actions within the platform generate immutable audit records for internal compliance and regulatory standards.
+            All critical actions within the platform generate immutable activity records for internal compliance and regulatory standards.
           </p>
           <p>
             For privacy inquiries or data requests, please contact our Data Protection Officer at{' '}

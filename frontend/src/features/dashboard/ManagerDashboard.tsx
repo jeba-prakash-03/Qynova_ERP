@@ -91,7 +91,7 @@ export const ManagerDashboard: React.FC = () => {
         />
       </div>
 
-      {/* SECTION: Projects & Tasks Deliverables (Dev B) */}
+      {/* SECTION: Projects & Tasks Deliverables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Overdue Tasks List for Manager */}
         <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">

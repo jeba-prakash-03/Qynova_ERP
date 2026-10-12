@@ -125,6 +125,15 @@ export class TimesheetsService {
       decision_note: note || (status === 'approved' ? 'Approved' : 'Rejected'),
     });
 
+    if (status === 'approved' && entry.task_id) {
+      const result = await db('timesheets')
+        .where({ task_id: entry.task_id, status: 'approved' })
+        .sum('hours as total_hours')
+        .first();
+      const actual_hours = Number(Number(result?.total_hours || 0).toFixed(2));
+      await db('tasks').where({ id: entry.task_id }).update({ actual_hours });
+    }
+
     try {
       const emp = await db('employees').where({ id: entry.employee_id }).first();
       if (emp && emp.user_id) {

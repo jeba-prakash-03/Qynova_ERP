@@ -625,7 +625,7 @@ export const ClientDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. INVOICES TAB (PLACEHOLDER) */}
+      {/* 5. INVOICES TAB */}
       {activeTab === 'invoices' && (
         <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
           <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -633,16 +633,21 @@ export const ClientDetailPage: React.FC = () => {
           </div>
           <h3 className="text-lg font-bold text-slate-800">Invoices & Financial Ledger</h3>
           <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
-            The Invoices & Payments module is scheduled for <strong>Dev 3 Stage 2</strong>. Client
-            billing statements, milestone disbursements, and tax credit tracking will appear here.
+            Client billing statements, milestone disbursements, and tax credit tracking are
+            managed through the dedicated Invoices module.
           </p>
-          <div className="mt-4 inline-block px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200">
-            Roadmap: Dev 3 Stage 2
+          <div className="mt-4">
+            <Link
+              to="/invoices"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-md border border-indigo-200 transition-colors"
+            >
+              Open Invoices
+            </Link>
           </div>
         </div>
       )}
 
-      {/* 6. DOCUMENTS TAB (PLACEHOLDER) */}
+      {/* 6. DOCUMENTS TAB */}
       {activeTab === 'documents' && (
         <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
           <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -651,11 +656,8 @@ export const ClientDetailPage: React.FC = () => {
           <h3 className="text-lg font-bold text-slate-800">Client Document Repository</h3>
           <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
             Master Service Agreements (MSAs), SOW documents, KYC certificates, and NDAs are
-            governed by the Foundation Document Vault (Dev 1 integration).
+            archived securely in the company document repository.
           </p>
-          <div className="mt-4 inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
-            Foundation: Dev 1 Integration
-          </div>
         </div>
       )}
 

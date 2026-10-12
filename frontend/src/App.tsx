@@ -15,7 +15,7 @@ import { AdminDashboard } from './features/dashboard/AdminDashboard';
 import { ManagerDashboard } from './features/dashboard/ManagerDashboard';
 import { EmployeeDashboard } from './features/dashboard/EmployeeDashboard';
 
-// People & Org (Dev 1)
+// People & Org
 import { EmployeeListPage } from './features/employees/pages/EmployeeListPage';
 import { EmployeeCreatePage } from './features/employees/pages/EmployeeCreatePage';
 import { EmployeeDetailPage } from './features/employees/pages/EmployeeDetailPage';
@@ -23,24 +23,24 @@ import { EmployeeEditPage } from './features/employees/pages/EmployeeEditPage';
 import { DepartmentListPage } from './features/departments/pages/DepartmentListPage';
 import { DesignationListPage } from './features/designations/pages/DesignationListPage';
 
-// Security & RBAC (Dev 1)
+// Security & RBAC
 import { RoleListPage } from './features/roles/pages/RoleListPage';
 import { RolePermissionsPage } from './features/roles/pages/RolePermissionsPage';
 
 
-// Time & Attendance (Dev 2)
+// Time & Attendance
 import { HolidaysPage } from './features/holidays/pages/HolidaysPage';
 import { MyAttendancePage } from './features/attendance/pages/MyAttendancePage';
 import { AttendanceSheetPage } from './features/attendance/pages/AttendanceSheetPage';
 import { MyLeavesPage } from './features/leaves/pages/MyLeavesPage';
 import { LeaveApprovalsPage } from './features/leaves/pages/LeaveApprovalsPage';
 
-// Payroll & Timesheets (Dev 2)
+// Payroll & Timesheets
 import { PayrollRunPage } from './features/payroll/pages/PayrollRunPage';
 import { MyPayslipsPage } from './features/payroll/pages/MyPayslipsPage';
 import { MyTimesheetsPage } from './features/timesheets/pages/MyTimesheetsPage';
 
-// Clients & Projects & Tasks (Dev 3)
+// Clients & Projects & Tasks
 import { ClientListPage } from './features/clients/pages/ClientListPage';
 import { ClientDetailPage } from './features/clients/pages/ClientDetailPage';
 import { ProjectListPage } from './features/projects/pages/ProjectListPage';
@@ -48,19 +48,19 @@ import { ProjectDetailPage } from './features/projects/pages/ProjectDetailPage';
 import { TasksPage } from './features/tasks/pages/TasksPage';
 import { MyTasksPage } from './features/tasks/pages/MyTasksPage';
 
-// Finance & Expenses & Invoices (Dev 3)
+// Finance & Expenses & Invoices
 import { ExpensesPage } from './features/expenses/pages/ExpensesPage';
 import { InvoiceListPage } from './features/invoices/pages/InvoiceListPage';
 import { InvoiceDetailPage } from './features/invoices/pages/InvoiceDetailPage';
 import { FinanceOverviewPage } from './features/finance/pages/FinanceOverviewPage';
 
-// CRM Module (Dev B)
+// CRM Module
 import { CrmPipelinePage } from './features/crm/pages/CrmPipelinePage';
 
 // Reports & Registry
 import { ReportsPage } from './features/reports/pages/ReportsPage';
 
-// Assets Management (Dev A)
+// Assets Management
 import { AssetListPage } from './features/assets/pages/AssetListPage';
 import { AssetDetailPage } from './features/assets/pages/AssetDetailPage';
 import { MyAssetsPage } from './features/assets/pages/MyAssetsPage';
@@ -198,7 +198,7 @@ export const App: React.FC = () => {
         />
 
 
-        {/* Attendance & Holidays (Dev 2) */}
+        {/* Attendance & Holidays */}
         <Route
           path="/attendance/my"
           element={
@@ -224,7 +224,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Leaves Module (Dev 2) */}
+        {/* Leaves Module */}
         <Route
           path="/leaves/my"
           element={
@@ -244,7 +244,7 @@ export const App: React.FC = () => {
         <Route path="/leaves" element={<Navigate to="/leaves/my" replace />} />
         <Route path="/leave" element={<Navigate to="/leaves/my" replace />} />
 
-        {/* Payroll Module (Dev 2) */}
+        {/* Payroll Module */}
         <Route
           path="/payroll/runs"
           element={
@@ -262,7 +262,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Timesheets Module (Dev 2) */}
+        {/* Timesheets Module */}
         <Route
           path="/timesheets/my"
           element={
@@ -272,7 +272,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Clients Module (Dev 3) */}
+        {/* Clients Module */}
         <Route
           path="/clients"
           element={
@@ -290,7 +290,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Projects Module (Dev 3) */}
+        {/* Projects Module */}
         <Route
           path="/projects"
           element={
@@ -308,7 +308,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Tasks Module (Dev 3) */}
+        {/* Tasks Module */}
         <Route
           path="/tasks"
           element={
@@ -326,7 +326,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Expenses Module (Dev 3) */}
+        {/* Expenses Module */}
         <Route
           path="/expenses"
           element={
@@ -336,7 +336,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Invoices Module (Dev 3) */}
+        {/* Invoices Module */}
         <Route
           path="/invoices"
           element={
@@ -354,7 +354,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Finance Overview Module (Dev 3) */}
+        {/* Finance Overview Module */}
         <Route
           path="/finance"
           element={
@@ -364,7 +364,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* CRM Pipeline Module (Dev B) */}
+        {/* CRM Pipeline Module */}
         <Route
           path="/crm"
           element={
@@ -384,7 +384,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Assets Management (Dev A) */}
+        {/* Assets Management */}
         <Route
           path="/assets"
           element={
@@ -410,7 +410,7 @@ export const App: React.FC = () => {
           }
         />
 
-        {/* Notification Settings (Dev A) */}
+        {/* Notification Settings */}
         <Route
           path="/settings/notifications"
           element={

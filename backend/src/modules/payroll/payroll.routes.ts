@@ -16,7 +16,7 @@ router.use(authenticate);
 router.get(
   '/me',
   requireEmployee,
-  requirePermission('payroll.view_own'),
+  requireAnyPermission('payroll.view_own', 'payslips.view_own'),
   asyncHandler(payrollController.getMyPayslips)
 );
 

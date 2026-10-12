@@ -59,10 +59,12 @@ export async function seed(knex: Knex): Promise<void> {
   const adminUserId = adminUser ? adminUser.id : 1;
 
   // Clear existing tasks
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 0;');
   await knex('task_history').del();
   await knex('task_comments').del();
   await knex('tasks').del();
   await knex('project_modules').del();
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 1;');
 
   // 3. Seed Modules
   const [mod1Id] = await knex('project_modules').insert({

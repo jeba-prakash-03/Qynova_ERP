@@ -930,7 +930,7 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. TIMESHEETS TAB (PLACEHOLDER) */}
+      {/* 5. TIMESHEETS TAB */}
       {activeTab === 'timesheets' && (
         <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
           <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -938,20 +938,21 @@ export const ProjectDetailPage: React.FC = () => {
           </div>
           <h3 className="text-lg font-bold text-slate-800">Timesheets & Hours Billed</h3>
           <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
-            Weekly timesheet submissions, hourly burn rate, and manager sign-offs are integrated
-            with <strong>Dev 2</strong> via{' '}
-            <code className="text-xs bg-slate-100 px-1 py-0.5 rounded">
-              /api/v1/projects/my-assignments
-            </code>
-            .
+            Weekly timesheet submissions, hourly burn rate, and manager sign-offs are tracked in
+            the Timesheets module and linked directly to project tasks.
           </p>
-          <div className="mt-4 inline-block px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-200">
-            Teammate: Dev 2 Integration
+          <div className="mt-4">
+            <Link
+              to="/timesheets/my"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-md border border-emerald-200 transition-colors"
+            >
+              Open Timesheets
+            </Link>
           </div>
         </div>
       )}
 
-      {/* 6. DOCUMENTS TAB (PLACEHOLDER) */}
+      {/* 6. DOCUMENTS TAB */}
       {activeTab === 'documents' && (
         <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
           <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -960,11 +961,8 @@ export const ProjectDetailPage: React.FC = () => {
           <h3 className="text-lg font-bold text-slate-800">Project Architecture & SOWs</h3>
           <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
             Project requirements documents, architecture diagrams, and sign-off agreements are
-            managed in Foundation Documents (Dev 1).
+            managed securely in the company document repository.
           </p>
-          <div className="mt-4 inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
-            Foundation: Dev 1 Integration
-          </div>
         </div>
       )}
 

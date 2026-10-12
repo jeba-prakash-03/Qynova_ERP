@@ -38,8 +38,7 @@ export interface MenuGroup {
 
 /**
  * MENU CONFIGURATION
- * Teammates (Dev 2 and Dev 3) should add their navigation entries here.
- * Items will automatically be filtered by user permissions and employee status in AppShell.
+ * Items are automatically filtered by user permissions and employee status in AppShell.
  */
 export const MENU_CONFIG: MenuGroup[] = [
   {
@@ -54,6 +53,7 @@ export const MENU_CONFIG: MenuGroup[] = [
         title: 'Reports',
         path: '/reports',
         icon: FileText,
+        permission: 'reports.view',
       },
     ],
   },
@@ -107,12 +107,6 @@ export const MENU_CONFIG: MenuGroup[] = [
         path: '/finance',
         icon: TrendingUp,
         permission: 'projects.view_financials',
-      },
-      {
-        title: 'Reports & Analytics',
-        path: '/reports',
-        icon: FileText,
-        permission: 'reports.view',
       },
     ],
   },

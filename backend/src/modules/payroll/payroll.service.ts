@@ -531,7 +531,7 @@ export class PayrollService {
       });
     }
 
-    if (targetStatus === 'paid' || targetStatus === 'processed') {
+    if (targetStatus === 'paid' || targetStatus === 'processed' || targetStatus === 'locked') {
       try {
         const items = await db('payroll_items as pi')
           .join('employees as e', 'pi.employee_id', 'e.id')

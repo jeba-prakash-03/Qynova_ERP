@@ -72,7 +72,10 @@ export async function seed(knex: Knex): Promise<void> {
     'holidays.view', 'holidays.create', 'holidays.edit',
     'payroll.view', 'payroll.create', 'payroll.edit', 'payroll.approve', 'payroll.run', 'payroll.export', 'payroll.view_own',
     'payslips.view', 'payslips.create', 'payslips.export', 'payslips.view_own',
-    'audit_logs.view',
+    'timesheets.view_own', 'timesheets.create',
+    'assets.view', 'assets.create', 'assets.edit', 'assets.delete', 'assets.assign', 'assets.view_own',
+    'clients.view', 'projects.view',
+    'reports.view',
     'notifications.view', 'notifications.create',
   ];
   const hrRolePerms = hrPermNames
@@ -97,7 +100,9 @@ export async function seed(knex: Knex): Promise<void> {
     'tasks.view_team', 'tasks.view_own', 'tasks.create', 'tasks.edit', 'tasks.assign',
     'milestones.view', 'milestones.create', 'milestones.edit',
     'expenses.view_team', 'expenses.view_own', 'expenses.approve', 'expenses.create',
-    'payslips.view_own',
+    'crm.view', 'crm.view_own', 'crm.create', 'crm.edit',
+    'payroll.view_own', 'payslips.view_own',
+    'assets.view_own',
     'notifications.view',
   ];
   const managerRolePerms = managerPermNames
@@ -119,7 +124,8 @@ export async function seed(knex: Knex): Promise<void> {
     'projects.view_own',
     'tasks.view_own', 'tasks.edit',
     'expenses.view_own', 'expenses.create',
-    'payslips.view_own',
+    'payroll.view_own', 'payslips.view_own',
+    'assets.view_own',
     'notifications.view',
   ];
   const employeeRolePerms = employeePermNames
@@ -136,7 +142,11 @@ export async function seed(knex: Knex): Promise<void> {
     'attendance.view_own', 'attendance.create',
     'leave.view_own', 'leave.create',
     'holidays.view',
+    'timesheets.view_own', 'timesheets.create',
+    'projects.view_own',
     'tasks.view_own', 'tasks.edit',
+    'payroll.view_own', 'payslips.view_own',
+    'assets.view_own',
     'notifications.view',
   ];
   const internRolePerms = internPermNames
