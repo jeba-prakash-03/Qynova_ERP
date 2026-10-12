@@ -23,6 +23,7 @@ import tasksRoutes from './modules/tasks/tasks.routes';
 import expensesRoutes from './modules/expenses/expenses.routes';
 import invoicesRoutes from './modules/invoices/invoices.routes';
 import financeRoutes from './modules/profitability/profitability.routes';
+import crmRoutes from './modules/crm/crm.routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -71,6 +72,7 @@ export const createApp = (): Application => {
   app.use('/api/v1/expenses', expensesRoutes);
   app.use('/api/v1/invoices', invoicesRoutes);
   app.use('/api/v1/finance', financeRoutes);
+  app.use('/api/v1/crm', crmRoutes);
 
   // 404 Route handler
   app.use('*', (req: Request, res: Response) => {

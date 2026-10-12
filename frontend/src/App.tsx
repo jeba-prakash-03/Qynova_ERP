@@ -53,6 +53,9 @@ import { InvoiceListPage } from './features/invoices/pages/InvoiceListPage';
 import { InvoiceDetailPage } from './features/invoices/pages/InvoiceDetailPage';
 import { FinanceOverviewPage } from './features/finance/pages/FinanceOverviewPage';
 
+// CRM Module (Dev B)
+import { CrmPipelinePage } from './features/crm/pages/CrmPipelinePage';
+
 // Root Redirect Helper
 const RootRedirect: React.FC = () => {
   const { user, isAuthenticated, isLoading, getRedirectPath } = useAuth();
@@ -343,6 +346,16 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute permission="projects.view_financials">
               <FinanceOverviewPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* CRM Pipeline Module (Dev B) */}
+        <Route
+          path="/crm"
+          element={
+            <ProtectedRoute permission="crm.view,crm.view_own">
+              <CrmPipelinePage />
             </ProtectedRoute>
           }
         />

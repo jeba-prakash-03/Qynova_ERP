@@ -17,6 +17,7 @@ import {
   Bell,
   CreditCard,
   TrendingUp,
+  Target,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -53,6 +54,12 @@ export const MENU_CONFIG: MenuGroup[] = [
   {
     groupTitle: 'Business',
     items: [
+      {
+        title: 'CRM Pipeline',
+        path: '/crm',
+        icon: Target,
+        permission: 'crm.view,crm.view_own',
+      },
       {
         title: 'Clients',
         path: '/clients',
