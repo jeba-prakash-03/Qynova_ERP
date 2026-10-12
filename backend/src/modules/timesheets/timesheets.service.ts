@@ -24,7 +24,9 @@ export class TimesheetsService {
     employeeId: number,
     date: string,
     hours: number,
-    taskDescription: string
+    taskDescription: string,
+    projectId?: number | null,
+    taskId?: number | null
   ): Promise<TimesheetEntry> {
     if (hours <= 0 || hours > 24) {
       throw new BadRequestError('Hours must be between 0.1 and 24');
@@ -49,6 +51,8 @@ export class TimesheetsService {
       date,
       hours,
       task_description: taskDescription,
+      project_id: projectId || null,
+      task_id: taskId || null,
       status: 'pending',
     });
 
@@ -60,9 +64,11 @@ export class TimesheetsService {
   }
 
   async getMyTimesheets(employeeId: number): Promise<TimesheetEntry[]> {
-    return db('timesheets')
-      .where({ employee_id: employeeId })
-      .orderBy('date', 'desc');
+    return db('timesheets as t')
+      .leftJoin('projects as p', 't.project_id', 'p.id')
+      .where('t.employee_id', employeeId)
+      .select('t.*', 'p.name as project_name', 'p.project_code')
+      .orderBy('t.date', 'desc');
   }
 
   async getPendingTimesheets(currentUser: {

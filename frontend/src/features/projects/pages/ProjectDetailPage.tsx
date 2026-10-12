@@ -47,7 +47,8 @@ type TabType =
   | 'tasks'
   | 'timesheets'
   | 'documents'
-  | 'expenses';
+  | 'expenses'
+  | 'invoices';
 
 const ALL_STATUSES: ProjectStatus[] = [
   'lead',
@@ -236,8 +237,8 @@ export const ProjectDetailPage: React.FC = () => {
     { key: 'milestones', label: 'Milestones', count: project.milestones?.length },
     { key: 'tasks', label: 'Tasks' },
     { key: 'timesheets', label: 'Timesheets' },
-    { key: 'documents', label: 'Documents' },
     { key: 'expenses', label: 'Expenses' },
+    { key: 'invoices', label: 'Invoices' },
   ];
 
   const totalMilestonesAmount = project.milestones?.reduce(
@@ -759,6 +760,22 @@ export const ProjectDetailPage: React.FC = () => {
           </p>
           <div className="mt-4 inline-block px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-200">
             Roadmap: Dev 3 Stage 2
+          </div>
+        </div>
+      )}
+
+      {/* 8. INVOICES TAB */}
+      {activeTab === 'invoices' && (
+        <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+            <FileText className="w-6 h-6" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-800">Project Invoices & Billing</h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
+            View milestone-based and hourly invoices generated for this project.
+          </p>
+          <div className="mt-4 inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
+            Linked Milestones & Invoicing
           </div>
         </div>
       )}

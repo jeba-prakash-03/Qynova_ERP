@@ -58,7 +58,8 @@ export const AppShell: React.FC = () => {
         // 4. Permission check
         if (item.permission) {
           if (isAdmin) return true;
-          return user.permissions?.includes(item.permission);
+          const reqPerms = item.permission.split(',');
+          return reqPerms.some((p) => user.permissions?.includes(p.trim()));
         }
 
         return true;

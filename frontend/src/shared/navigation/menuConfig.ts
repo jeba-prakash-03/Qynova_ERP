@@ -57,6 +57,12 @@ export const MENU_CONFIG: MenuGroup[] = [
         icon: Building,
         permission: 'clients.view',
       },
+      {
+        title: 'Projects',
+        path: '/projects',
+        icon: FolderKanban,
+        permission: 'projects.view,projects.view_team,projects.view_own',
+      },
     ],
   },
   {

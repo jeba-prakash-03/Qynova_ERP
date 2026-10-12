@@ -10,12 +10,14 @@ export class TimesheetsController {
       throw new ForbiddenError('Only registered employees can submit timesheets.');
     }
 
-    const { date, hours, task_description } = req.body;
+    const { date, hours, task_description, project_id, task_id } = req.body;
     const entry = await timesheetsService.submitTimesheet(
       employeeId,
       date,
       Number(hours),
-      task_description
+      task_description,
+      project_id ? Number(project_id) : null,
+      task_id ? Number(task_id) : null
     );
     return sendCreated(res, entry, 'Timesheet entry submitted successfully');
   };
