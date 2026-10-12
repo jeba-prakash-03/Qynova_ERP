@@ -81,6 +81,9 @@ const config: { [key: string]: Knex.Config } = {
       tableName: 'knex_migrations',
       directory: path.resolve(__dirname, './migrations'),
     },
+    seeds: {
+      directory: path.resolve(__dirname, './seeds'),
+    },
   },
 };
 

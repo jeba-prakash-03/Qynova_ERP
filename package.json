@@ -13,6 +13,9 @@
     "dev:frontend": "npm run dev --workspace=frontend",
     "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
     "test:backend": "npm run test --workspace=backend",
+    "db:migrate": "npm run migrate:latest --workspace=backend",
+    "db:seed": "npm run seed:run --workspace=backend",
+    "db:setup": "npm run migrate:latest --workspace=backend && npm run seed:run --workspace=backend",
     "db:reset:test": "npm run db:reset:test --workspace=backend",
     "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend"
   },

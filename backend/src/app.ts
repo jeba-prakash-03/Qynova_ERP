@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import { errorHandler } from './shared/middleware/error.middleware';
+import db from './db/knex';
 import authRoutes from './modules/auth/auth.routes';
 import rolesRoutes from './modules/roles/roles.routes';
 import permissionsRoutes from './modules/permissions/permissions.routes';
@@ -39,9 +40,23 @@ export const createApp = (): Application => {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-  // Health check
-  app.get('/health', (_req: Request, res: Response) => {
-    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  // Health check with actual DB connectivity validation
+  app.get('/health', async (_req: Request, res: Response) => {
+    try {
+      await db.raw('SELECT 1');
+      res.status(200).json({
+        status: 'ok',
+        database: 'connected',
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      res.status(503).json({
+        status: 'error',
+        database: 'disconnected',
+        error: err.message,
+        timestamp: new Date().toISOString(),
+      });
+    }
   });
 
   // API v1 Routes
