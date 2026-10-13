@@ -21,12 +21,13 @@ export class EmailService {
     const port = Number(process.env.SMTP_PORT) || 587;
     const user = process.env.SMTP_USER;
     const pass = process.env.SMTP_PASS;
+    const secure = process.env.SMTP_SECURE === 'true' || port === 465;
 
     if (host && user && pass) {
       this.transporter = nodemailer.createTransport({
         host,
         port,
-        secure: port === 465,
+        secure,
         auth: { user, pass },
       });
       this.isConfigured = true;
@@ -58,6 +59,13 @@ export class EmailService {
         updated_at: db.fn.now(),
       });
 
+      // Trigger background outbox dispatch asynchronously without blocking caller
+      if (this.isConfigured && process.env.NODE_ENV !== 'test') {
+        this.processOutbox().catch((err) => {
+          console.error('[EMAIL_ASYNC_DISPATCH_ERROR]', err);
+        });
+      }
+
       return { id: Number(id), queued: true };
     } catch (err: any) {
       if (err.code === 'ER_DUP_ENTRY' || err.errno === 1062) {
@@ -73,7 +81,7 @@ export class EmailService {
    */
   public async sendEmailDirectly(to: string, subject: string, html: string): Promise<boolean> {
     if (this.isConfigured && this.transporter) {
-      const from = process.env.SMTP_FROM || 'no-reply@qynova-erp.com';
+      const from = process.env.EMAIL_FROM || process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@qynova-erp.com';
       await this.transporter.sendMail({
         from,
         to,

@@ -23,7 +23,9 @@ registerDashboardWidget({
     const result: Array<{ month: string; count: number; joiners: number }> = [];
 
     for (const m of months) {
-      const endOfMonth = `${m}-31`;
+      const [yr, mo] = m.split('-').map(Number);
+      const lastDay = new Date(yr, mo, 0).getDate();
+      const endOfMonth = `${m}-${String(lastDay).padStart(2, '0')}`;
       const [cumRow] = await db('employees')
         .where('joining_date', '<=', endOfMonth)
         .where((builder) => {

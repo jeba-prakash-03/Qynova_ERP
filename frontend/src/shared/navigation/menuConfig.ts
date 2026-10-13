@@ -173,6 +173,12 @@ export const MENU_CONFIG: MenuGroup[] = [
         icon: Clock,
         requireEmployee: true,
       },
+      {
+        title: 'Timesheet Approvals',
+        path: '/timesheets/approvals',
+        icon: CheckSquare,
+        permission: 'timesheets.approve',
+      },
     ],
   },
   {

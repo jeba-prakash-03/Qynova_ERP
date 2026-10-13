@@ -44,7 +44,7 @@ export class AuthService {
     const employee = await authRepository.getEmployeeByUserId(user.id);
     if (
       employee &&
-      ['candidate', 'selected', 'offer_generated', 'offer_accepted'].includes(employee.lifecycle_stage)
+      ['candidate', 'selected', 'offer_generated'].includes(employee.lifecycle_stage)
     ) {
       throw new BadRequestError('Your account is not active yet', [
         { field: 'email', message: 'Your account is not active yet' },

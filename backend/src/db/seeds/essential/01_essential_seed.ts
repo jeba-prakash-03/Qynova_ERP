@@ -253,6 +253,28 @@ export async function seed(knex: Knex): Promise<void> {
     });
   }
 
+  // 5b. Company Settings (Idempotent)
+  if (await knex.schema.hasTable('company_settings')) {
+    const existingComp = await knex('company_settings').where({ id: 1 }).first();
+    if (!existingComp) {
+      await knex('company_settings').insert({
+        id: 1,
+        company_name: 'Qynova',
+        legal_name: 'Qynova Technologies Pvt. Ltd.',
+        tagline: 'Run your people, time and payroll in one place.',
+        country: 'India',
+        currency: 'INR',
+        timezone: 'Asia/Kolkata',
+      });
+    } else {
+      await knex('company_settings').where({ id: 1 }).update({
+        company_name: 'Qynova',
+        legal_name: 'Qynova Technologies Pvt. Ltd.',
+        tagline: 'Run your people, time and payroll in one place.',
+      });
+    }
+  }
+
   // 6. Offer Letter Template (Idempotent)
   const existingDefaultTemplate = await knex('offer_letter_templates').where({ is_default: true }).first();
   if (!existingDefaultTemplate) {

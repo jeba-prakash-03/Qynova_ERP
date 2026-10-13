@@ -158,6 +158,20 @@ export class EmployeesService {
         });
       }
 
+      // Step E: Initialize default annual leave quotas for the employee
+      const joinYear = new Date(input.joining_date || getTodayKolkata()).getFullYear();
+      const activeLeaveTypes = await trx('leave_types').select('id', 'yearly_quota');
+      for (const lt of activeLeaveTypes) {
+        await trx('leave_balances').insert({
+          employee_id: empId,
+          leave_type_id: lt.id,
+          year: joinYear,
+          allocated: Number(lt.yearly_quota),
+          used: 0,
+          pending: 0,
+        });
+      }
+
       createdEmployeeId = empId;
     });
 

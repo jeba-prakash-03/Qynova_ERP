@@ -57,9 +57,9 @@ registerDashboardWidget({
       .join('leave_types as lt', 'lr.leave_type_id', 'lt.id')
       .select(
         'lr.id',
-        'lr.start_date',
-        'lr.end_date',
-        'lr.total_days',
+        'lr.from_date as start_date',
+        'lr.to_date as end_date',
+        'lr.days as total_days',
         'lr.reason',
         'lr.status',
         'lr.created_at',

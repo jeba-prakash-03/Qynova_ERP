@@ -176,7 +176,7 @@ export class AttendanceRepository {
       .whereNull('e.deleted_at')
       .where('e.joining_date', '<=', options.date)
       .where((q) => q.whereNull('e.last_working_date').orWhere('e.last_working_date', '>=', options.date))
-      .whereNotIn('e.lifecycle_stage', ['candidate', 'selected', 'offer_generated', 'offer_accepted'])
+      .whereNotIn('e.lifecycle_stage', ['candidate', 'selected', 'offer_generated'])
       .select(
         'e.id as employee_id',
         'e.employee_code',

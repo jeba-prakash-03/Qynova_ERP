@@ -39,6 +39,7 @@ import { LeaveApprovalsPage } from './features/leaves/pages/LeaveApprovalsPage';
 import { PayrollRunPage } from './features/payroll/pages/PayrollRunPage';
 import { MyPayslipsPage } from './features/payroll/pages/MyPayslipsPage';
 import { MyTimesheetsPage } from './features/timesheets/pages/MyTimesheetsPage';
+import { TimesheetApprovalsPage } from './features/timesheets/pages/TimesheetApprovalsPage';
 
 // Clients & Projects & Tasks
 import { ClientListPage } from './features/clients/pages/ClientListPage';
@@ -272,6 +273,15 @@ export const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/timesheets/approvals"
+          element={
+            <ProtectedRoute permission="timesheets.approve">
+              <TimesheetApprovalsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/timesheets" element={<Navigate to="/timesheets/approvals" replace />} />
 
         {/* Clients Module */}
         <Route

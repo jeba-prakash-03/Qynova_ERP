@@ -25,10 +25,14 @@ yarn-debug.log*
 yarn-error.log*
 *.log
 
-# Build outputs
+# Build & Test outputs
 dist
 build
 coverage
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
 storage/
 backend/storage/
 

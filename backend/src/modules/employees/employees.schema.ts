@@ -116,7 +116,7 @@ export const updateLifecycleSchema = z.object({
 
 export const employeeQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  limit: z.coerce.number().int().min(1).max(500).default(20),
   search: z.string().optional(),
   department_id: z.coerce.number().int().positive().optional(),
   employment_type: z.enum(['full_time', 'intern', 'contract']).optional(),
