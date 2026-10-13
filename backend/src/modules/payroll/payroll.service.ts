@@ -261,6 +261,7 @@ export class PayrollService {
       .leftJoin('departments as d', 'e.department_id', 'd.id')
       .leftJoin('designations as des', 'e.designation_id', 'des.id')
       .whereNull('e.deleted_at')
+      .where('e.status', 'active')
       .whereNot('e.lifecycle_stage', 'relieved')
       .select(
         'e.id',

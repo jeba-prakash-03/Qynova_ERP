@@ -32,12 +32,13 @@ export const ConvertLeadModal: React.FC<ConvertLeadModalProps> = ({
   );
   const [endDate, setEndDate] = useState('');
 
-  // Fetch employees for project manager select
+  // Fetch active employees for project manager select
   const { data: employees = [] } = useQuery({
     queryKey: ['employees', 'for-pm-select'],
     queryFn: async () => {
-      const res = await axiosClient.get('/employees?limit=100');
-      return res.data.data;
+      const res = await axiosClient.get('/employees?limit=200&status=active');
+      const list: any[] = res.data?.data || [];
+      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved');
     },
     enabled: isOpen,
   });

@@ -470,7 +470,8 @@ export class LeavesService {
       employee?.reporting_manager_id === currentUser.employeeId;
     const isHrOrAdmin =
       hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
-      currentUser.permissions.includes('leave.approve') ||
+      currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+      currentUser.permissions.includes('leave.view') ||
       currentUser.permissions.includes('*');
 
     if (!isReportingManager && !isHrOrAdmin) {
@@ -654,7 +655,8 @@ export class LeavesService {
       employee?.reporting_manager_id === currentUser.employeeId;
     const isHrOrAdmin =
       hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
-      currentUser.permissions.includes('leave.approve') ||
+      currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+      currentUser.permissions.includes('leave.view') ||
       currentUser.permissions.includes('*');
 
     if (!isReportingManager && !isHrOrAdmin) {
@@ -872,7 +874,8 @@ export class LeavesService {
   }): Promise<LeaveRequest[]> {
     const isHrOrAdmin =
       hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
-      currentUser.permissions.includes('leave.approve') ||
+      currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+      currentUser.permissions.includes('leave.view') ||
       currentUser.permissions.includes('*');
 
     const requests = isHrOrAdmin

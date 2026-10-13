@@ -162,8 +162,11 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
       return res.data.data;
     },
     onSuccess: (result, saveAsDraft) => {
-      queryClient.invalidateQueries({ queryKey: ['offer-letters', 'employee', employee.id] });
+      queryClient.invalidateQueries({ queryKey: ['offer-letters'] });
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['employees', String(employee.id)] });
+      queryClient.invalidateQueries({ queryKey: ['employee-lifecycle-history', employee.id] });
+      queryClient.invalidateQueries({ queryKey: ['employee-stats'] });
       setGenerateModalOpen(false);
       success(saveAsDraft ? 'Offer letter saved as draft' : 'Offer letter generated successfully');
     },
@@ -179,6 +182,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
       return res.data.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['offer-letters'] });
       queryClient.invalidateQueries({ queryKey: ['offer-letters', 'employee', employee.id] });
       setSendModalOpen(false);
       success('Offer letter sent to candidate successfully');
@@ -195,8 +199,12 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
       return res.data.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['offer-letters'] });
       queryClient.invalidateQueries({ queryKey: ['offer-letters', 'employee', employee.id] });
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['employees', String(employee.id)] });
+      queryClient.invalidateQueries({ queryKey: ['employee-lifecycle-history', employee.id] });
+      queryClient.invalidateQueries({ queryKey: ['employee-stats'] });
       success('Offer marked as accepted. Employee stage moved to offer_accepted.');
     },
     onError: (err: any) => {
@@ -213,8 +221,12 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
       return res.data.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['offer-letters'] });
       queryClient.invalidateQueries({ queryKey: ['offer-letters', 'employee', employee.id] });
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['employees', String(employee.id)] });
+      queryClient.invalidateQueries({ queryKey: ['employee-lifecycle-history', employee.id] });
+      queryClient.invalidateQueries({ queryKey: ['employee-stats'] });
       setDeclineModalOpen(false);
       success('Offer marked as declined. Candidate marked inactive.');
     },

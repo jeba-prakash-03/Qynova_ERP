@@ -58,7 +58,7 @@ export const MyTimesheetsPage: React.FC = () => {
       setTaskDescription('');
       setSelectedProjectId('');
       setSelectedTaskId('');
-      queryClient.invalidateQueries({ queryKey: ['timesheets', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['timesheets'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to submit timesheet');

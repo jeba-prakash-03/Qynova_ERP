@@ -66,12 +66,13 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
     enabled: isOpen,
   });
 
-  // Fetch employees for PM dropdown
+  // Fetch active employees for PM dropdown
   const { data: employeesData } = useQuery({
-    queryKey: ['employees', 'select-options'],
+    queryKey: ['employees', 'active-select-options'],
     queryFn: async () => {
-      const res = await axiosClient.get('/employees?limit=100');
-      return res.data.data;
+      const res = await axiosClient.get('/employees?limit=200&status=active');
+      const list: any[] = res.data?.data || [];
+      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved');
     },
     enabled: isOpen,
   });

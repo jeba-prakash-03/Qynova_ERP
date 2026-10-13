@@ -118,7 +118,16 @@ export class DocumentsService {
     const isOwner = currentUser.employeeId === employeeId;
     const isAdminOrHr =
       currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+      currentUser.permissions.includes('documents.view') ||
       currentUser.permissions.includes('*');
+    const isReportingManager =
+      Boolean(currentUser.employeeId && employee.reporting_manager_id === currentUser.employeeId);
+    const canViewTeam =
+      Boolean(currentUser.permissions.includes('documents.view_team') && isReportingManager);
+
+    if (!isAdminOrHr && !isOwner && !canViewTeam) {
+      throw new ForbiddenError('You do not have permission to view documents for this employee');
+    }
 
     const docs = await documentsRepository.findByEmployeeId(employeeId);
 

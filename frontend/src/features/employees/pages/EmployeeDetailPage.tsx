@@ -179,8 +179,10 @@ export const EmployeeDetailPage: React.FC = () => {
     onSuccess: () => {
       success('Lifecycle stage updated successfully.');
       setIsLifecycleModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['employees', id] });
       queryClient.invalidateQueries({ queryKey: ['employee-lifecycle-history', id] });
+      queryClient.invalidateQueries({ queryKey: ['employee-stats'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to update lifecycle stage');
@@ -261,6 +263,8 @@ export const EmployeeDetailPage: React.FC = () => {
     onSuccess: () => {
       success('Offer letter generated and saved to document vault.');
       setIsOfferModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['offer-letters'] });
+      queryClient.invalidateQueries({ queryKey: ['offer-letters', 'employee', id] });
       refetchDocs();
     },
     onError: (err: any) => {
@@ -275,6 +279,8 @@ export const EmployeeDetailPage: React.FC = () => {
     },
     onSuccess: () => {
       success('Employee profile soft-deleted.');
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+      queryClient.invalidateQueries({ queryKey: ['employee-stats'] });
       navigate('/employees');
     },
     onError: (err: any) => {

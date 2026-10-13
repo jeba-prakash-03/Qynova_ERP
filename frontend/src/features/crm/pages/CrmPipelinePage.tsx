@@ -94,8 +94,9 @@ export const CrmPipelinePage: React.FC = () => {
   const { data: employees = [] } = useQuery({
     queryKey: ['employees', 'for-sales-filter'],
     queryFn: async () => {
-      const res = await axiosClient.get('/employees?limit=100');
-      return res.data.data;
+      const res = await axiosClient.get('/employees?limit=200&status=active');
+      const list: any[] = res.data?.data || [];
+      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved');
     },
   });
 

@@ -40,7 +40,19 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Check role dashboard restriction
   if (targetDashboard) {
     const userHighestDashboard = getRedirectPath(user);
-    if (userHighestDashboard !== targetDashboard) {
+    const isAdminOrHr = Boolean(user.roles?.includes('Admin') || user.roles?.includes('HR'));
+    const isManager = Boolean(user.roles?.includes('Manager'));
+
+    let isAuthorizedDashboard = false;
+    if (targetDashboard === '/admin') {
+      isAuthorizedDashboard = isAdminOrHr;
+    } else if (targetDashboard === '/manager') {
+      isAuthorizedDashboard = isAdminOrHr || isManager;
+    } else if (targetDashboard === '/me') {
+      isAuthorizedDashboard = Boolean(user.employee);
+    }
+
+    if (!isAuthorizedDashboard) {
       return (
         <div className="min-h-[70vh] flex items-center justify-center p-6">
           <div className="max-w-md w-full text-center bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
@@ -65,6 +77,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check employee requirement
   if (requireEmployee && !user.employee) {
+    const userHighestDashboard = getRedirectPath(user);
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
@@ -76,7 +89,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             This module requires an active employee profile linked to your user account.
           </p>
           <a
-            href="/admin"
+            href={userHighestDashboard}
             className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
           >
             Back to Dashboard
@@ -86,22 +99,21 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // Check permission
-  if (
-    permission &&
-    !user.roles?.includes('Admin') &&
-    !user.permissions?.includes(permission)
-  ) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center p-6">
-        <div className="max-w-md w-full text-center bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <ShieldAlert className="w-6 h-6" />
-          </div>
-          <h2 className="text-lg font-bold text-slate-800 mb-1">Access Restricted</h2>
-          <p className="text-sm text-slate-500 mb-5">
-            You do not possess the required permission (<code className="text-xs bg-slate-100 text-slate-700 px-1 py-0.5 rounded">{permission}</code>) to view this resource.
-          </p>
+  // Check permission (supports single permission or comma-separated permissions)
+  if (permission && !user.roles?.includes('Admin')) {
+    const reqPerms = permission.split(',').map((p) => p.trim());
+    const hasPerm = reqPerms.some((p) => user.permissions?.includes(p));
+    if (!hasPerm) {
+      return (
+        <div className="min-h-[70vh] flex items-center justify-center p-6">
+          <div className="max-w-md w-full text-center bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-800 mb-1">Access Restricted</h2>
+            <p className="text-sm text-slate-500 mb-5">
+              You do not possess the required permission (<code className="text-xs bg-slate-100 text-slate-700 px-1 py-0.5 rounded">{permission}</code>) to view this resource.
+            </p>
           <button
             onClick={() => window.history.back()}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
@@ -111,6 +123,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         </div>
       </div>
     );
+    }
   }
 
   return <>{children}</>;

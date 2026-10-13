@@ -62,12 +62,13 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   const [stage, setStage] = useState<LeadStage>('lead');
   const [lostReason, setLostReason] = useState('');
 
-  // Fetch employees for salesperson select
+  // Fetch active employees for salesperson select
   const { data: employees = [] } = useQuery({
     queryKey: ['employees', 'for-salesperson-select'],
     queryFn: async () => {
-      const res = await axiosClient.get('/employees?limit=100');
-      return res.data.data;
+      const res = await axiosClient.get('/employees?limit=200&status=active');
+      const list: any[] = res.data?.data || [];
+      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved');
     },
     enabled: isOpen,
   });

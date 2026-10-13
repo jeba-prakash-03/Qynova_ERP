@@ -67,7 +67,7 @@ export const PayrollRunPage: React.FC = () => {
       if (data.warnings && data.warnings.length > 0) {
         data.warnings.forEach((w: string) => info(w));
       }
-      queryClient.invalidateQueries({ queryKey: ['payroll', 'run', selectedMonth] });
+      queryClient.invalidateQueries({ queryKey: ['payroll'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to generate payroll');
@@ -82,7 +82,7 @@ export const PayrollRunPage: React.FC = () => {
     },
     onSuccess: (data) => {
       success(`Payroll status updated to ${data.status.toUpperCase()}`);
-      queryClient.invalidateQueries({ queryKey: ['payroll', 'run', selectedMonth] });
+      queryClient.invalidateQueries({ queryKey: ['payroll'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to update payroll status');
@@ -98,7 +98,7 @@ export const PayrollRunPage: React.FC = () => {
     onSuccess: () => {
       success('Adjustment saved! Re-run payroll calculation to apply.');
       setSelectedAdjustmentEmployee(null);
-      queryClient.invalidateQueries({ queryKey: ['payroll', 'run', selectedMonth] });
+      queryClient.invalidateQueries({ queryKey: ['payroll'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to save adjustment');

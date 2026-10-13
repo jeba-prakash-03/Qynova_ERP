@@ -72,7 +72,7 @@ router.get(
 // Get employee's offer letters & version history
 router.get(
   '/employee/:employeeId',
-  requirePermission('offer_letters.view'),
+  requireAnyPermission('offer_letters.view', 'offer_letters.view_own'),
   offerLettersController.getEmployeeOfferLetters
 );
 

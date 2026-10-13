@@ -34,9 +34,13 @@ export const Can: React.FC<CanProps> = ({
     return <>{children}</>;
   }
 
-  // Single permission check
-  if (permission && !user.permissions?.includes(permission)) {
-    return <>{fallback}</>;
+  // Single or comma-separated permission check
+  if (permission) {
+    const parts = permission.split(',').map((p) => p.trim());
+    const hasPerm = parts.some((p) => user.permissions?.includes(p));
+    if (!hasPerm) {
+      return <>{fallback}</>;
+    }
   }
 
   // Any permission check

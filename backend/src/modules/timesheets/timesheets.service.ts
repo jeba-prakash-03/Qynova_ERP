@@ -80,7 +80,8 @@ export class TimesheetsService {
   }): Promise<TimesheetEntry[]> {
     const isHrOrAdmin =
       hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
-      currentUser.permissions.includes('timesheets.approve') ||
+      currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+      currentUser.permissions.includes('timesheets.view') ||
       currentUser.permissions.includes('*');
 
     const q = db('timesheets as t')
@@ -117,6 +118,22 @@ export class TimesheetsService {
     const entry = await db('timesheets').where({ id }).first();
     if (!entry) {
       throw new NotFoundError(`Timesheet entry with ID ${id} not found`);
+    }
+
+    // Permission check: reporting manager or HR/Admin
+    const emp = await db('employees').where({ id: entry.employee_id }).first();
+    const isReportingManager =
+      currentUser.employeeId && emp?.reporting_manager_id === currentUser.employeeId;
+    const isHrOrAdmin =
+      hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
+      currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+      currentUser.permissions.includes('timesheets.view') ||
+      currentUser.permissions.includes('*');
+
+    if (!isReportingManager && !isHrOrAdmin) {
+      throw new ForbiddenError(
+        'You are not authorized to approve or reject this timesheet entry. Only the reporting manager or HR/Admin can decide.'
+      );
     }
 
     await db('timesheets').where({ id }).update({

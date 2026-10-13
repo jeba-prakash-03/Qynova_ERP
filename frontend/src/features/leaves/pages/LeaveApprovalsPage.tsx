@@ -142,12 +142,13 @@ export const LeaveApprovalsPage: React.FC = () => {
     },
   });
 
-  // 4. Fetch Employees for allocation dropdown
+  // 4. Fetch Employees for allocation dropdown (active, non-relieved only)
   const { data: employees = [] } = useQuery<Employee[]>({
-    queryKey: ['employees', 'active-list'],
+    queryKey: ['employees', 'active-allocation'],
     queryFn: async () => {
-      const res = await axiosClient.get('/employees?limit=200');
-      return res.data.data;
+      const res = await axiosClient.get('/employees?limit=200&status=active');
+      const list: any[] = res.data.data || [];
+      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved');
     },
     enabled: isAdminOrHr && activeTab === 'allocation',
   });
@@ -181,8 +182,8 @@ export const LeaveApprovalsPage: React.FC = () => {
       setApprovalNote('');
       setSelectedDates({});
       setDayNotes({});
-      queryClient.invalidateQueries({ queryKey: ['leave-requests', 'pending'] });
-      queryClient.invalidateQueries({ queryKey: ['leave-requests', 'calendar'] });
+      queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['leave-balances'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to approve leave request');
@@ -201,7 +202,8 @@ export const LeaveApprovalsPage: React.FC = () => {
       info('Leave request rejected');
       setRejectTarget(null);
       setRejectNote('');
-      queryClient.invalidateQueries({ queryKey: ['leave-requests', 'pending'] });
+      queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['leave-balances'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to reject leave request');

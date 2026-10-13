@@ -39,10 +39,11 @@ export const EmployeeEditPage: React.FC = () => {
   });
 
   const { data: managers = [] } = useQuery({
-    queryKey: ['employees', 'managers'],
+    queryKey: ['employees', 'active-managers', id],
     queryFn: async () => {
-      const res = await axiosClient.get('/employees?limit=100');
-      return res.data.data;
+      const res = await axiosClient.get('/employees?limit=200&status=active');
+      const list: any[] = res.data?.data || [];
+      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved' && Number(e.id) !== Number(id));
     },
   });
 
@@ -111,7 +112,9 @@ export const EmployeeEditPage: React.FC = () => {
     },
     onSuccess: () => {
       success('Employee profile updated successfully.');
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['employees', id] });
+      queryClient.invalidateQueries({ queryKey: ['employee-stats'] });
       navigate(`/employees/${id}`);
     },
     onError: (err: any) => {

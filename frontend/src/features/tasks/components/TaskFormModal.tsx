@@ -56,12 +56,13 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
     enabled: Boolean(activeProjectId && isOpen),
   });
 
-  // Fetch all employees for reviewer list
+  // Fetch active employees for reviewer list
   const { data: employees = [] } = useQuery({
-    queryKey: ['employees', 'form-select'],
+    queryKey: ['employees', 'active-form-select'],
     queryFn: async () => {
-      const res = await axiosClient.get('/employees?limit=200');
-      return res.data.data;
+      const res = await axiosClient.get('/employees?limit=200&status=active');
+      const list: any[] = res.data?.data || [];
+      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved');
     },
     enabled: isOpen,
   });

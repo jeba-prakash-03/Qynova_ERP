@@ -28,17 +28,18 @@ export class EmployeesController {
 
   public getById = asyncHandler(async (req: Request, res: Response) => {
     const id = Number(req.params.id);
+    const employee = await employeesService.getEmployeeById(id);
 
-    // If user does not have employees.view, they can only view their own employee record
-    if (
-      !req.user?.roles.includes('Admin') &&
-      !req.user?.permissions.includes('employees.view') &&
-      req.user?.employeeId !== id
-    ) {
+    // If user does not have employees.view, they can only view their own record or direct reports (if they have employees.view_team)
+    const isOwner = req.user?.employeeId === id;
+    const isReportingManager = Boolean(req.user?.employeeId && employee.reporting_manager_id === req.user.employeeId);
+    const canViewTeam = Boolean(req.user?.permissions.includes('employees.view_team') && isReportingManager);
+    const isFullView = Boolean(req.user?.roles.includes('Admin') || req.user?.permissions.includes('employees.view'));
+
+    if (!isFullView && !isOwner && !canViewTeam) {
       throw new ForbiddenError('You do not have permission to view other employee records');
     }
 
-    const employee = await employeesService.getEmployeeById(id);
     return sendSuccess(res, employee, 200);
   });
 
@@ -68,6 +69,17 @@ export class EmployeesController {
 
   public getLifecycleHistory = asyncHandler(async (req: Request, res: Response) => {
     const id = Number(req.params.id);
+    const employee = await employeesService.getEmployeeById(id);
+
+    const isOwner = req.user?.employeeId === id;
+    const isReportingManager = Boolean(req.user?.employeeId && employee.reporting_manager_id === req.user.employeeId);
+    const canViewTeam = Boolean(req.user?.permissions.includes('employees.view_team') && isReportingManager);
+    const isFullView = Boolean(req.user?.roles.includes('Admin') || req.user?.permissions.includes('employees.view'));
+
+    if (!isFullView && !isOwner && !canViewTeam) {
+      throw new ForbiddenError('You do not have permission to view this employee lifecycle history');
+    }
+
     const history = await employeesService.getLifecycleHistory(id);
     return sendSuccess(res, history);
   });

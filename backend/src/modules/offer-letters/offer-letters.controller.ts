@@ -7,7 +7,7 @@ import {
   declineOfferSchema,
   sendOfferSchema,
 } from './offer-letters.schema';
-import { BadRequestError } from '../../shared/errors/app-error';
+import { BadRequestError, ForbiddenError } from '../../shared/errors/app-error';
 import { TokenUserPayload } from '../../shared/utils/jwt.util';
 
 export class OfferLettersController {
@@ -148,6 +148,17 @@ export class OfferLettersController {
       if (isNaN(employeeId)) {
         throw new BadRequestError('Invalid employee ID', [{ field: 'employeeId', message: 'Must be an integer' }]);
       }
+
+      const currentUser = (req as any).user as TokenUserPayload;
+      const isAdminOrHr =
+        currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+        currentUser.permissions.includes('offer_letters.view') ||
+        currentUser.permissions.includes('*');
+
+      if (!isAdminOrHr && currentUser.employeeId !== employeeId) {
+        throw new ForbiddenError('You do not have permission to view this employee offer letter');
+      }
+
       const latest = await offerLettersService.repository.findLatestByEmployeeId(employeeId);
       const history = await offerLettersService.repository.findHistoryByEmployeeId(employeeId);
       res.json({ success: true, data: { latest, history } });
@@ -181,6 +192,17 @@ export class OfferLettersController {
         res.status(404).json({ success: false, message: 'Offer letter not found' });
         return;
       }
+
+      const currentUser = (req as any).user as TokenUserPayload;
+      const isAdminOrHr =
+        currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+        currentUser.permissions.includes('offer_letters.view') ||
+        currentUser.permissions.includes('*');
+
+      if (!isAdminOrHr && currentUser.employeeId !== letter.employee_id) {
+        throw new ForbiddenError('You do not have permission to view this offer letter');
+      }
+
       res.json({ success: true, data: letter });
     } catch (err) {
       next(err);

@@ -211,8 +211,8 @@ export const MyLeavesPage: React.FC = () => {
       success('Leave request submitted successfully!');
       setIsApplyModalOpen(false);
       resetForm();
-      queryClient.invalidateQueries({ queryKey: ['leave-requests', 'me'] });
-      queryClient.invalidateQueries({ queryKey: ['leave-balances', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['leave-balances'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to submit leave request');
@@ -228,8 +228,8 @@ export const MyLeavesPage: React.FC = () => {
     onSuccess: () => {
       info('Leave request cancelled successfully');
       setCancelTarget(null);
-      queryClient.invalidateQueries({ queryKey: ['leave-requests', 'me'] });
-      queryClient.invalidateQueries({ queryKey: ['leave-balances', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['leave-balances'] });
     },
     onError: (err: any) => {
       error(err.response?.data?.message || 'Failed to cancel leave request');

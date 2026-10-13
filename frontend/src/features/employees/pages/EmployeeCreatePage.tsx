@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../../../shared/api/axiosClient';
 import { FormField } from '../../../shared/components/FormField';
 import { Modal } from '../../../shared/components/Modal';
@@ -22,6 +22,7 @@ import {
 
 export const EmployeeCreatePage: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { error } = useToast();
 
   // Reference data queries
@@ -50,10 +51,11 @@ export const EmployeeCreatePage: React.FC = () => {
   });
 
   const { data: managers = [] } = useQuery({
-    queryKey: ['employees', 'managers'],
+    queryKey: ['employees', 'active-managers'],
     queryFn: async () => {
-      const res = await axiosClient.get('/employees?limit=100');
-      return res.data.data;
+      const res = await axiosClient.get('/employees?limit=200&status=active');
+      const list: any[] = res.data?.data || [];
+      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved');
     },
   });
 
@@ -189,6 +191,10 @@ export const EmployeeCreatePage: React.FC = () => {
     try {
       const res = await axiosClient.post('/employees', payload);
       const createdData = res.data.data;
+
+      // Invalidate employee directory & statistics cache
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+      queryClient.invalidateQueries({ queryKey: ['employee-stats'] });
 
       // Upload Resume if attached
       if (resumeFile && createdData.employee?.id) {

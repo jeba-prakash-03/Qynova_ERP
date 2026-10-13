@@ -11,7 +11,8 @@ export const usePermission = (permission?: string): boolean => {
 
   if (!permission) return true;
 
-  return user.permissions?.includes(permission) || false;
+  const parts = permission.split(',').map((p) => p.trim());
+  return parts.some((p) => user.permissions?.includes(p));
 };
 
 export const useHasEmployeeProfile = (): boolean => {
