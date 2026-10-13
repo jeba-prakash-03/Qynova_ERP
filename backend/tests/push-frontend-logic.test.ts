@@ -11,7 +11,7 @@ describe('Frontend Push Notification Logic & Contract Tests', () => {
   beforeAll(async () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
-      .send({ email: 'employee@qynova.erp', password: 'Password@123' });
+      .send({ email: 'employee@qynova.erp', password: 'Employee@123' });
 
     expect(res.status).toBe(200);
     userToken = res.body.data.accessToken;

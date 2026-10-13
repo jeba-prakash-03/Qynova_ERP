@@ -11,10 +11,12 @@
     "migrate:latest": "knex --knexfile src/db/knexfile.ts migrate:latest",
     "migrate:latest:test": "cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:latest",
     "migrate:rollback": "knex --knexfile src/db/knexfile.ts migrate:rollback",
+    "seed": "knex --knexfile src/db/knexfile.ts seed:run",
     "seed:run": "knex --knexfile src/db/knexfile.ts seed:run",
     "seed:run:test": "cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts seed:run",
+    "seed:demo": "ts-node src/db/seeds/run-demo-seeds.ts",
     "db:setup": "knex --knexfile src/db/knexfile.ts migrate:latest && knex --knexfile src/db/knexfile.ts seed:run",
-    "db:reset:test": "cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:rollback --all && cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:latest && cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts seed:run",
+    "db:reset:test": "cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:rollback --all && cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts migrate:latest && cross-env NODE_ENV=test knex --knexfile src/db/knexfile.ts seed:run && cross-env NODE_ENV=test ts-node src/db/seeds/run-demo-seeds.ts",
     "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit",
     "lint": "eslint src/**/*.ts"
   },

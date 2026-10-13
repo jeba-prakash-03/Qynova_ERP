@@ -34,7 +34,7 @@ const config: { [key: string]: Knex.Config } = {
       extension: 'ts',
     },
     seeds: {
-      directory: path.resolve(__dirname, './seeds'),
+      directory: path.resolve(__dirname, './seeds/essential'),
       extension: 'ts',
     },
   },
@@ -59,7 +59,7 @@ const config: { [key: string]: Knex.Config } = {
       extension: 'ts',
     },
     seeds: {
-      directory: path.resolve(__dirname, './seeds'),
+      directory: path.resolve(__dirname, './seeds/essential'),
       extension: 'ts',
     },
   },
@@ -82,7 +82,7 @@ const config: { [key: string]: Knex.Config } = {
       directory: path.resolve(__dirname, './migrations'),
     },
     seeds: {
-      directory: path.resolve(__dirname, './seeds'),
+      directory: path.resolve(__dirname, './seeds/essential'),
     },
   },
 };

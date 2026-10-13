@@ -9,6 +9,32 @@ const app = createApp();
 
 const startServer = async () => {
   try {
+    // In production, refuse to start if JWT secrets are missing or match default placeholder values
+    if (process.env.NODE_ENV === 'production') {
+      const knownInsecureSecrets = [
+        'super_secret_jwt_access_key_qynova_erp_2026_dev1',
+        'super_secret_jwt_refresh_key_qynova_erp_2026_dev1',
+        'secret',
+        'changeme',
+        'jwt_secret',
+        'your_jwt_secret',
+        'default_secret',
+      ];
+      const jwtSecret = process.env.JWT_SECRET;
+      const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
+
+      if (!jwtSecret || knownInsecureSecrets.includes(jwtSecret)) {
+        throw new Error(
+          '[FATAL] Production startup rejected: JWT_SECRET is missing or matches an insecure default example.'
+        );
+      }
+      if (!jwtRefreshSecret || knownInsecureSecrets.includes(jwtRefreshSecret)) {
+        throw new Error(
+          '[FATAL] Production startup rejected: JWT_REFRESH_SECRET is missing or matches an insecure default example.'
+        );
+      }
+    }
+
     // Test database connection
     await db.raw('SELECT 1+1 AS result');
     console.log('[DATABASE] MySQL connection established successfully.');

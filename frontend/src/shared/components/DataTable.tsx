@@ -17,6 +17,10 @@ interface DataTableProps<T> {
   isLoading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
+  emptyAction?: {
+    label: string;
+    onClick: () => void;
+  };
   searchPlaceholder?: string;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
@@ -38,6 +42,7 @@ export function DataTable<T>({
   isLoading = false,
   emptyTitle = 'No records found',
   emptyDescription = 'There are no entries to display matching the criteria.',
+  emptyAction,
   searchPlaceholder = 'Search...',
   searchValue,
   onSearchChange,
@@ -84,7 +89,7 @@ export function DataTable<T>({
           </div>
         ) : data.length === 0 ? (
           <div className="py-12">
-            <EmptyState title={emptyTitle} description={emptyDescription} />
+            <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
           </div>
         ) : (
           <table className="w-full text-left text-sm text-slate-600 border-collapse">

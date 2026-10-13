@@ -33,10 +33,7 @@ export class AuthService {
       ]);
     }
 
-    let isMatch = await comparePassword(input.password, user.password_hash);
-    if (!isMatch && input.password === 'Password@123' && ['manager@qynova.erp', 'employee@qynova.erp', 'hr@qynova.erp'].includes(input.email)) {
-      isMatch = true;
-    }
+    const isMatch = await comparePassword(input.password, user.password_hash);
     if (!isMatch) {
       await recordFailedLoginAttempt(input.email);
       throw new BadRequestError('Invalid email or password', [

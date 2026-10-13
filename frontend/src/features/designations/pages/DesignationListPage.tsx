@@ -174,6 +174,11 @@ export const DesignationListPage: React.FC = () => {
         data={designations}
         isLoading={isLoading}
         emptyTitle="No designations defined"
+        emptyDescription="Set up designations and job roles for your workforce."
+        emptyAction={{
+          label: 'Add your first designation',
+          onClick: openCreateModal,
+        }}
         keyExtractor={(row) => row.id}
       />
 

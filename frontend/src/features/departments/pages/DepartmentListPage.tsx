@@ -5,6 +5,8 @@ import { DataTable, Column } from '../../../shared/components/DataTable';
 import { Modal } from '../../../shared/components/Modal';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { FormField } from '../../../shared/components/FormField';
+import { Button } from '../../../shared/components/Button';
+import { EmptyState } from '../../../shared/components/EmptyState';
 import { Can } from '../../../shared/components/Can';
 import { useToast } from '../../../shared/context/ToastContext';
 import {
@@ -231,93 +233,107 @@ export const DepartmentListPage: React.FC = () => {
             Organizational Tree Breakdown
           </div>
 
-          <div className="space-y-4">
-            {treeDepts.map((root: any) => (
-              <div
-                key={root.id}
-                className="border border-slate-200/90 rounded-2xl p-4 bg-slate-50/50 hover:bg-slate-50 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-                      <Building2 className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-extrabold text-sm text-slate-800">{root.name}</h3>
-                        <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
-                          {root.code}
-                        </span>
+          {treeDepts.length === 0 ? (
+            <div className="py-12">
+              <EmptyState
+                icon={Building2}
+                title="No departments found"
+                description="Start organizing your teams and reporting structure."
+                action={{
+                  label: 'Add your first department',
+                  onClick: openCreateModal,
+                }}
+              />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {treeDepts.map((root: any) => (
+                <div
+                  key={root.id}
+                  className="border border-slate-200/90 rounded-2xl p-4 bg-slate-50/50 hover:bg-slate-50 transition"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                        <Building2 className="w-5 h-5" />
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">{root.description || 'Top-level branch'}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Can permission="departments.edit">
-                      <button
-                        onClick={() => openEditModal(root)}
-                        className="p-1.5 text-slate-400 hover:text-amber-600 transition"
-                        title="Edit"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                    </Can>
-                    <Can permission="departments.delete">
-                      <button
-                        onClick={() => setDeleteTarget(root)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 transition"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </Can>
-                  </div>
-                </div>
-
-                {/* Sub-departments */}
-                {root.children && root.children.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-slate-200/60 pl-6 space-y-2.5">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                      <GitBranch className="w-3 h-3" />
-                      Sub-Departments ({root.children.length})
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                      {root.children.map((sub: any) => (
-                        <div
-                          key={sub.id}
-                          className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between gap-2"
-                        >
-                          <div>
-                            <div className="font-bold text-xs text-slate-800">{sub.name}</div>
-                            <span className="font-mono text-[10px] text-slate-400">{sub.code}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Can permission="departments.edit">
-                              <button
-                                onClick={() => openEditModal(sub)}
-                                className="p-1 text-slate-400 hover:text-amber-600 transition"
-                              >
-                                <Edit2 className="w-3 h-3" />
-                              </button>
-                            </Can>
-                            <Can permission="departments.delete">
-                              <button
-                                onClick={() => setDeleteTarget(sub)}
-                                className="p-1 text-slate-400 hover:text-rose-600 transition"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </button>
-                            </Can>
-                          </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-extrabold text-sm text-slate-800">{root.name}</h3>
+                          <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            {root.code}
+                          </span>
                         </div>
-                      ))}
+                        <p className="text-xs text-slate-500 mt-0.5">{root.description || 'Top-level branch'}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Can permission="departments.edit">
+                        <button
+                          onClick={() => openEditModal(root)}
+                          className="p-1.5 text-slate-400 hover:text-amber-600 transition"
+                          title="Edit"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </Can>
+                      <Can permission="departments.delete">
+                        <button
+                          onClick={() => setDeleteTarget(root)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 transition"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </Can>
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+
+                  {/* Sub-departments */}
+                  {root.children && root.children.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-slate-200/60 pl-6 space-y-2.5">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                        <GitBranch className="w-3 h-3" />
+                        Sub-Departments ({root.children.length})
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                        {root.children.map((sub: any) => (
+                          <div
+                            key={sub.id}
+                            className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between gap-2"
+                          >
+                            <div>
+                              <div className="font-bold text-xs text-slate-800">{sub.name}</div>
+                              <span className="font-mono text-[10px] text-slate-400">{sub.code}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Can permission="departments.edit">
+                                <button
+                                  onClick={() => openEditModal(sub)}
+                                  className="p-1 text-slate-400 hover:text-amber-600 transition"
+                                >
+                                  <Edit2 className="w-3 h-3" />
+                                </button>
+                              </Can>
+                              <Can permission="departments.delete">
+                                <button
+                                  onClick={() => setDeleteTarget(sub)}
+                                  className="p-1 text-slate-400 hover:text-rose-600 transition"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </Can>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         <DataTable
@@ -325,6 +341,11 @@ export const DepartmentListPage: React.FC = () => {
           data={flatDepts}
           isLoading={loadingFlat}
           emptyTitle="No departments found"
+          emptyDescription="Start organizing your teams and reporting structure."
+          emptyAction={{
+            label: 'Add your first department',
+            onClick: openCreateModal,
+          }}
           keyExtractor={(row) => row.id}
         />
       )}

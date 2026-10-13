@@ -23,14 +23,6 @@ const loginValidationSchema = z.object({
   password: z.string().min(1, 'Enter your password'),
 });
 
-// Conditionally load dev quick login in development mode only
-const isDevLoginEnabled =
-  Boolean(import.meta.env.DEV) && import.meta.env.VITE_SHOW_DEV_LOGIN === 'true';
-
-const LazyDevQuickLogin = isDevLoginEnabled
-  ? React.lazy(() => import('../components/DevQuickLogin'))
-  : null;
-
 interface AlertState {
   type: 'error' | 'warning' | 'info' | 'success';
   message: string;
@@ -317,13 +309,6 @@ export const LoginPage: React.FC = () => {
     executeLogin(email, password);
   };
 
-  const handleDevQuickSelect = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setFieldErrors({});
-    setAlert(null);
-  };
-
   return (
     <AuthLayout
       title="Welcome back"
@@ -498,16 +483,6 @@ export const LoginPage: React.FC = () => {
           {isLoading ? 'Signing in...' : 'Sign in'}
         </Button>
       </form>
-
-      {/* DEV QUICK LOGIN (Excluded in production bundle) */}
-      {isDevLoginEnabled && LazyDevQuickLogin && (
-        <React.Suspense fallback={null}>
-          <LazyDevQuickLogin
-            onSelect={handleDevQuickSelect}
-            disabled={isLoading}
-          />
-        </React.Suspense>
-      )}
     </AuthLayout>
   );
 };

@@ -76,7 +76,12 @@ export async function up(knex: Knex): Promise<void> {
 export async function down(knex: Knex): Promise<void> {
   await knex.schema.dropTableIfExists('employee_lifecycle_history');
   await knex.schema.dropTableIfExists('employee_documents');
-  await knex.raw(
-    "ALTER TABLE users MODIFY COLUMN status ENUM('active', 'inactive') NOT NULL DEFAULT 'active'"
-  );
+  if (await knex.schema.hasTable('users')) {
+    await knex('users')
+      .whereNotIn('status', ['active', 'inactive'])
+      .update({ status: 'inactive' });
+    await knex.raw(
+      "ALTER TABLE users MODIFY COLUMN status ENUM('active', 'inactive') NOT NULL DEFAULT 'active'"
+    );
+  }
 }
