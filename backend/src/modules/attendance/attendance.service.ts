@@ -677,6 +677,26 @@ export class AttendanceService {
   }
 
   /**
+   * Admin / HR Delete Attendance Record
+   */
+  async deleteAttendance(id: number, userId: number): Promise<void> {
+    const current = await attendanceRepository.findById(id);
+    if (!current) {
+      throw new NotFoundError(`Attendance record ${id} not found`);
+    }
+
+    await db('attendance').where({ id }).delete();
+
+    await auditService.record({
+      userId,
+      action: 'attendance.delete',
+      entity: 'attendance',
+      entityId: id,
+      oldValue: current,
+    });
+  }
+
+  /**
    * Admin / HR Create Attendance for Missing Day
    */
   async createManualAttendance(

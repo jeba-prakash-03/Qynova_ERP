@@ -137,6 +137,12 @@ export class AttendanceController {
     return sendSuccess(res, result, 200, undefined, 'Attendance record updated successfully');
   });
 
+  public delete = asyncHandler(async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    await attendanceService.deleteAttendance(id, req.user!.userId);
+    return sendSuccess(res, { deleted: true }, 200, undefined, 'Attendance record deleted successfully');
+  });
+
   public exportSheet = asyncHandler(async (req: Request, res: Response) => {
     const { type = 'daily', date, month, format = 'xlsx' } = req.query as {
       type?: 'daily' | 'monthly';

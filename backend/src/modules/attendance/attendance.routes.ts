@@ -91,4 +91,10 @@ router.put(
   attendanceController.update
 );
 
+router.delete(
+  '/:id',
+  requirePermission('attendance.edit'),
+  attendanceController.delete
+);
+
 export default router;

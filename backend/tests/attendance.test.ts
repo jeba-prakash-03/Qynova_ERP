@@ -203,6 +203,55 @@ describe('Attendance Module Lifecycle & Permissions', () => {
       expect(audit).toBeDefined();
     });
 
+    it('should allow admin to manually create and then delete attendance record', async () => {
+      const manualDate = '2026-10-08';
+      // Clean up if already exists
+      await db('attendance').where({ employee_id: employeeId, date: manualDate }).delete();
+
+      // 1. Admin creates manual attendance
+      const createRes = await request(app)
+        .post('/api/v1/attendance')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          employee_id: employeeId,
+          date: manualDate,
+          status: 'present',
+          work_type: 'wfh',
+          check_in: `${manualDate}T09:30:00.000Z`,
+          check_out: `${manualDate}T18:30:00.000Z`,
+          reason: 'Manual backdated entry by administrator',
+        });
+
+      expect(createRes.status).toBe(201);
+      expect(createRes.body.success).toBe(true);
+      const createdId = createRes.body.data.id;
+      expect(createdId).toBeDefined();
+
+      // Verify audit log for creation
+      const createAudit = await db('audit_logs')
+        .where({ entity: 'attendance', entity_id: createdId, action: 'attendance.create_manual' })
+        .first();
+      expect(createAudit).toBeDefined();
+
+      // 2. Admin deletes attendance
+      const deleteRes = await request(app)
+        .delete(`/api/v1/attendance/${createdId}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(deleteRes.status).toBe(200);
+      expect(deleteRes.body.success).toBe(true);
+
+      // Verify deleted from db
+      const deletedRecord = await db('attendance').where({ id: createdId }).first();
+      expect(deletedRecord).toBeUndefined();
+
+      // Verify delete audit log
+      const deleteAudit = await db('audit_logs')
+        .where({ entity: 'attendance', entity_id: createdId, action: 'attendance.delete' })
+        .first();
+      expect(deleteAudit).toBeDefined();
+    });
+
     it('should filter manager daily sheet to only direct team reportees', async () => {
       const yesterday = '2026-10-09';
       const mgrSheet = await request(app)
