@@ -1,40 +1,55 @@
 # Dependencies
-node_modules
+node_modules/
 .pnp
 .pnp.js
 
-# Environment variables & Credentials
+# Environment files and secrets
 .env
 .env.*
-!.env.example
-!*.env.example
 .env*.local
-*firebase*.json
-*service-account*.json
+!.env.example
+!.env.*.example
+!*.env.example
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Service account credentials
+service-account*.json
+*-service-account.json
 *serviceAccount*.json
+firebase-adminsdk*.json
+*firebase*.json
+
+# Generated notification service workers
 frontend/public/firebase-messaging-sw.js
 public/firebase-messaging-sw.js
 
-
-# Backups
+# Local development data & uploads
+uploads/
+backend/uploads/
+storage/
+backend/storage/
 backups/
 
 # Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.log
 
 # Build & Test outputs
-dist
-build
-coverage
+dist/
+build/
+coverage/
 test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
-storage/
-backend/storage/
 
 # IDE & OS
 .vscode/

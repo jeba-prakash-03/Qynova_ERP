@@ -1,0 +1,17 @@
+# Environment files & secrets
+.env
+.env.*
+.env*.local
+!.env.example
+!.env.*.example
+!*.env.example
+
+# Service workers & build artifacts
+public/firebase-messaging-sw.js
+dist/
+coverage/
+logs/
+*.log
+
+# Dependencies
+node_modules/

@@ -38,8 +38,12 @@ test.describe.serial('Qynova ERP End-to-End Enterprise Workflow Suite', () => {
     adminPassword = 'SuperAdmin#Qynova2026!';
     console.log('[E2E SETUP] Resetting data tables in qynova_e2e and applying essential seed...');
     try {
+      const dbUser = process.env.DB_USER || 'root';
+      const dbPass = process.env.DB_PASSWORD ? `-p"${process.env.DB_PASSWORD}"` : '';
+      const dbHost = process.env.DB_HOST ? `-h ${process.env.DB_HOST}` : '';
+      const dbPort = process.env.DB_PORT ? `-P ${process.env.DB_PORT}` : '';
       execSync(
-        'mysql -u root -p7868 -e "SET FOREIGN_KEY_CHECKS = 0; TRUNCATE qynova_e2e.users; TRUNCATE qynova_e2e.user_roles; TRUNCATE qynova_e2e.employees; TRUNCATE qynova_e2e.employee_bank_details; TRUNCATE qynova_e2e.employee_emergency_contacts; TRUNCATE qynova_e2e.employee_lifecycle_history; TRUNCATE qynova_e2e.employee_documents; TRUNCATE qynova_e2e.departments; TRUNCATE qynova_e2e.designations; TRUNCATE qynova_e2e.leave_balances; TRUNCATE qynova_e2e.leave_requests; TRUNCATE qynova_e2e.leave_request_days; TRUNCATE qynova_e2e.attendance; TRUNCATE qynova_e2e.attendance_breaks; TRUNCATE qynova_e2e.timesheets; TRUNCATE qynova_e2e.offer_letters; TRUNCATE qynova_e2e.salary_structures; TRUNCATE qynova_e2e.payroll_runs; TRUNCATE qynova_e2e.payroll_items; TRUNCATE qynova_e2e.payroll_adjustments; SET FOREIGN_KEY_CHECKS = 1;" && npx cross-env DB_NAME=qynova_e2e ADMIN_EMAIL=admin@qynova.erp ADMIN_PASSWORD="SuperAdmin#Qynova2026!" npx knex --knexfile src/db/knexfile.ts seed:run',
+        `mysql -u ${dbUser} ${dbPass} ${dbHost} ${dbPort} -e "SET FOREIGN_KEY_CHECKS = 0; TRUNCATE qynova_e2e.users; TRUNCATE qynova_e2e.user_roles; TRUNCATE qynova_e2e.employees; TRUNCATE qynova_e2e.employee_bank_details; TRUNCATE qynova_e2e.employee_emergency_contacts; TRUNCATE qynova_e2e.employee_lifecycle_history; TRUNCATE qynova_e2e.employee_documents; TRUNCATE qynova_e2e.departments; TRUNCATE qynova_e2e.designations; TRUNCATE qynova_e2e.leave_balances; TRUNCATE qynova_e2e.leave_requests; TRUNCATE qynova_e2e.leave_request_days; TRUNCATE qynova_e2e.attendance; TRUNCATE qynova_e2e.attendance_breaks; TRUNCATE qynova_e2e.timesheets; TRUNCATE qynova_e2e.offer_letters; TRUNCATE qynova_e2e.salary_structures; TRUNCATE qynova_e2e.payroll_runs; TRUNCATE qynova_e2e.payroll_items; TRUNCATE qynova_e2e.payroll_adjustments; SET FOREIGN_KEY_CHECKS = 1;" && npx cross-env DB_NAME=qynova_e2e ADMIN_EMAIL=admin@qynova.erp ADMIN_PASSWORD="SuperAdmin#Qynova2026!" npx knex --knexfile src/db/knexfile.ts seed:run`,
         { cwd: '../backend', stdio: 'inherit' }
       );
       console.log('[E2E SETUP] Database reset and essential seed complete.');

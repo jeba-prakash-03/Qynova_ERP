@@ -1,0 +1,28 @@
+# Environment files & secrets
+.env
+.env.*
+.env*.local
+!.env.example
+!.env.*.example
+!*.env.example
+
+# Service account & keys
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+*-service-account.json
+*serviceAccount*.json
+firebase-adminsdk*.json
+
+# Storage & Uploads
+uploads/
+storage/
+logs/
+*.log
+
+# Build & Dependencies
+node_modules/
+dist/
+coverage/
