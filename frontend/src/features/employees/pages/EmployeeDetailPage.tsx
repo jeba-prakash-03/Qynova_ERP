@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../../../shared/api/axiosClient';
 import { Loader } from '../../../shared/components/Loader';
@@ -10,6 +10,7 @@ import { StatusBadge } from '../../../shared/components/StatusBadge';
 import { Button } from '../../../shared/components/Button';
 import { Can } from '../../../shared/components/Can';
 import { useToast } from '../../../shared/context/ToastContext';
+import { OfferLetterEmployeeTab } from '../components/OfferLetterEmployeeTab';
 import {
   ArrowLeft,
   Edit2,
@@ -53,13 +54,13 @@ const ALL_LIFECYCLE_STAGES = [
 ] as const;
 
 const ALLOWED_LIFECYCLE_TRANSITIONS: Record<string, string[]> = {
-  candidate: ['selected'],
-  selected: ['offer_generated'],
+  candidate: ['selected', 'offer_generated'],
+  selected: ['offer_generated', 'onboarding'],
   offer_generated: ['offer_accepted'],
   offer_accepted: ['onboarding'],
-  onboarding: ['active'],
-  active: ['probation'],
-  probation: ['confirmed'],
+  onboarding: ['active', 'probation'],
+  active: ['probation', 'confirmed', 'resigned'],
+  probation: ['confirmed', 'resigned'],
   confirmed: ['resigned'],
   resigned: ['notice_period'],
   notice_period: ['relieved'],
@@ -91,7 +92,17 @@ function formatBytes(bytes: number, decimals = 1): string {
 
 export const EmployeeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<'profile' | 'lifecycle' | 'documents' | 'bank' | 'emergency'>('profile');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'profile' | 'lifecycle' | 'offer-letter' | 'documents' | 'bank' | 'emergency'>(
+    (searchParams.get('tab') as any) === 'offer-letter' ? 'offer-letter' : 'profile'
+  );
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'offer-letter') {
+      setActiveTab('offer-letter');
+    }
+  }, [searchParams]);
 
   // Lifecycle stage modal states
   const [isLifecycleModalOpen, setIsLifecycleModalOpen] = useState(false);
@@ -458,6 +469,18 @@ export const EmployeeDetailPage: React.FC = () => {
         </button>
 
         <button
+          onClick={() => setActiveTab('offer-letter')}
+          className={`py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition flex items-center gap-2 ${
+            activeTab === 'offer-letter'
+              ? 'border-[#4F46E5] text-[#4F46E5]'
+              : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
+          }`}
+        >
+          <Sparkles className="w-4 h-4" />
+          Offer Letter
+        </button>
+
+        <button
           onClick={() => setActiveTab('documents')}
           className={`py-3.5 text-xs font-bold border-b-2 whitespace-nowrap transition flex items-center gap-2 ${
             activeTab === 'documents'
@@ -742,6 +765,14 @@ export const EmployeeDetailPage: React.FC = () => {
             )}
           </div>
         </div>
+      )}
+
+      {/* OFFER LETTER TAB */}
+      {activeTab === 'offer-letter' && (
+        <OfferLetterEmployeeTab
+          employee={employee}
+          initialOpenGenerate={searchParams.get('generate') === 'true'}
+        />
       )}
 
       {/* 3. DOCUMENTS VAULT TAB */}

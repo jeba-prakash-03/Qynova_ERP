@@ -34,8 +34,10 @@ const startServer = async () => {
     // Initialize business cron jobs
     const { initTasksCron } = await import('./modules/tasks/tasks.cron');
     const { initInvoicesCron } = await import('./modules/invoices/invoices.cron');
+    const { initOfferLettersCron } = await import('./modules/offer-letters/offer-letters.cron');
     initTasksCron();
     initInvoicesCron();
+    initOfferLettersCron();
 
     app.listen(PORT, () => {
       console.log(`[SERVER] Qynova ERP Backend running on http://localhost:${PORT}`);

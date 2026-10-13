@@ -13,7 +13,13 @@ import {
   CheckSquare,
   ArrowUpRight,
   LayoutDashboard,
+  Download,
+  Eye,
+  Sparkles,
 } from 'lucide-react';
+import { Modal } from '../../shared/components/Modal';
+import { Button } from '../../shared/components/Button';
+import DOMPurify from 'dompurify';
 import {
   EmployeeTodayAttendanceWidget,
   EmployeeLeaveBalancesWidget,
@@ -31,6 +37,8 @@ export const EmployeeDashboard: React.FC = () => {
     },
   });
 
+  const [offerPreviewOpen, setOfferPreviewOpen] = useState(false);
+
   const { data: myTasks } = useQuery({
     queryKey: ['dashboard', 'widget', 'my_tasks'],
     queryFn: async () => {
@@ -42,6 +50,35 @@ export const EmployeeDashboard: React.FC = () => {
       }
     },
   });
+
+  const { data: myOfferLetter } = useQuery({
+    queryKey: ['offer-letters', 'my'],
+    queryFn: async () => {
+      try {
+        const res = await axiosClient.get('/offer-letters/my');
+        return res.data?.data || null;
+      } catch {
+        return null;
+      }
+    },
+  });
+
+  const downloadMyOfferPdf = async (letterId: number, refNo: string) => {
+    try {
+      const res = await axiosClient.get(`/offer-letters/${letterId}/download`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Offer_Letter_${refNo}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+    } catch {
+      alert('Failed to download offer letter PDF');
+    }
+  };
 
   if (isLoading) {
     return <Loader size="lg" text="Loading your employee profile..." />;
@@ -353,8 +390,96 @@ export const EmployeeDashboard: React.FC = () => {
       )}
 
       {activeTab === 'documents' && (
-        <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm">
-          <p className="text-xs text-[#64748B]">Document vault section.</p>
+        <div className="space-y-6">
+          {/* Offer Letter Official Card */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#E2E8F0] shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-indigo-600" />
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Official Offer & Appointment Letter</h3>
+                  <p className="text-xs text-slate-500">Your binding employment contract issued by the organization.</p>
+                </div>
+              </div>
+              {myOfferLetter && <StatusBadge status={myOfferLetter.status} />}
+            </div>
+
+            {myOfferLetter ? (
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-900 text-sm">{myOfferLetter.reference_no}</span>
+                    <span className="text-[10px] font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                      v{myOfferLetter.version}
+                    </span>
+                  </div>
+                  <p className="text-slate-600">
+                    Position: <strong className="text-slate-800">{myOfferLetter.designation}</strong> • Commencement: <strong className="text-slate-800">{myOfferLetter.joining_date}</strong>
+                  </p>
+                  <p className="text-slate-500 text-[11px]">
+                    CTC: ₹{Number(myOfferLetter.annual_ctc || 0).toLocaleString('en-IN')} / annum • Valid Until: {myOfferLetter.offer_valid_until}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setOfferPreviewOpen(true)}
+                  >
+                    <Eye className="w-3.5 h-3.5 mr-1" />
+                    View Letter
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => downloadMyOfferPdf(myOfferLetter.id, myOfferLetter.reference_no)}
+                  >
+                    <Download className="w-3.5 h-3.5 mr-1" />
+                    Download PDF
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="py-8 text-center text-xs text-slate-400 space-y-1">
+                <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <p className="font-semibold text-slate-600">No Offer Letter Available</p>
+                <p>Your official offer letter will appear here once dispatched by Human Resources.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Offer Letter Preview Modal */}
+          {myOfferLetter && (
+            <Modal
+              isOpen={offerPreviewOpen}
+              onClose={() => setOfferPreviewOpen(false)}
+              title={`Offer Letter - ${myOfferLetter.reference_no}`}
+              footer={
+                <Button
+                  size="sm"
+                  onClick={() => downloadMyOfferPdf(myOfferLetter.id, myOfferLetter.reference_no)}
+                >
+                  <Download className="w-3.5 h-3.5 mr-1" />
+                  Download PDF
+                </Button>
+              }
+            >
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl max-h-[60vh] overflow-y-auto space-y-4 text-xs font-sans">
+                <div className="border-b border-slate-200 pb-3">
+                  <h4 className="text-base font-bold text-slate-900">
+                    {myOfferLetter.snapshot?.company_name || 'Qynova Technologies'}
+                  </h4>
+                  <p className="text-slate-500">{myOfferLetter.snapshot?.company_address}</p>
+                </div>
+                <div
+                  className="prose prose-sm max-w-none text-slate-800 leading-relaxed text-xs space-y-2 font-sans"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(myOfferLetter.snapshot?.rendered_html || ''),
+                  }}
+                />
+              </div>
+            </Modal>
+          )}
         </div>
       )}
     </div>

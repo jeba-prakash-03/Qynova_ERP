@@ -381,7 +381,36 @@ export class EmployeesService {
       // 2. Update employee lifecycle stage
       await employeesRepository.updateLifecycleStage(id, nextStage, trx);
 
-      // 3. On relieved: set employees.status = inactive, last_working_date = today and users.status = disabled
+      // 3. On onboarding: activate user, set must_change_password = true, generate temp password, send welcome email
+      if (nextStage === 'onboarding') {
+        const tempPassword = generateTemporaryPassword();
+        const hash = await hashPassword(tempPassword);
+        await trx('users').where({ id: existing.user_id }).update({
+          status: 'active',
+          must_change_password: true,
+          password_hash: hash,
+          updated_at: db.fn.now(),
+        });
+
+        const companyRow = await trx('company_settings').where({ id: 1 }).first();
+        const compName = companyRow?.company_name || 'Qynova Technologies';
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+        await emailService.queueEmail({
+          to: existing.email,
+          subject: `Welcome to ${compName} - Your Account Credentials`,
+          html: `<p>Dear ${existing.first_name},</p>
+<p>Welcome to <strong>${compName}</strong>! Your account has been activated for onboarding.</p>
+<p><strong>Login URL:</strong> <a href="${clientUrl}/login">${clientUrl}/login</a><br/>
+<strong>Email:</strong> ${existing.email}<br/>
+<strong>Temporary Password:</strong> <code>${tempPassword}</code></p>
+<p>Please change your password immediately upon your first login.</p>
+<p>Best regards,<br/>${compName} HR Team</p>`,
+          eventKey: `welcome-onboarding-${id}`,
+        });
+      }
+
+      // 4. On relieved: set employees.status = inactive, last_working_date = today and users.status = disabled
       if (nextStage === 'relieved') {
         const today = new Date().toISOString().split('T')[0];
         await trx('employees').where({ id }).update({ status: 'inactive', last_working_date: today });

@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   Copy,
   Info,
+  Sparkles,
 } from 'lucide-react';
 
 export const EmployeeCreatePage: React.FC = () => {
@@ -98,6 +99,7 @@ export const EmployeeCreatePage: React.FC = () => {
   });
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [generateOfferLetter, setGenerateOfferLetter] = useState(false);
   const [createdResult, setCreatedResult] = useState<{
     employee: any;
     temporaryPassword: string;
@@ -520,13 +522,21 @@ export const EmployeeCreatePage: React.FC = () => {
             <FormField label="Lifecycle Stage">
               <select
                 value={formData.lifecycle_stage}
-                onChange={(e) => setFormData({ ...formData, lifecycle_stage: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({ ...formData, lifecycle_stage: val });
+                  if (val === 'selected') {
+                    setGenerateOfferLetter(true);
+                  }
+                }}
                 className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               >
+                <option value="active">Active</option>
+                <option value="selected">Selected (Candidate)</option>
+                <option value="candidate">Candidate</option>
                 <option value="onboarding">Onboarding</option>
                 <option value="probation">Probation</option>
                 <option value="confirmed">Confirmed</option>
-                <option value="active">Active</option>
               </select>
             </FormField>
 
@@ -550,6 +560,27 @@ export const EmployeeCreatePage: React.FC = () => {
                 className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </FormField>
+
+            <div className="sm:col-span-3 p-3.5 bg-indigo-50/70 border border-indigo-200/80 rounded-2xl flex items-center justify-between">
+              <label htmlFor="generateOfferLetter" className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  id="generateOfferLetter"
+                  checked={generateOfferLetter}
+                  onChange={(e) => setGenerateOfferLetter(e.target.checked)}
+                  className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                />
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block">
+                    Generate offer letter after saving
+                  </span>
+                  <span className="text-[11px] text-slate-500">
+                    Automatically opens the offer letter studio with pre-filled compensation and appointment details
+                  </span>
+                </div>
+              </label>
+              <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+            </div>
           </div>
         </div>
 
@@ -710,12 +741,17 @@ export const EmployeeCreatePage: React.FC = () => {
         footer={
           <button
             onClick={() => {
+              const empId = createdResult?.employee.id;
               setCreatedResult(null);
-              navigate('/employees');
+              if (generateOfferLetter && empId) {
+                navigate(`/employees/${empId}?tab=offer-letter&generate=true`);
+              } else {
+                navigate('/employees');
+              }
             }}
             className="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition"
           >
-            Go to Employee Directory
+            {generateOfferLetter ? 'Generate Offer Letter' : 'Go to Employee Directory'}
           </button>
         }
       >

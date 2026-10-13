@@ -77,13 +77,13 @@ export interface EmployeeLifecycleHistoryRecord {
 }
 
 export const ALLOWED_LIFECYCLE_TRANSITIONS: Record<LifecycleStage, LifecycleStage[]> = {
-  candidate: ['selected'],
-  selected: ['offer_generated'],
+  candidate: ['selected', 'offer_generated'],
+  selected: ['offer_generated', 'onboarding'],
   offer_generated: ['offer_accepted'],
   offer_accepted: ['onboarding'],
-  onboarding: ['active'],
-  active: ['probation'],
-  probation: ['confirmed'],
+  onboarding: ['active', 'probation'],
+  active: ['probation', 'confirmed', 'resigned'],
+  probation: ['confirmed', 'resigned'],
   confirmed: ['resigned'],
   resigned: ['notice_period'],
   notice_period: ['relieved'],

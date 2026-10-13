@@ -38,4 +38,6 @@
 | # | Assumption | Rationale |
 |---|------------|-----------|
 | 21 | Company settings uses a singleton row (`id = 1`) in `company_settings`. Public branding assets (logo, favicon, signature) are served via `/api/v1/public/branding/file/:filename` without authentication, and branding metadata via `/api/v1/public/branding`. Updating company settings requires `settings.company.edit` and records backend audit logs. | Phase 1 requirement: singleton table, public branding for login page, audited updates. |
+| 22 | Offer letter sequence uses unique format OFR-YYYY-XXXX. Variables in templates are substituted from the active salary structure and employee record into an immutable snapshot JSON. PDFs are stored under UPLOAD_DIR/documents/offer-letters and served via authenticated endpoint with role/ownership enforcement. Daily cron runs at midnight Asia/Kolkata for expiry and onboarding activation. | Phase 2 specifications for offer letter generation, lifecycle linkage, and snapshot immutability. |
+
 

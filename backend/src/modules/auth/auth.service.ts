@@ -45,6 +45,15 @@ export class AuthService {
     }
 
     const employee = await authRepository.getEmployeeByUserId(user.id);
+    if (
+      employee &&
+      ['candidate', 'selected', 'offer_generated', 'offer_accepted'].includes(employee.lifecycle_stage)
+    ) {
+      throw new BadRequestError('Your account is not active yet', [
+        { field: 'email', message: 'Your account is not active yet' },
+      ]);
+    }
+
     if (user.status !== 'active' || employee?.lifecycle_stage === 'relieved') {
       throw new BadRequestError('Account disabled, contact HR', [
         { field: 'email', message: 'Account disabled, contact HR' },
