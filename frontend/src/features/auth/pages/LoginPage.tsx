@@ -319,24 +319,24 @@ export const LoginPage: React.FC = () => {
         <div
           role="alert"
           aria-live="polite"
-          className={`mb-6 p-4 rounded-xl text-xs font-medium border flex items-start gap-3 transition-all ${
+          className={`mb-6 p-4 rounded-[18px] text-xs font-semibold border flex items-start gap-3 transition-all ${
             alert.type === 'error'
-              ? 'bg-rose-50 border-rose-200 text-rose-800'
+              ? 'bg-[#f6dfd8] border-[#e8beae] text-[#8a3114]'
               : alert.type === 'warning'
-              ? 'bg-amber-50 border-amber-200 text-amber-800'
+              ? 'bg-[#f7efdd] border-[#e6d4a8] text-[#855b11]'
               : alert.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-indigo-50 border-indigo-200 text-indigo-800'
+              ? 'bg-[#d8ebd9] border-[#b8d6ba] text-[#1e5725]'
+              : 'bg-[#d3ebe7] border-[#a9d6cf] text-[#0e5950]'
           }`}
         >
           {alert.type === 'error' && (
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <AlertCircle className="w-4 h-4 text-[#c4643f] shrink-0 mt-0.5" />
           )}
           {alert.type === 'warning' && (
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 text-[#cf9b34] shrink-0 mt-0.5" />
           )}
           {alert.type === 'success' && (
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <CheckCircle2 className="w-4 h-4 text-[#3f8f4a] shrink-0 mt-0.5" />
           )}
 
           <div className="flex-1">
@@ -347,7 +347,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => executeLogin(email, password)}
-                className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+                className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#c4643f] hover:bg-[#af5533] text-white rounded-full text-xs font-semibold shadow-xs transition"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 Try again
@@ -356,11 +356,11 @@ export const LoginPage: React.FC = () => {
 
             {/* Hint after 3 failed attempts */}
             {failedAttempts >= 3 && alert.type === 'error' && !alert.canRetry && (
-              <p className="mt-2 text-[11px] text-rose-700/90 font-normal">
+              <p className="mt-2 text-[11px] text-[#8a3114] font-normal">
                 Forgot your password?{' '}
                 <Link
                   to="/forgot-password"
-                  className="font-semibold underline hover:text-rose-900 ml-0.5"
+                  className="font-bold underline hover:text-[#5a1e0d] ml-0.5"
                 >
                   Reset it
                 </Link>
@@ -391,8 +391,8 @@ export const LoginPage: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => handleBlur('email')}
             placeholder="name@company.com"
-            className={`w-full min-h-[44px] px-3.5 py-2.5 text-sm bg-white border rounded-xl text-slate-900 placeholder:text-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 disabled:text-slate-400 ${
-              fieldErrors.email ? 'border-rose-300 ring-1 ring-rose-300' : 'border-slate-200'
+            className={`w-full min-h-[46px] px-4 py-2.5 text-sm bg-[#dbe2d5] border rounded-[16px] text-[#26301f] placeholder:text-[#6b7663] shadow-[inset_2px_3px_6px_rgba(104,118,100,0.22),inset_-2px_-2px_4px_rgba(255,255,255,0.65)] transition-all focus:outline-none focus:ring-2 focus:ring-[#14776b] focus:border-[#14776b] disabled:bg-[#dbe2d5]/60 disabled:text-[#6b7663] ${
+              fieldErrors.email ? 'border-[#c4643f] ring-1 ring-[#c4643f]' : 'border-[rgba(76,91,70,0.18)]'
             }`}
           />
         </FormField>
@@ -420,10 +420,10 @@ export const LoginPage: React.FC = () => {
               onKeyDown={handleKeyModifierCheck}
               onKeyUp={handleKeyModifierCheck}
               placeholder="••••••••"
-              className={`w-full min-h-[44px] px-3.5 py-2.5 pr-11 text-sm bg-white border rounded-xl text-slate-900 placeholder:text-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 disabled:text-slate-400 ${
+              className={`w-full min-h-[46px] px-4 py-2.5 pr-11 text-sm bg-[#dbe2d5] border rounded-[16px] text-[#26301f] placeholder:text-[#6b7663] shadow-[inset_2px_3px_6px_rgba(104,118,100,0.22),inset_-2px_-2px_4px_rgba(255,255,255,0.65)] transition-all focus:outline-none focus:ring-2 focus:ring-[#14776b] focus:border-[#14776b] disabled:bg-[#dbe2d5]/60 disabled:text-[#6b7663] ${
                 fieldErrors.password
-                  ? 'border-rose-300 ring-1 ring-rose-300'
-                  : 'border-slate-200'
+                  ? 'border-[#c4643f] ring-1 ring-[#c4643f]'
+                  : 'border-[rgba(76,91,70,0.18)]'
               }`}
             />
             <button
@@ -431,7 +431,7 @@ export const LoginPage: React.FC = () => {
               disabled={isLoading}
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] min-w-[32px] min-h-[32px] flex items-center justify-center transition"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-[#6b7663] hover:text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b] min-w-[32px] min-h-[32px] flex items-center justify-center transition"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -441,7 +441,7 @@ export const LoginPage: React.FC = () => {
           {capsLockOn && (
             <div
               role="status"
-              className="flex items-center gap-1.5 text-xs text-amber-600 font-medium mt-1 animate-fadeIn"
+              className="flex items-center gap-1.5 text-xs text-[#cf9b34] font-bold mt-1 animate-fadeIn"
             >
               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
               <span>Caps Lock is on</span>
@@ -451,21 +451,21 @@ export const LoginPage: React.FC = () => {
 
         {/* Remember Me & Forgot Password Row */}
         <div className="flex items-center justify-between text-xs pt-0.5">
-          <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-[#35422d] font-semibold">
             <input
               type="checkbox"
               id="remember-me"
               disabled={isLoading}
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-[#4F46E5] focus:ring-2 focus:outline-none cursor-pointer"
+              className="w-4 h-4 rounded border-[rgba(76,91,70,0.25)] text-[#14776b] focus:ring-[#14776b] focus:ring-2 focus:outline-none cursor-pointer accent-[#14776b]"
             />
             <span>Remember me</span>
           </label>
 
           <Link
             to="/forgot-password"
-            className="font-semibold text-indigo-600 hover:text-indigo-800 transition focus:outline-none focus:ring-2 focus:ring-[#4F46E5] rounded px-1 py-0.5"
+            className="font-bold text-[#14776b] hover:text-[#106258] transition focus:outline-none focus:ring-2 focus:ring-[#14776b] rounded px-1 py-0.5"
           >
             Forgot password?
           </Link>
@@ -478,7 +478,7 @@ export const LoginPage: React.FC = () => {
           size="lg"
           isLoading={isLoading}
           disabled={isLoading}
-          className="w-full min-h-[44px] font-bold text-sm shadow-md shadow-indigo-500/20"
+          className="w-full min-h-[46px] font-bold text-sm"
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
         </Button>

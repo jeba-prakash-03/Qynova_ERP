@@ -234,17 +234,17 @@ export const EmployeeCreatePage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">
-      {/* Top Header */}
-      <div className="flex items-center gap-3">
+      {/* Header */}
+      <div className="flex items-center gap-3.5">
         <Link
           to="/employees"
-          className="p-2 text-slate-400 hover:text-slate-700 bg-white border border-slate-200 rounded-xl transition shadow-xs"
+          className="p-2.5 text-[#35422d] hover:text-[#26301f] bg-[#e2e8dc] border border-[rgba(76,91,70,0.18)] rounded-[14px] shadow-[inset_1px_1px_3px_rgba(255,255,255,0.7),2px_3px_8px_rgba(88,104,84,0.15)] transition"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Onboard New Employee</h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#26301f] tracking-tight">Onboard New Employee</h1>
+          <p className="text-xs sm:text-sm text-[#6b7663] mt-0.5">
             Creates user login credentials, role assignments, and HR identity in one atomic transaction.
           </p>
         </div>
@@ -252,14 +252,14 @@ export const EmployeeCreatePage: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Section 1: User & System Access */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
-          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+        <div className="bg-[#e2e8dc] rounded-[24px] p-6 sm:p-7 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] space-y-5">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-[rgba(76,91,70,0.15)]">
+            <div className="w-9 h-9 rounded-[12px] bg-[#dbe2d5] text-[#14776b] flex items-center justify-center shadow-inner border border-[rgba(76,91,70,0.15)]">
               <Lock className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">User Identity & Authentication</h3>
-              <p className="text-xs text-slate-400">Account login credentials and security role assignment</p>
+              <h3 className="font-display text-base font-bold text-[#26301f]">User Identity & Authentication</h3>
+              <p className="text-xs text-[#6b7663]">Account login credentials and security role assignment</p>
             </div>
           </div>
 
@@ -271,7 +271,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="alex.smith@company.com"
                 required
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -280,7 +280,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.role_id}
                 onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
                 required
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">Select a security role...</option>
                 {roles.map((r: any) => (
@@ -294,14 +294,14 @@ export const EmployeeCreatePage: React.FC = () => {
         </div>
 
         {/* Section 2: Personal Profile & Resume Upload */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
-          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-            <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
+        <div className="bg-[#e2e8dc] rounded-[24px] p-6 sm:p-7 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] space-y-5">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-[rgba(76,91,70,0.15)]">
+            <div className="w-9 h-9 rounded-[12px] bg-[#dbe2d5] text-[#14776b] flex items-center justify-center shadow-inner border border-[rgba(76,91,70,0.15)]">
               <UserPlus className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">Personal Information</h3>
-              <p className="text-xs text-slate-400">Basic identification, resume upload, and contact particulars</p>
+              <h3 className="font-display text-base font-bold text-[#26301f]">Personal Information</h3>
+              <p className="text-xs text-[#6b7663]">Basic identification, resume upload, and contact particulars</p>
             </div>
           </div>
 
@@ -313,7 +313,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                 placeholder="John"
                 required
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -324,7 +324,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                 placeholder="Doe"
                 required
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -334,7 +334,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="+91 9876543210"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -343,7 +343,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 type="date"
                 value={formData.date_of_birth}
                 onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -353,29 +353,29 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.photo_url}
                 onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
                 placeholder="Enter profile photo URL"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
             {/* Resume Upload Drag & Drop */}
             <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Resume Attachment <span className="text-slate-400 font-normal">(Optional, PDF / DOC / DOCX, max 5 MB)</span>
+              <label className="block text-xs font-bold text-[#26301f] mb-1.5">
+                Resume Attachment <span className="text-[#6b7663] font-normal">(Optional, PDF / DOC / DOCX, max 5 MB)</span>
               </label>
 
               {resumeFile ? (
-                <div className="flex items-center justify-between p-3.5 bg-indigo-50/60 border border-indigo-200 rounded-2xl text-xs">
-                  <div className="flex items-center gap-2 text-indigo-900 font-medium truncate">
-                    <Info className="w-4 h-4 text-indigo-600 shrink-0" />
+                <div className="flex items-center justify-between p-3.5 bg-[#dbe2d5] border border-[rgba(76,91,70,0.2)] rounded-[16px] text-xs shadow-inner">
+                  <div className="flex items-center gap-2 text-[#26301f] font-medium truncate">
+                    <Info className="w-4 h-4 text-[#14776b] shrink-0" />
                     <span className="truncate">{resumeFile.name}</span>
-                    <span className="text-slate-400 font-mono">
+                    <span className="text-[#6b7663] font-mono tabular-nums">
                       ({(resumeFile.size / (1024 * 1024)).toFixed(2)} MB)
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setResumeFile(null)}
-                    className="px-2.5 py-1 text-[11px] font-bold text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                    className="px-2.5 py-1 text-[11px] font-bold text-[#c4643f] hover:bg-[#c4643f]/10 rounded-lg transition"
                   >
                     Remove
                   </button>
@@ -394,10 +394,10 @@ export const EmployeeCreatePage: React.FC = () => {
                       handleResumeSelect(e.dataTransfer.files[0]);
                     }
                   }}
-                  className={`border-2 border-dashed rounded-2xl p-6 text-center transition cursor-pointer ${
+                  className={`border-2 border-dashed rounded-[18px] p-6 text-center transition cursor-pointer ${
                     isDragging
-                      ? 'border-indigo-500 bg-indigo-50/50'
-                      : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'
+                      ? 'border-[#14776b] bg-[#dbe2d5]'
+                      : 'border-[rgba(76,91,70,0.25)] hover:border-[#14776b] bg-[#dbe2d5]/60 hover:bg-[#dbe2d5]'
                   }`}
                   onClick={() => {
                     const input = document.createElement('input');
@@ -411,14 +411,14 @@ export const EmployeeCreatePage: React.FC = () => {
                     input.click();
                   }}
                 >
-                  <p className="text-xs text-slate-600 font-medium">
-                    Drag and drop resume here, or <span className="text-indigo-600 font-bold underline">browse file</span>
+                  <p className="text-xs text-[#26301f] font-medium">
+                    Drag and drop resume here, or <span className="text-[#14776b] font-bold underline">browse file</span>
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-1">Accepted: PDF, DOC, DOCX up to 5MB</p>
+                  <p className="text-[11px] text-[#6b7663] mt-1">Accepted: PDF, DOC, DOCX up to 5MB</p>
                 </div>
               )}
               {resumeError && (
-                <p className="mt-1.5 text-xs text-rose-600 font-medium">{resumeError}</p>
+                <p className="mt-1.5 text-xs text-[#c4643f] font-medium">{resumeError}</p>
               )}
             </div>
 
@@ -429,7 +429,7 @@ export const EmployeeCreatePage: React.FC = () => {
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   placeholder="Street, City, State, Pincode"
-                  className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 />
               </FormField>
             </div>
@@ -437,14 +437,14 @@ export const EmployeeCreatePage: React.FC = () => {
         </div>
 
         {/* Section 3: Employment Particulars */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
-          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+        <div className="bg-[#e2e8dc] rounded-[24px] p-6 sm:p-7 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] space-y-5">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-[rgba(76,91,70,0.15)]">
+            <div className="w-9 h-9 rounded-[12px] bg-[#dbe2d5] text-[#14776b] flex items-center justify-center shadow-inner border border-[rgba(76,91,70,0.15)]">
               <Briefcase className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">Employment Details</h3>
-              <p className="text-xs text-slate-400">Positioning, reporting structure, and lifecycle progression</p>
+              <h3 className="font-display text-base font-bold text-[#26301f]">Employment Details</h3>
+              <p className="text-xs text-[#6b7663]">Positioning, reporting structure, and lifecycle progression</p>
             </div>
           </div>
 
@@ -453,7 +453,7 @@ export const EmployeeCreatePage: React.FC = () => {
               <select
                 value={formData.department_id}
                 onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">Select department...</option>
                 {departments.map((d: any) => (
@@ -468,7 +468,7 @@ export const EmployeeCreatePage: React.FC = () => {
               <select
                 value={formData.designation_id}
                 onChange={(e) => setFormData({ ...formData, designation_id: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">Select designation...</option>
                 {designations.map((d: any) => (
@@ -483,7 +483,7 @@ export const EmployeeCreatePage: React.FC = () => {
               <select
                 value={formData.reporting_manager_id}
                 onChange={(e) => setFormData({ ...formData, reporting_manager_id: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">Direct / None</option>
                 {managers.map((m: any) => (
@@ -495,8 +495,8 @@ export const EmployeeCreatePage: React.FC = () => {
             </FormField>
 
             {!formData.reporting_manager_id && (
-              <div className="sm:col-span-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center gap-2">
-                <Info className="w-4 h-4 text-amber-600 shrink-0" />
+              <div className="sm:col-span-3 p-3 bg-[#cf9b34]/15 border border-[#cf9b34]/30 rounded-[14px] text-[#26301f] text-xs flex items-center gap-2">
+                <Info className="w-4 h-4 text-[#cf9b34] shrink-0" />
                 <span>
                   <strong>Warning:</strong> No reporting manager selected. Leave and timesheet approval requests will fall back to HR.
                 </span>
@@ -509,7 +509,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.joining_date}
                 onChange={(e) => setFormData({ ...formData, joining_date: e.target.value })}
                 required
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -517,7 +517,7 @@ export const EmployeeCreatePage: React.FC = () => {
               <select
                 value={formData.employment_type}
                 onChange={(e) => setFormData({ ...formData, employment_type: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="full_time">Full Time</option>
                 <option value="intern">Intern</option>
@@ -535,7 +535,7 @@ export const EmployeeCreatePage: React.FC = () => {
                     setGenerateOfferLetter(true);
                   }
                 }}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="active">Active</option>
                 <option value="selected">Selected (Candidate)</option>
@@ -552,7 +552,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.skills}
                 onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
                 placeholder="React, TypeScript, SQL"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -563,42 +563,42 @@ export const EmployeeCreatePage: React.FC = () => {
                 min="0"
                 value={formData.experience_years}
                 onChange={(e) => setFormData({ ...formData, experience_years: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
-            <div className="sm:col-span-3 p-3.5 bg-indigo-50/70 border border-indigo-200/80 rounded-2xl flex items-center justify-between">
+            <div className="sm:col-span-3 p-3.5 bg-[#dbe2d5] border border-[rgba(76,91,70,0.2)] rounded-[16px] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] flex items-center justify-between">
               <label htmlFor="generateOfferLetter" className="flex items-center gap-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   id="generateOfferLetter"
                   checked={generateOfferLetter}
                   onChange={(e) => setGenerateOfferLetter(e.target.checked)}
-                  className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                  className="w-4 h-4 text-[#14776b] rounded border-[rgba(76,91,70,0.3)] focus:ring-[#14776b]"
                 />
                 <div>
-                  <span className="text-xs font-bold text-slate-800 block">
+                  <span className="text-xs font-bold text-[#26301f] block">
                     Generate offer letter after saving
                   </span>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-[#6b7663]">
                     Automatically opens the offer letter studio with pre-filled compensation and appointment details
                   </span>
                 </div>
               </label>
-              <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+              <Sparkles className="w-4 h-4 text-[#14776b] shrink-0" />
             </div>
           </div>
         </div>
 
         {/* Section 4: Compensation & Salary */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
-          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-            <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+        <div className="bg-[#e2e8dc] rounded-[24px] p-6 sm:p-7 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] space-y-5">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-[rgba(76,91,70,0.15)]">
+            <div className="w-9 h-9 rounded-[12px] bg-[#dbe2d5] text-[#14776b] flex items-center justify-center shadow-inner border border-[rgba(76,91,70,0.15)]">
               <CreditCard className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">Salary Structure</h3>
-              <p className="text-xs text-slate-400">Monthly base salary allocation for payroll calculation</p>
+              <h3 className="font-display text-base font-bold text-[#26301f]">Salary Structure</h3>
+              <p className="text-xs text-[#6b7663]">Monthly base salary allocation for payroll calculation</p>
             </div>
           </div>
 
@@ -612,21 +612,21 @@ export const EmployeeCreatePage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, initial_salary: e.target.value })}
                 placeholder="50000"
                 required
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-mono font-bold text-slate-800"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] font-mono font-bold tabular-nums"
               />
             </FormField>
           </div>
         </div>
 
         {/* Section 5: Bank Details */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
-          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+        <div className="bg-[#e2e8dc] rounded-[24px] p-6 sm:p-7 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] space-y-5">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-[rgba(76,91,70,0.15)]">
+            <div className="w-9 h-9 rounded-[12px] bg-[#dbe2d5] text-[#14776b] flex items-center justify-center shadow-inner border border-[rgba(76,91,70,0.15)]">
               <CreditCard className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">Bank Details (Optional on Create)</h3>
-              <p className="text-xs text-slate-400">Direct deposit payroll account information</p>
+              <h3 className="font-display text-base font-bold text-[#26301f]">Bank Details (Optional on Create)</h3>
+              <p className="text-xs text-[#6b7663]">Direct deposit payroll account information</p>
             </div>
           </div>
 
@@ -637,7 +637,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.account_holder}
                 onChange={(e) => setFormData({ ...formData, account_holder: e.target.value })}
                 placeholder="Full name as in bank"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -647,7 +647,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.bank_name}
                 onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
                 placeholder="e.g. HDFC Bank, ICICI Bank"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -657,7 +657,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.account_number}
                 onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
                 placeholder="Account number"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] font-mono"
               />
             </FormField>
 
@@ -667,21 +667,21 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.ifsc}
                 onChange={(e) => setFormData({ ...formData, ifsc: e.target.value })}
                 placeholder="e.g. HDFC0001234"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] font-mono"
               />
             </FormField>
           </div>
         </div>
 
         {/* Section 6: Emergency Contacts */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-5">
-          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+        <div className="bg-[#e2e8dc] rounded-[24px] p-6 sm:p-7 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] space-y-5">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-[rgba(76,91,70,0.15)]">
+            <div className="w-9 h-9 rounded-[12px] bg-[#dbe2d5] text-[#14776b] flex items-center justify-center shadow-inner border border-[rgba(76,91,70,0.15)]">
               <PhoneCall className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">Primary Emergency Contact (Optional)</h3>
-              <p className="text-xs text-slate-400">Emergency notification information</p>
+              <h3 className="font-display text-base font-bold text-[#26301f]">Primary Emergency Contact (Optional)</h3>
+              <p className="text-xs text-[#6b7663]">Emergency notification information</p>
             </div>
           </div>
 
@@ -692,7 +692,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.contact_name}
                 onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
                 placeholder="Parent / Spouse / Sibling"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -702,7 +702,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.relationship}
                 onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
                 placeholder="Father / Spouse / Sister"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -712,7 +712,7 @@ export const EmployeeCreatePage: React.FC = () => {
                 value={formData.emergency_phone}
                 onChange={(e) => setFormData({ ...formData, emergency_phone: e.target.value })}
                 placeholder="+91 9876543210"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
           </div>
@@ -722,14 +722,14 @@ export const EmployeeCreatePage: React.FC = () => {
         <div className="flex items-center justify-end gap-3 pt-4">
           <Link
             to="/employees"
-            className="px-5 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition"
+            className="px-5 py-2.5 text-xs font-bold text-[#35422d] bg-[#dbe2d5] border border-[rgba(76,91,70,0.2)] rounded-[14px] hover:bg-[#e2e8dc] transition shadow-xs"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/30 transition flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-2.5 text-xs font-bold text-white bg-[#14776b] hover:bg-[#0d524a] rounded-[14px] shadow-[3px_4px_12px_rgba(20,119,107,0.35)] transition flex items-center gap-2 disabled:opacity-50"
           >
             {isSubmitting ? 'Creating Employee...' : 'Complete Onboarding'}
           </button>
@@ -755,42 +755,42 @@ export const EmployeeCreatePage: React.FC = () => {
                 navigate('/employees');
               }
             }}
-            className="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition"
+            className="px-5 py-2.5 text-xs font-bold text-white bg-[#14776b] hover:bg-[#0d524a] rounded-[14px] shadow-sm transition"
           >
             {generateOfferLetter ? 'Generate Offer Letter' : 'Go to Employee Directory'}
           </button>
         }
       >
         <div className="space-y-4 py-2 text-center sm:text-left">
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900">
-            <CheckCircle2 className="w-8 h-8 text-emerald-600 shrink-0" />
+          <div className="flex items-center gap-3 p-4 rounded-[18px] bg-[#3f8f4a]/15 border border-[#3f8f4a]/30 text-[#26301f]">
+            <CheckCircle2 className="w-8 h-8 text-[#3f8f4a] shrink-0" />
             <div className="text-xs">
-              <span className="font-bold text-sm block">
+              <span className="font-bold text-sm block font-display">
                 {createdResult?.employee.first_name} {createdResult?.employee.last_name}
               </span>
               Employee code assigned:{' '}
-              <span className="font-mono font-bold text-emerald-700">{createdResult?.employee.employee_code}</span>
+              <span className="font-mono font-bold text-[#14776b]">{createdResult?.employee.employee_code}</span>
             </div>
           </div>
 
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <p className="text-xs text-[#6b7663] leading-relaxed">
             A login user account has been registered with a temporary password. The employee will be prompted to change this password on their initial sign in.
           </p>
 
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div className="p-4 rounded-[18px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.2)] shadow-inner space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500">Login Email:</span>
-              <span className="font-bold text-slate-800">{createdResult?.employee.email}</span>
+              <span className="text-[#6b7663]">Login Email:</span>
+              <span className="font-bold text-[#26301f]">{createdResult?.employee.email}</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500">Temporary Password:</span>
+              <span className="text-[#6b7663]">Temporary Password:</span>
               <div className="flex items-center gap-2">
-                <span className="font-mono font-bold bg-white px-2 py-0.5 rounded border border-slate-200 text-indigo-700">
+                <span className="font-mono font-bold bg-[#e2e8dc] px-2.5 py-1 rounded-[8px] border border-[rgba(76,91,70,0.2)] text-[#14776b]">
                   {createdResult?.temporaryPassword}
                 </span>
                 <button
                   onClick={copyPassword}
-                  className="p-1 text-slate-400 hover:text-indigo-600 transition"
+                  className="p-1 text-[#6b7663] hover:text-[#14776b] transition"
                   title="Copy password"
                 >
                   <Copy className="w-4 h-4" />

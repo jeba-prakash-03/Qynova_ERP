@@ -8,6 +8,7 @@ import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { FormField } from '../../../shared/components/FormField';
 import { Can } from '../../../shared/components/Can';
 import { useToast } from '../../../shared/context/ToastContext';
+import { Button } from '../../../shared/components/Button';
 import { ShieldCheck, Plus, Edit2, Trash2, Key, Shield, Layers } from 'lucide-react';
 
 export const RoleListPage: React.FC = () => {
@@ -99,19 +100,19 @@ export const RoleListPage: React.FC = () => {
       sortable: true,
       cell: (row) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+          <div className="w-8 h-8 rounded-[10px] bg-[#dbe2d5] text-[#14776b] flex items-center justify-center font-bold shadow-inner border border-[rgba(76,91,70,0.15)]">
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-bold text-slate-900 flex items-center gap-2">
+            <div className="font-bold text-[#26301f] flex items-center gap-2">
               {row.name}
               {row.is_system && (
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-[6px] bg-[#dbe2d5] text-[#14776b] border border-[rgba(76,91,70,0.2)] uppercase">
                   System
                 </span>
               )}
             </div>
-            <div className="text-xs text-slate-400">{row.description || 'No description'}</div>
+            <div className="text-xs text-[#6b7663]">{row.description || 'No description'}</div>
           </div>
         </div>
       ),
@@ -119,8 +120,8 @@ export const RoleListPage: React.FC = () => {
     {
       header: 'Granted Permissions',
       cell: (row) => (
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200/60">
-          <Key className="w-3 h-3 text-indigo-500" />
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-[10px] bg-[#dbe2d5] text-[#14776b] border border-[rgba(76,91,70,0.2)] shadow-xs">
+          <Key className="w-3 h-3 text-[#14776b]" />
           {row.is_system && row.name === 'Admin' ? 'All System Access' : `${row.permissions_count} Permissions`}
         </span>
       ),
@@ -131,7 +132,7 @@ export const RoleListPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate(`/roles/${row.id}/permissions`)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#14776b] bg-[#dbe2d5] hover:bg-[#c5d0be] border border-[rgba(76,91,70,0.2)] rounded-[12px] shadow-xs transition"
             title="Configure Permissions Matrix"
           >
             <Key className="w-3.5 h-3.5" />
@@ -141,7 +142,7 @@ export const RoleListPage: React.FC = () => {
           <Can permission="roles.edit">
             <button
               onClick={() => openEditModal(row)}
-              className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#dbe2d5] rounded-lg transition"
               title="Edit Role Details"
             >
               <Edit2 className="w-4 h-4" />
@@ -152,7 +153,7 @@ export const RoleListPage: React.FC = () => {
             {!row.is_system && (
               <button
                 onClick={() => setDeleteTarget(row)}
-                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                className="p-1.5 text-[#6b7663] hover:text-[#c4643f] hover:bg-[#c4643f]/10 rounded-lg transition"
                 title="Delete Role"
               >
                 <Trash2 className="w-4 h-4" />
@@ -168,20 +169,21 @@ export const RoleListPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Roles & Access Control</h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#26301f] tracking-tight">Roles & Access Control</h1>
+          <p className="text-xs sm:text-sm text-[#6b7663] mt-1">
             Configure system roles and grant granular capabilities in the Module × Action authorization grid.
           </p>
         </div>
 
         <Can permission="roles.create">
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition"
+            leftIcon={<Plus className="w-4 h-4" />}
           >
-            <Plus className="w-4 h-4" />
             Create Role
-          </button>
+          </Button>
         </Can>
       </div>
 
@@ -199,24 +201,26 @@ export const RoleListPage: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         title={editingRole ? 'Edit Role' : 'Create Security Role'}
         footer={
-          <>
-            <button
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
               onClick={handleSave}
-              disabled={saveMutation.isPending}
-              className="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition"
+              isLoading={saveMutation.isPending}
             >
-              {saveMutation.isPending ? 'Saving...' : editingRole ? 'Update Role' : 'Create & Assign Permissions'}
-            </button>
-          </>
+              {editingRole ? 'Update Role' : 'Create & Assign Permissions'}
+            </Button>
+          </div>
         }
       >
-        <form onSubmit={handleSave} className="space-y-4">
+        <form onSubmit={handleSave} className="space-y-4 text-xs">
           <FormField label="Role Name" required>
             <input
               type="text"
@@ -225,7 +229,7 @@ export const RoleListPage: React.FC = () => {
               placeholder="e.g. Operations Manager"
               disabled={editingRole?.is_system}
               required
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
+              className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] disabled:opacity-50"
             />
           </FormField>
 
@@ -235,7 +239,7 @@ export const RoleListPage: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Responsibilities and purpose of this access role"
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             />
           </FormField>
         </form>

@@ -57,6 +57,18 @@ export class PushService {
   }
 
   /**
+   * Get active registered device count for a user
+   */
+  public async getActiveDeviceCount(userId: number): Promise<number> {
+    const res = await db('device_tokens')
+      .where({ user_id: userId })
+      .whereNull('deleted_at')
+      .count('id as count')
+      .first();
+    return Number((res as any)?.count || 0);
+  }
+
+  /**
    * Send push notification to target users asynchronously
    */
   public async sendPushToUsers(

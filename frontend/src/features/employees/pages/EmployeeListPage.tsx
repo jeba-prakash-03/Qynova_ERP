@@ -79,7 +79,7 @@ export const EmployeeListPage: React.FC = () => {
       accessorKey: 'employee_code',
       sortable: true,
       cell: (row) => (
-        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-[#EEF2FF] text-[#4F46E5] border border-[#C7D2FE]">
+        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-[8px] bg-[#dbe2d5] text-[#14776b] border border-[rgba(76,91,70,0.18)] tabular-nums">
           {row.employee_code}
         </span>
       ),
@@ -90,7 +90,7 @@ export const EmployeeListPage: React.FC = () => {
       sortable: true,
       cell: (row) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#F1F5F9] text-[#475569] flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden">
+          <div className="w-8 h-8 rounded-full bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.18)] flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden shadow-[inset_1px_1px_3px_rgba(104,118,100,0.2)]">
             {row.photo_url ? (
               <img src={row.photo_url} alt="avatar" className="w-full h-full object-cover" />
             ) : (
@@ -98,10 +98,10 @@ export const EmployeeListPage: React.FC = () => {
             )}
           </div>
           <div>
-            <div className="font-bold text-[#0F172A] leading-tight">
+            <div className="font-bold text-[#26301f] leading-tight font-display">
               {row.first_name} {row.last_name}
             </div>
-            <div className="text-xs text-[#64748B]">{row.email}</div>
+            <div className="text-xs text-[#6b7663]">{row.email}</div>
           </div>
         </div>
       ),
@@ -110,10 +110,10 @@ export const EmployeeListPage: React.FC = () => {
       header: 'Department & Role',
       cell: (row) => (
         <div>
-          <div className="font-semibold text-[#475569] text-xs">
+          <div className="font-semibold text-[#26301f] text-xs">
             {row.department_name || '—'}
           </div>
-          <div className="text-xs text-[#64748B]">{row.designation_name || '—'}</div>
+          <div className="text-xs text-[#6b7663]">{row.designation_name || '—'}</div>
         </div>
       ),
     },
@@ -126,7 +126,7 @@ export const EmployeeListPage: React.FC = () => {
       header: 'Type',
       accessorKey: 'employment_type',
       cell: (row) => (
-        <span className="text-xs text-[#475569] capitalize">
+        <span className="text-xs text-[#35422d] capitalize">
           {row.employment_type?.replace('_', ' ')}
         </span>
       ),
@@ -142,7 +142,7 @@ export const EmployeeListPage: React.FC = () => {
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => navigate(`/employees/${row.id}`)}
-            className="p-1.5 text-[#64748B] hover:text-[#4F46E5] hover:bg-[#EEF2FF] rounded-lg transition"
+            className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#dbe2d5] rounded-[8px] transition"
             title="View Details"
           >
             <Eye className="w-4 h-4" />
@@ -150,7 +150,7 @@ export const EmployeeListPage: React.FC = () => {
           <Can permission="employees.edit">
             <button
               onClick={() => navigate(`/employees/${row.id}/edit`)}
-              className="p-1.5 text-[#64748B] hover:text-[#D97706] hover:bg-[#FEF3C7] rounded-lg transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#cf9b34] hover:bg-[#dbe2d5] rounded-[8px] transition"
               title="Edit Profile"
             >
               <Edit2 className="w-4 h-4" />
@@ -161,7 +161,7 @@ export const EmployeeListPage: React.FC = () => {
               onClick={() =>
                 setDeleteTarget({ id: row.id, name: `${row.first_name} ${row.last_name}` })
               }
-              className="p-1.5 text-[#64748B] hover:text-[#DC2626] hover:bg-[#FEE2E2] rounded-lg transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#c4643f] hover:bg-[#dbe2d5] rounded-[8px] transition"
               title="Delete Profile"
             >
               <Trash2 className="w-4 h-4" />
@@ -177,8 +177,8 @@ export const EmployeeListPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">Employees Directory</h1>
-          <p className="text-xs sm:text-sm text-[#64748B] mt-1">
+          <h1 className="text-2xl font-extrabold text-[#26301f] font-display tracking-tight">Employees Directory</h1>
+          <p className="text-xs sm:text-sm text-[#6b7663] mt-1">
             Browse and manage all registered company personnel, departments, and onboarding statuses.
           </p>
         </div>
@@ -228,7 +228,7 @@ export const EmployeeListPage: React.FC = () => {
                 setDepartmentId(e.target.value);
                 setPage(1);
               }}
-              className="text-xs bg-white border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              className="text-xs bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.18)] rounded-[12px] px-2.5 py-1.5 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.12)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             >
               <option value="">All Departments</option>
               {departments.map((d: any) => (
@@ -244,7 +244,7 @@ export const EmployeeListPage: React.FC = () => {
                 setLifecycleStage(e.target.value);
                 setPage(1);
               }}
-              className="text-xs bg-white border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              className="text-xs bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.18)] rounded-[12px] px-2.5 py-1.5 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.12)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             >
               <option value="">All Lifecycle Stages</option>
               <option value="onboarding">Onboarding</option>
@@ -261,7 +261,7 @@ export const EmployeeListPage: React.FC = () => {
                 setEmploymentType(e.target.value);
                 setPage(1);
               }}
-              className="text-xs bg-white border border-[#E2E8F0] rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              className="text-xs bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.18)] rounded-[12px] px-2.5 py-1.5 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.12)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             >
               <option value="">All Types</option>
               <option value="full_time">Full Time</option>

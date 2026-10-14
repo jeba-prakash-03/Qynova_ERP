@@ -19,8 +19,22 @@ interface NotificationPrefItem {
 export const NotificationSettingsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { success, error: toastError, info } = useToast();
-  const { permission, isSupported, enable, isLoading: isEnablingPush } = usePushNotifications();
+  const { permission, isSupported, enable, registerDevice, isLoading: isEnablingPush } = usePushNotifications();
   const [testSending, setTestSending] = useState(false);
+  const [syncingDevice, setSyncingDevice] = useState(false);
+
+  // Fetch push status (active device count and firebase status)
+  const { data: pushStatus, refetch: refetchStatus } = useQuery({
+    queryKey: ['push', 'status'],
+    queryFn: async () => {
+      try {
+        const res = await axiosClient.get('/push/status');
+        return res.data.data as { isPushEnabled: boolean; activeDeviceCount: number };
+      } catch {
+        return { isPushEnabled: false, activeDeviceCount: 0 };
+      }
+    },
+  });
 
   // Fetch preferences
   const { data: preferences = [], isLoading, refetch } = useQuery({
@@ -56,6 +70,24 @@ export const NotificationSettingsPage: React.FC = () => {
     updateMutation.mutate(updated);
   };
 
+  // Register / sync this browser device
+  const handleSyncDevice = async () => {
+    setSyncingDevice(true);
+    try {
+      const res = await registerDevice();
+      if (res.success) {
+        success('This device has been registered for push notifications successfully!');
+        refetchStatus();
+      } else if (res.error) {
+        toastError(res.error);
+      }
+    } catch (err: any) {
+      toastError(err?.message || 'Failed to register device');
+    } finally {
+      setSyncingDevice(false);
+    }
+  };
+
   // Send test push notification
   const handleSendTest = async () => {
     setTestSending(true);
@@ -63,10 +95,11 @@ export const NotificationSettingsPage: React.FC = () => {
       const res = await axiosClient.post('/push/test');
       const data = res.data.data;
       if (data.activeTokens === 0) {
-        info('No registered devices found. Click "Enable Push" to register this browser first.');
+        info('No registered devices found. Click "Register this Device" to register this browser first.');
       } else {
         success(`Test notification dispatched to ${data.activeTokens} registered device(s)!`);
       }
+      refetchStatus();
     } catch (err: any) {
       toastError(err?.response?.data?.message || 'Failed to send test notification');
     } finally {
@@ -116,8 +149,10 @@ export const NotificationSettingsPage: React.FC = () => {
         <div className="flex items-center gap-3.5">
           <div
             className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-              permission === 'granted'
+              permission === 'granted' && (pushStatus?.activeDeviceCount ?? 0) > 0
                 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                : permission === 'granted'
+                ? 'bg-amber-50 text-amber-600 border border-amber-200'
                 : permission === 'denied'
                 ? 'bg-rose-50 text-rose-600 border border-rose-200'
                 : 'bg-indigo-50 text-indigo-600 border border-indigo-200'
@@ -130,19 +165,29 @@ export const NotificationSettingsPage: React.FC = () => {
               <h2 className="text-sm font-bold text-slate-900">Current Browser Push Status</h2>
               <span
                 className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                  permission === 'granted'
+                  permission === 'granted' && (pushStatus?.activeDeviceCount ?? 0) > 0
                     ? 'bg-emerald-100 text-emerald-800'
+                    : permission === 'granted'
+                    ? 'bg-amber-100 text-amber-800'
                     : permission === 'denied'
                     ? 'bg-rose-100 text-rose-800'
-                    : 'bg-amber-100 text-amber-800'
+                    : 'bg-indigo-100 text-indigo-800'
                 }`}
               >
-                {permission === 'granted' ? 'Enabled' : permission === 'denied' ? 'Blocked' : 'Not Enabled'}
+                {permission === 'granted' && (pushStatus?.activeDeviceCount ?? 0) > 0
+                  ? `Active (${pushStatus?.activeDeviceCount} device${pushStatus!.activeDeviceCount > 1 ? 's' : ''})`
+                  : permission === 'granted'
+                  ? 'Device Not Registered'
+                  : permission === 'denied'
+                  ? 'Blocked'
+                  : 'Not Enabled'}
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              {permission === 'granted'
-                ? 'This browser is registered to receive real-time alerts even when the tab is closed.'
+              {permission === 'granted' && (pushStatus?.activeDeviceCount ?? 0) > 0
+                ? 'This device is registered to receive real-time push alerts even when the tab is closed.'
+                : permission === 'granted'
+                ? 'Browser notification permission is granted, but this device token has not been registered yet. Click "Register this Device".'
                 : permission === 'denied'
                 ? 'Push notifications are blocked in your browser settings. Set Notifications to Allow in the address bar.'
                 : 'Enable web push to receive instant leave, attendance, and salary notifications.'}
@@ -150,16 +195,40 @@ export const NotificationSettingsPage: React.FC = () => {
           </div>
         </div>
 
-        {permission !== 'granted' && isSupported && (
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={enable}
-            disabled={isEnablingPush}
-            className="shrink-0 text-xs"
-          >
-            {isEnablingPush ? 'Activating...' : 'Enable on this Device'}
-          </Button>
+        {isSupported && (
+          <div className="flex items-center gap-2 shrink-0">
+            {permission === 'default' && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={async () => {
+                  const res = await enable();
+                  if (res?.error) toastError(res.error);
+                  refetchStatus();
+                }}
+                disabled={isEnablingPush}
+                className="text-xs"
+              >
+                {isEnablingPush ? 'Activating...' : 'Enable on this Device'}
+              </Button>
+            )}
+
+            {permission === 'granted' && (
+              <Button
+                variant={(pushStatus?.activeDeviceCount ?? 0) > 0 ? 'secondary' : 'primary'}
+                size="sm"
+                onClick={handleSyncDevice}
+                disabled={syncingDevice}
+                className="text-xs"
+              >
+                {syncingDevice
+                  ? 'Registering...'
+                  : (pushStatus?.activeDeviceCount ?? 0) > 0
+                  ? 'Re-sync this Device'
+                  : 'Register this Device'}
+              </Button>
+            )}
+          </div>
         )}
       </div>
 

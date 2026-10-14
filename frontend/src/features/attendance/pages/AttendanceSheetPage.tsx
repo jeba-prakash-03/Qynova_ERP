@@ -356,34 +356,34 @@ export const AttendanceSheetPage: React.FC = () => {
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#0F172A] flex items-center gap-2.5">
-              <CalendarDays className="w-7 h-7 text-[#4F46E5]" />
+            <h1 className="text-2xl font-bold text-[#26301f] font-display flex items-center gap-2.5">
+              <CalendarDays className="w-7 h-7 text-[#14776b]" />
               Attendance Management
             </h1>
-            <p className="text-[#64748B] text-sm mt-1">
+            <p className="text-[#6b7663] text-sm mt-1">
               Review company attendance sheets, record manual attendance punches, and edit employee records.
             </p>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
             {/* Mode Tabs */}
-            <div className="bg-[#F1F5F9] p-1 rounded-xl flex text-sm font-medium border border-[#E2E8F0]">
+            <div className="bg-[#dbe2d5] p-1 rounded-full flex text-sm font-semibold border border-[rgba(76,91,70,0.14)] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)]">
               <button
                 onClick={() => setViewMode('daily')}
-                className={`px-3.5 py-1.5 rounded-lg transition-all ${
+                className={`px-4 py-1.5 rounded-full transition-all font-display ${
                   viewMode === 'daily'
-                    ? 'bg-white text-[#4F46E5] shadow-sm font-bold'
-                    : 'text-[#475569] hover:text-[#0F172A]'
+                    ? 'bg-[#14776b] text-white shadow-sm font-bold'
+                    : 'text-[#35422d] hover:text-[#26301f]'
                 }`}
               >
                 Daily Sheet
               </button>
               <button
                 onClick={() => setViewMode('monthly')}
-                className={`px-3.5 py-1.5 rounded-lg transition-all ${
+                className={`px-4 py-1.5 rounded-full transition-all font-display ${
                   viewMode === 'monthly'
-                    ? 'bg-white text-[#4F46E5] shadow-sm font-bold'
-                    : 'text-[#475569] hover:text-[#0F172A]'
+                    ? 'bg-[#14776b] text-white shadow-sm font-bold'
+                    : 'text-[#35422d] hover:text-[#26301f]'
                 }`}
               >
                 Monthly Grid
@@ -394,7 +394,7 @@ export const AttendanceSheetPage: React.FC = () => {
             <Button
               variant="secondary"
               size="md"
-              leftIcon={<FileSpreadsheet className="w-4 h-4 text-emerald-600" />}
+              leftIcon={<FileSpreadsheet className="w-4 h-4 text-[#1b4e23]" />}
               onClick={() => handleExport('xlsx')}
             >
               Export Excel
@@ -426,36 +426,36 @@ export const AttendanceSheetPage: React.FC = () => {
         </div>
 
         {/* Filter Toolbar */}
-        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-[#e2e8dc] rounded-[22px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)] p-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             {viewMode === 'daily' ? (
-              <div className="flex items-center gap-2 text-sm font-medium text-[#475569]">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#26301f] font-display">
                 <label>Date:</label>
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="px-3 py-1.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="px-3.5 py-1.5 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 />
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-sm font-medium text-[#475569]">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#26301f] font-display">
                 <label>Month:</label>
                 <input
                   type="month"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="px-3 py-1.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="px-3.5 py-1.5 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 />
               </div>
             )}
 
-            <div className="flex items-center gap-2 text-sm font-medium text-[#475569]">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#26301f] font-display">
               <label>Department:</label>
               <select
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="px-3 py-1.5 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="px-3.5 py-1.5 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">All Departments</option>
                 {departments.map((d: any) => (
@@ -467,13 +467,13 @@ export const AttendanceSheetPage: React.FC = () => {
             </div>
 
             <div className="relative">
-              <Search className="w-4 h-4 text-[#64748B] absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-[#6b7663] absolute left-3 top-2.5" />
               <input
                 type="text"
                 placeholder="Search employee..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-3 py-1.5 border border-[#E2E8F0] rounded-lg text-sm w-48 sm:w-64 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="pl-9 pr-3.5 py-1.5 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] rounded-[14px] text-sm w-48 sm:w-64 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </div>
           </div>
@@ -482,30 +482,30 @@ export const AttendanceSheetPage: React.FC = () => {
         {/* COMPACT DAILY SHEET TABLE */}
         {viewMode === 'daily' ? (
           <div className="flex gap-6 flex-col lg:flex-row">
-            <div className="flex-1 bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+            <div className="flex-1 bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-[#F8FAFC] text-xs font-semibold text-[#64748B] border-b border-[#E2E8F0]">
+                  <thead className="bg-[#dbe2d5] text-xs font-semibold text-[#26301f] border-b border-[rgba(76,91,70,0.14)]">
                     <tr>
-                      <th className="py-3 px-4">Employee</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Work Type</th>
-                      <th className="py-3 px-4">Check In</th>
-                      <th className="py-3 px-4">Check Out</th>
-                      <th className="py-3 px-4">Hours</th>
-                      {canEdit && <th className="py-3 px-4 text-right">Actions</th>}
+                      <th className="py-3 px-4 font-display">Employee</th>
+                      <th className="py-3 px-4 font-display">Status</th>
+                      <th className="py-3 px-4 font-display">Work Type</th>
+                      <th className="py-3 px-4 font-display">Check In</th>
+                      <th className="py-3 px-4 font-display">Check Out</th>
+                      <th className="py-3 px-4 font-display">Hours</th>
+                      {canEdit && <th className="py-3 px-4 text-right font-display">Actions</th>}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E2E8F0] text-[#475569]">
+                  <tbody className="divide-y divide-[rgba(76,91,70,0.10)] text-[#35422d]">
                     {isLoadingDaily ? (
                       <tr>
-                        <td colSpan={canEdit ? 7 : 6} className="text-center py-12 text-[#64748B]">
+                        <td colSpan={canEdit ? 7 : 6} className="text-center py-12 text-[#6b7663]">
                           Loading daily attendance sheet...
                         </td>
                       </tr>
                     ) : dailyData?.items?.length === 0 ? (
                       <tr>
-                        <td colSpan={canEdit ? 7 : 6} className="text-center py-12 text-[#64748B]">
+                        <td colSpan={canEdit ? 7 : 6} className="text-center py-12 text-[#6b7663]">
                           No employee records found for this date.
                         </td>
                       </tr>
@@ -514,15 +514,15 @@ export const AttendanceSheetPage: React.FC = () => {
                         <tr
                           key={item.employee_id}
                           onClick={() => setDetailItem(item)}
-                          className={`hover:bg-[#F8FAFC] cursor-pointer transition-colors ${
-                            detailItem?.employee_id === item.employee_id ? 'bg-[#EEF2FF]' : ''
+                          className={`hover:bg-[#dbe2d5]/60 cursor-pointer transition-colors ${
+                            detailItem?.employee_id === item.employee_id ? 'bg-[#d5ded0]' : ''
                           }`}
                         >
                           <td className="py-3.5 px-4">
-                            <div className="font-semibold text-[#0F172A]">
+                            <div className="font-semibold text-[#26301f] font-display">
                               {item.first_name} {item.last_name}
                             </div>
-                            <div className="text-xs text-[#64748B] font-mono">
+                            <div className="text-xs text-[#6b7663] font-mono">
                               {item.employee_code} • {item.department_name}
                             </div>
                           </td>
@@ -530,17 +530,17 @@ export const AttendanceSheetPage: React.FC = () => {
                             <StatusBadge status={item.status} size="sm" />
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="text-xs font-medium uppercase text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                            <span className="text-xs font-medium uppercase text-[#26301f] bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] px-2 py-0.5 rounded-[8px]">
                               {item.work_type || 'office'}
                             </span>
                           </td>
-                          <td className="py-3.5 px-4 font-mono text-xs">
+                          <td className="py-3.5 px-4 font-mono text-xs tabular-nums text-[#35422d]">
                             {safeFormatTime(item.check_in)}
                           </td>
-                          <td className="py-3.5 px-4 font-mono text-xs">
+                          <td className="py-3.5 px-4 font-mono text-xs tabular-nums text-[#35422d]">
                             {safeFormatTime(item.check_out)}
                           </td>
-                          <td className="py-3.5 px-4 font-semibold text-[#0F172A]">
+                          <td className="py-3.5 px-4 font-semibold text-[#26301f] tabular-nums">
                             {item.working_minutes > 0
                               ? `${(item.working_minutes / 60).toFixed(1)} hrs`
                               : '--'}
@@ -569,79 +569,79 @@ export const AttendanceSheetPage: React.FC = () => {
 
             {/* SIDE PANEL DETAILS FOR ROW CLICK */}
             {detailItem && (
-              <div className="w-full lg:w-80 bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-5 space-y-4 shrink-0 flex flex-col justify-between">
+              <div className="w-full lg:w-80 bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] p-5 space-y-4 shrink-0 flex flex-col justify-between">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+                  <div className="flex items-center justify-between pb-3 border-b border-[rgba(76,91,70,0.14)]">
                     <div>
-                      <h3 className="font-bold text-[#0F172A]">
+                      <h3 className="font-bold text-[#26301f] font-display text-base">
                         {detailItem.first_name} {detailItem.last_name}
                       </h3>
-                      <p className="text-xs text-[#64748B] font-mono">
+                      <p className="text-xs text-[#6b7663] font-mono">
                         {detailItem.employee_code} • {detailItem.department_name}
                       </p>
                     </div>
                     <button
                       onClick={() => setDetailItem(null)}
-                      className="p-1 rounded-lg text-[#64748B] hover:bg-[#F1F5F9]"
+                      className="p-1 rounded-lg text-[#6b7663] hover:bg-[#dbe2d5] hover:text-[#26301f] transition"
                     >
                       <X className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <div className="space-y-2 text-xs text-[#475569]">
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
-                      <span>Date:</span>
-                      <span className="font-semibold text-[#0F172A]">{detailItem.date}</span>
+                  <div className="space-y-2 text-xs text-[#35422d]">
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)]">
+                      <span className="text-[#6b7663]">Date:</span>
+                      <span className="font-semibold text-[#26301f] tabular-nums">{detailItem.date}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9] items-center">
-                      <span>Status:</span>
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)] items-center">
+                      <span className="text-[#6b7663]">Status:</span>
                       <StatusBadge status={detailItem.status} size="sm" />
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
-                      <span>Work Type:</span>
-                      <span className="font-semibold uppercase">{detailItem.work_type}</span>
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)]">
+                      <span className="text-[#6b7663]">Work Type:</span>
+                      <span className="font-semibold uppercase text-[#26301f]">{detailItem.work_type}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
-                      <span>Check In:</span>
-                      <span className="font-mono font-semibold">
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)]">
+                      <span className="text-[#6b7663]">Check In:</span>
+                      <span className="font-mono font-semibold tabular-nums text-[#26301f]">
                         {safeFormatTime(detailItem.check_in)}
                       </span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
-                      <span>Check Out:</span>
-                      <span className="font-mono font-semibold">
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)]">
+                      <span className="text-[#6b7663]">Check Out:</span>
+                      <span className="font-mono font-semibold tabular-nums text-[#26301f]">
                         {safeFormatTime(detailItem.check_out)}
                       </span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
-                      <span>Working Minutes:</span>
-                      <span className="font-semibold">{detailItem.working_minutes} mins</span>
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)]">
+                      <span className="text-[#6b7663]">Working Minutes:</span>
+                      <span className="font-semibold tabular-nums text-[#26301f]">{detailItem.working_minutes} mins</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
-                      <span>Break Minutes:</span>
-                      <span className="font-semibold">{detailItem.break_minutes} mins</span>
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)]">
+                      <span className="text-[#6b7663]">Break Minutes:</span>
+                      <span className="font-semibold tabular-nums text-[#26301f]">{detailItem.break_minutes} mins</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
-                      <span>Overtime Minutes:</span>
-                      <span className="font-semibold">{detailItem.overtime_minutes} mins</span>
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)]">
+                      <span className="text-[#6b7663]">Overtime Minutes:</span>
+                      <span className="font-semibold tabular-nums text-[#26301f]">{detailItem.overtime_minutes} mins</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-[#F1F5F9]">
-                      <span>Late Arrival:</span>
-                      <span className={`font-bold ${detailItem.is_late ? 'text-[#D97706]' : 'text-[#64748B]'}`}>
+                    <div className="flex justify-between py-1 border-b border-[rgba(76,91,70,0.10)]">
+                      <span className="text-[#6b7663]">Late Arrival:</span>
+                      <span className={`font-bold ${detailItem.is_late ? 'text-[#c4643f]' : 'text-[#6b7663]'}`}>
                         {detailItem.is_late ? 'YES' : 'NO'}
                       </span>
                     </div>
                     {detailItem.remarks && (
                       <div className="py-1">
-                        <span className="block text-[#64748B] mb-0.5">Remarks / Reason:</span>
-                        <p className="p-2 bg-[#F8FAFC] rounded border text-[#475569]">{detailItem.remarks}</p>
+                        <span className="block text-[#6b7663] mb-0.5">Remarks / Reason:</span>
+                        <p className="p-2 bg-[#dbe2d5] rounded-[12px] border border-[rgba(76,91,70,0.14)] text-[#35422d] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.10)]">{detailItem.remarks}</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {canEdit && (
-                  <div className="space-y-2 pt-3 border-t border-[#E2E8F0]">
+                  <div className="space-y-2 pt-3 border-t border-[rgba(76,91,70,0.14)]">
                     <Button
                       variant="primary"
                       size="md"
@@ -655,7 +655,7 @@ export const AttendanceSheetPage: React.FC = () => {
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="w-full text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300"
+                        className="w-full text-[#c4643f] border-[#c4643f]/30 hover:bg-[#c4643f]/10"
                         leftIcon={<Trash2 className="w-3.5 h-3.5" />}
                         onClick={() => setDeletingId(detailItem.attendance_id)}
                       >
@@ -669,10 +669,10 @@ export const AttendanceSheetPage: React.FC = () => {
           </div>
         ) : (
           /* MONTHLY GRID VIEW */
-          <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-5 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-semibold text-[#475569] bg-[#F8FAFC] p-3 rounded-lg border border-[#E2E8F0]">
+          <div className="bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] p-5 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-semibold text-[#26301f] bg-[#dbe2d5] p-3 rounded-[16px] border border-[rgba(76,91,70,0.14)] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.10)]">
               <div className="flex flex-wrap items-center gap-3">
-                <span>Legend:</span>
+                <span className="font-display">Legend:</span>
                 <StatusBadge status="present" label="P (Present)" size="sm" />
                 <StatusBadge status="absent" label="A (Absent)" size="sm" />
                 <StatusBadge status="half_day" label="HD (Half Day)" size="sm" />
@@ -681,7 +681,7 @@ export const AttendanceSheetPage: React.FC = () => {
                 <StatusBadge status="weekend" label="W (Weekend)" size="sm" />
               </div>
               {canEdit && (
-                <div className="text-indigo-600 font-normal">
+                <div className="text-[#14776b] font-medium">
                   * Click any day cell in the grid to edit or record attendance.
                 </div>
               )}
@@ -689,34 +689,34 @@ export const AttendanceSheetPage: React.FC = () => {
 
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-[#F8FAFC] font-semibold text-[#64748B] border-b border-[#E2E8F0]">
+                <thead className="bg-[#dbe2d5] font-semibold text-[#26301f] border-b border-[rgba(76,91,70,0.14)]">
                   <tr>
-                    <th className="py-2.5 px-3">Employee</th>
-                    <th className="py-2.5 px-3">Department</th>
+                    <th className="py-2.5 px-3 font-display">Employee</th>
+                    <th className="py-2.5 px-3 font-display">Department</th>
                     {Array.from({ length: monthlyData?.totalDays || 30 }, (_, i) => i + 1).map((d) => (
-                      <th key={d} className="py-2 px-1 text-center font-mono">
+                      <th key={d} className="py-2 px-1 text-center font-mono text-[#26301f]">
                         {d}
                       </th>
                     ))}
-                    <th className="py-2.5 px-2 text-center bg-[#DCFCE7] text-[#15803D]">P</th>
-                    <th className="py-2.5 px-2 text-center bg-[#FEE2E2] text-[#B91C1C]">A</th>
-                    <th className="py-2.5 px-2 text-center bg-[#FEF3C7] text-[#B45309]">HD</th>
+                    <th className="py-2.5 px-2 text-center bg-[#3f8f4a]/20 text-[#26301f] font-display">P</th>
+                    <th className="py-2.5 px-2 text-center bg-[#c4643f]/20 text-[#26301f] font-display">A</th>
+                    <th className="py-2.5 px-2 text-center bg-[#cf9b34]/20 text-[#26301f] font-display">HD</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E2E8F0] text-[#475569]">
+                <tbody className="divide-y divide-[rgba(76,91,70,0.10)] text-[#35422d]">
                   {isLoadingMonthly ? (
                     <tr>
-                      <td colSpan={35} className="text-center py-12 text-[#64748B]">
+                      <td colSpan={35} className="text-center py-12 text-[#6b7663]">
                         Loading monthly attendance grid...
                       </td>
                     </tr>
                   ) : (
                     monthlyData?.employees?.map((emp: any) => (
-                      <tr key={emp.employee_id} className="hover:bg-[#F8FAFC]">
-                        <td className="py-2.5 px-3 font-medium text-[#0F172A] truncate max-w-[140px]">
+                      <tr key={emp.employee_id} className="hover:bg-[#dbe2d5]/60 transition-colors">
+                        <td className="py-2.5 px-3 font-medium text-[#26301f] font-display truncate max-w-[140px]">
                           {emp.first_name} {emp.last_name}
                         </td>
-                        <td className="py-2.5 px-3 text-[#64748B] truncate max-w-[100px]">
+                        <td className="py-2.5 px-3 text-[#6b7663] truncate max-w-[100px]">
                           {emp.department_name}
                         </td>
 
@@ -735,7 +735,7 @@ export const AttendanceSheetPage: React.FC = () => {
                                 }
                               }}
                               className={`text-center p-0.5 ${
-                                canEdit ? 'cursor-pointer hover:bg-indigo-50 transition-colors' : ''
+                                canEdit ? 'cursor-pointer hover:bg-[#14776b]/15 rounded-[4px] transition-colors' : ''
                               }`}
                               title={canEdit ? `Click to add/edit attendance for ${emp.first_name} on ${dateKey}` : undefined}
                             >
@@ -746,13 +746,13 @@ export const AttendanceSheetPage: React.FC = () => {
                           );
                         })}
 
-                        <td className="text-center font-bold text-[#15803D] bg-[#DCFCE7]/40">
+                        <td className="text-center font-bold text-[#26301f] tabular-nums bg-[#3f8f4a]/15">
                           {emp.totals?.present || 0}
                         </td>
-                        <td className="text-center font-bold text-[#B91C1C] bg-[#FEE2E2]/40">
+                        <td className="text-center font-bold text-[#26301f] tabular-nums bg-[#c4643f]/15">
                           {emp.totals?.absent || 0}
                         </td>
-                        <td className="text-center font-bold text-[#B45309] bg-[#FEF3C7]/40">
+                        <td className="text-center font-bold text-[#26301f] tabular-nums bg-[#cf9b34]/15">
                           {emp.totals?.half_day || 0}
                         </td>
                       </tr>
@@ -777,7 +777,7 @@ export const AttendanceSheetPage: React.FC = () => {
             }}
             className="space-y-4"
           >
-            <div className="p-3 bg-[#EEF2FF] border border-[#C7D2FE] rounded-lg text-xs text-[#3730A3]">
+            <div className="p-3 bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] rounded-[14px] text-xs text-[#26301f] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.10)]">
               Administrators and HR managers can manually record daily attendance, shifts, and overrides.
             </div>
 
@@ -785,7 +785,7 @@ export const AttendanceSheetPage: React.FC = () => {
               <select
                 value={addForm.employee_id}
                 onChange={(e) => setAddForm({ ...addForm, employee_id: e.target.value })}
-                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 required
               >
                 <option value="">-- Choose Employee --</option>
@@ -803,7 +803,7 @@ export const AttendanceSheetPage: React.FC = () => {
                   type="date"
                   value={addForm.date}
                   onChange={(e) => setAddForm({ ...addForm, date: e.target.value })}
-                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                   required
                 />
               </FormField>
@@ -812,7 +812,7 @@ export const AttendanceSheetPage: React.FC = () => {
                 <select
                   value={addForm.work_type}
                   onChange={(e) => setAddForm({ ...addForm, work_type: e.target.value as 'office' | 'wfh' })}
-                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 >
                   <option value="office">Office (On-site)</option>
                   <option value="wfh">Work From Home (WFH)</option>
@@ -833,7 +833,7 @@ export const AttendanceSheetPage: React.FC = () => {
                     check_out_time: isOff ? '' : (addForm.check_out_time || '18:30'),
                   });
                 }}
-                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="present">Present</option>
                 <option value="wfh">Work From Home</option>
@@ -852,7 +852,7 @@ export const AttendanceSheetPage: React.FC = () => {
                     type="time"
                     value={addForm.check_in_time}
                     onChange={(e) => setAddForm({ ...addForm, check_in_time: e.target.value })}
-                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                   />
                 </FormField>
 
@@ -861,7 +861,7 @@ export const AttendanceSheetPage: React.FC = () => {
                     type="time"
                     value={addForm.check_out_time}
                     onChange={(e) => setAddForm({ ...addForm, check_out_time: e.target.value })}
-                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                   />
                 </FormField>
               </div>
@@ -873,7 +873,7 @@ export const AttendanceSheetPage: React.FC = () => {
                 placeholder="e.g. Manual entry authorized by administrator"
                 value={addForm.reason}
                 onChange={(e) => setAddForm({ ...addForm, reason: e.target.value })}
-                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 required
                 minLength={5}
               />
@@ -883,7 +883,7 @@ export const AttendanceSheetPage: React.FC = () => {
                     key={preset}
                     type="button"
                     onClick={() => setAddForm({ ...addForm, reason: preset })}
-                    className="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded transition"
+                    className="text-[11px] bg-[#dbe2d5] hover:bg-[#d5ded0] text-[#26301f] border border-[rgba(76,91,70,0.14)] px-2 py-0.5 rounded-[8px] transition"
                   >
                     + {preset}
                   </button>
@@ -891,7 +891,7 @@ export const AttendanceSheetPage: React.FC = () => {
               </div>
             </FormField>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[rgba(76,91,70,0.14)]">
               <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>
                 Cancel
               </Button>
@@ -920,14 +920,14 @@ export const AttendanceSheetPage: React.FC = () => {
             }}
             className="space-y-4"
           >
-            <div className="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-xs space-y-1 text-[#475569]">
+            <div className="p-3 bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] rounded-[14px] text-xs space-y-1 text-[#35422d] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.10)]">
               <div>
-                Date: <strong className="text-[#0F172A]">{editingItem?.date}</strong>
+                Date: <strong className="text-[#26301f] tabular-nums">{editingItem?.date}</strong>
               </div>
               <div>
-                Employee Code: <strong className="text-[#0F172A]">{editingItem?.employee_code}</strong>
+                Employee Code: <strong className="text-[#26301f] font-mono">{editingItem?.employee_code}</strong>
               </div>
-              <div className="text-[#4F46E5] font-medium">
+              <div className="text-[#14776b] font-medium">
                 * System will automatically recalculate total working minutes and late/early flags.
               </div>
             </div>
@@ -946,7 +946,7 @@ export const AttendanceSheetPage: React.FC = () => {
                       check_out_time: isOff ? '' : (editForm.check_out_time || '18:30'),
                     });
                   }}
-                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 >
                   <option value="present">Present</option>
                   <option value="wfh">Work From Home</option>
@@ -962,7 +962,7 @@ export const AttendanceSheetPage: React.FC = () => {
                 <select
                   value={editForm.work_type}
                   onChange={(e) => setEditForm({ ...editForm, work_type: e.target.value as 'office' | 'wfh' })}
-                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 >
                   <option value="office">Office (On-site)</option>
                   <option value="wfh">Work From Home (WFH)</option>
@@ -977,7 +977,7 @@ export const AttendanceSheetPage: React.FC = () => {
                     type="time"
                     value={editForm.check_in_time}
                     onChange={(e) => setEditForm({ ...editForm, check_in_time: e.target.value })}
-                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                   />
                 </FormField>
 
@@ -986,7 +986,7 @@ export const AttendanceSheetPage: React.FC = () => {
                     type="time"
                     value={editForm.check_out_time}
                     onChange={(e) => setEditForm({ ...editForm, check_out_time: e.target.value })}
-                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                   />
                 </FormField>
               </div>
@@ -998,7 +998,7 @@ export const AttendanceSheetPage: React.FC = () => {
                 placeholder="e.g. Biometric reader sync failure, verified by supervisor."
                 value={editForm.reason}
                 onChange={(e) => setEditForm({ ...editForm, reason: e.target.value })}
-                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 required
                 minLength={5}
               />
@@ -1008,7 +1008,7 @@ export const AttendanceSheetPage: React.FC = () => {
                     key={preset}
                     type="button"
                     onClick={() => setEditForm({ ...editForm, reason: preset })}
-                    className="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded transition"
+                    className="text-[11px] bg-[#dbe2d5] hover:bg-[#d5ded0] text-[#26301f] border border-[rgba(76,91,70,0.14)] px-2 py-0.5 rounded-[8px] transition"
                   >
                     + {preset}
                   </button>
@@ -1016,7 +1016,7 @@ export const AttendanceSheetPage: React.FC = () => {
               </div>
             </FormField>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[rgba(76,91,70,0.14)]">
               <Button variant="secondary" onClick={() => setEditingItem(null)}>
                 Cancel
               </Button>

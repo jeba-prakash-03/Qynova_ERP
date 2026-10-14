@@ -276,20 +276,20 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
     <div className="space-y-6">
       {/* Top Banner or Empty State */}
       {!latest ? (
-        <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-xs text-center space-y-4">
-          <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="bg-[#e2e8dc] rounded-[24px] p-8 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] text-center space-y-4">
+          <div className="w-14 h-14 bg-[#dbe2d5] text-[#14776b] rounded-[18px] flex items-center justify-center mx-auto shadow-inner border border-[rgba(76,91,70,0.15)]">
             <FileText className="w-7 h-7" />
           </div>
           <div className="max-w-md mx-auto space-y-1">
-            <h3 className="text-base font-bold text-slate-800">No Offer Letter Generated Yet</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <h3 className="font-display text-base font-bold text-[#26301f]">No Offer Letter Generated Yet</h3>
+            <p className="text-xs text-[#6b7663] leading-relaxed">
               Create a formal offer letter with dynamic company letterhead, compensation breakups, and terms of employment.
             </p>
           </div>
 
           {hasMissingData && (
-            <div className="max-w-md mx-auto p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-left flex items-start gap-2.5 text-xs text-amber-800">
-              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="max-w-md mx-auto p-3.5 bg-[#cf9b34]/15 border border-[#cf9b34]/30 rounded-[14px] text-left flex items-start gap-2.5 text-xs text-[#26301f]">
+              <AlertTriangle className="w-4 h-4 text-[#cf9b34] shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold block">Incomplete Candidate Details</span>
                 Ensure candidate designation and joining date are specified before generating.
@@ -308,19 +308,19 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
         </div>
       ) : (
         /* Active Offer Letter Card */
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/40">
+        <div className="bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] overflow-hidden">
+          <div className="p-6 border-b border-[rgba(76,91,70,0.15)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#dbe2d5]/50">
             <div className="space-y-1">
               <div className="flex items-center gap-2.5">
-                <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">
+                <h3 className="font-display text-lg font-bold text-[#26301f] tracking-tight">
                   {latest.reference_no}
                 </h3>
-                <span className="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                <span className="text-xs font-mono font-bold text-[#14776b] bg-[#dbe2d5] px-2 py-0.5 rounded-[8px] border border-[rgba(76,91,70,0.2)] shadow-xs">
                   v{latest.version}
                 </span>
                 <StatusBadge status={latest.status} />
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#6b7663]">
                 Generated on {new Date(latest.created_at).toLocaleDateString('en-GB')}
                 {latest.sent_at && ` • Dispatched on ${new Date(latest.sent_at).toLocaleDateString('en-GB')}`}
                 {latest.accepted_at && ` • Accepted on ${new Date(latest.accepted_at).toLocaleDateString('en-GB')}`}
@@ -354,7 +354,6 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 <Button
                   size="sm"
                   onClick={() => setSendModalOpen(true)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
                   <Send className="w-3.5 h-3.5 mr-1" />
                   Send to Candidate
@@ -367,7 +366,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                     size="sm"
                     onClick={() => acceptMutation.mutate()}
                     isLoading={acceptMutation.isPending}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="bg-[#3f8f4a] hover:bg-[#32733b] text-white"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
                     Mark Accepted
@@ -377,7 +376,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                     variant="secondary"
                     size="sm"
                     onClick={() => setDeclineModalOpen(true)}
-                    className="text-rose-600 hover:bg-rose-50 border-rose-200"
+                    className="text-[#c4643f] hover:bg-[#c4643f]/10 border-[#c4643f]/30"
                   >
                     <XCircle className="w-3.5 h-3.5 mr-1" />
                     Mark Declined
@@ -398,41 +397,41 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
 
           {/* Letter Breakdown Details */}
           <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-              <span className="text-slate-400 font-medium">Designation</span>
-              <p className="font-bold text-slate-800 text-sm truncate">{latest.designation}</p>
+            <div className="p-3.5 rounded-[16px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] space-y-1">
+              <span className="text-[#6b7663] text-[11px] font-semibold block">Designation</span>
+              <p className="font-bold text-[#26301f] text-sm truncate">{latest.designation}</p>
             </div>
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-              <span className="text-slate-400 font-medium">Monthly Gross</span>
-              <p className="font-bold text-slate-800 text-sm">
+            <div className="p-3.5 rounded-[16px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] space-y-1">
+              <span className="text-[#6b7663] text-[11px] font-semibold block">Monthly Gross</span>
+              <p className="font-bold text-[#26301f] text-sm font-mono tabular-nums">
                 ₹{Number(latest.monthly_gross || 0).toLocaleString('en-IN')}
               </p>
             </div>
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-              <span className="text-slate-400 font-medium">Annual CTC</span>
-              <p className="font-bold text-slate-800 text-sm">
+            <div className="p-3.5 rounded-[16px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] space-y-1">
+              <span className="text-[#6b7663] text-[11px] font-semibold block">Annual CTC</span>
+              <p className="font-bold text-[#26301f] text-sm font-mono tabular-nums">
                 ₹{Number(latest.annual_ctc || 0).toLocaleString('en-IN')}
               </p>
             </div>
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-              <span className="text-slate-400 font-medium">Proposed Joining</span>
-              <p className="font-bold text-slate-800 text-sm">{latest.joining_date}</p>
+            <div className="p-3.5 rounded-[16px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] space-y-1">
+              <span className="text-[#6b7663] text-[11px] font-semibold block">Proposed Joining</span>
+              <p className="font-bold text-[#26301f] text-sm tabular-nums">{latest.joining_date}</p>
             </div>
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-              <span className="text-slate-400 font-medium">Probation Period</span>
-              <p className="font-bold text-slate-800 text-sm">{latest.probation_months} Months</p>
+            <div className="p-3.5 rounded-[16px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] space-y-1">
+              <span className="text-[#6b7663] text-[11px] font-semibold block">Probation Period</span>
+              <p className="font-bold text-[#26301f] text-sm tabular-nums">{latest.probation_months} Months</p>
             </div>
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-              <span className="text-slate-400 font-medium">Notice Period</span>
-              <p className="font-bold text-slate-800 text-sm">{latest.notice_period_days} Days</p>
+            <div className="p-3.5 rounded-[16px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] space-y-1">
+              <span className="text-[#6b7663] text-[11px] font-semibold block">Notice Period</span>
+              <p className="font-bold text-[#26301f] text-sm tabular-nums">{latest.notice_period_days} Days</p>
             </div>
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-              <span className="text-slate-400 font-medium">Work Location</span>
-              <p className="font-bold text-slate-800 text-sm truncate">{latest.work_location}</p>
+            <div className="p-3.5 rounded-[16px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] space-y-1">
+              <span className="text-[#6b7663] text-[11px] font-semibold block">Work Location</span>
+              <p className="font-bold text-[#26301f] text-sm truncate">{latest.work_location}</p>
             </div>
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-              <span className="text-slate-400 font-medium">Offer Valid Until</span>
-              <p className="font-bold text-slate-800 text-sm">{latest.offer_valid_until}</p>
+            <div className="p-3.5 rounded-[16px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.15)] space-y-1">
+              <span className="text-[#6b7663] text-[11px] font-semibold block">Offer Valid Until</span>
+              <p className="font-bold text-[#26301f] text-sm tabular-nums">{latest.offer_valid_until}</p>
             </div>
           </div>
         </div>
@@ -440,15 +439,15 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
 
       {/* Version History Table */}
       {history.length > 0 && (
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-          <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <History className="w-4 h-4 text-indigo-600" />
-            <h4 className="text-sm font-bold text-slate-900">Offer Letter Revision History</h4>
+        <div className="bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] p-6 space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-[rgba(76,91,70,0.15)]">
+            <History className="w-4 h-4 text-[#14776b]" />
+            <h4 className="font-display text-sm font-bold text-[#26301f]">Offer Letter Revision History</h4>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-600">
-              <thead className="bg-slate-50 text-slate-400 font-semibold border-b border-slate-100 uppercase tracking-wider text-[10px]">
+            <table className="w-full text-left text-xs text-[#35422d]">
+              <thead className="bg-[#dbe2d5] text-[#6b7663] font-semibold border-b border-[rgba(76,91,70,0.15)] uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="py-2.5 px-3">Ver</th>
                   <th className="py-2.5 px-3">Reference No</th>
@@ -457,15 +456,15 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                   <th className="py-2.5 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[rgba(76,91,70,0.12)]">
                 {history.map((item: any) => (
-                  <tr key={item.id} className="hover:bg-slate-50/50 transition">
-                    <td className="py-3 px-3 font-mono font-bold text-slate-800">v{item.version}</td>
-                    <td className="py-3 px-3 font-medium text-slate-800">{item.reference_no}</td>
+                  <tr key={item.id} className="hover:bg-[#dbe2d5]/60 transition">
+                    <td className="py-3 px-3 font-mono font-bold text-[#26301f]">v{item.version}</td>
+                    <td className="py-3 px-3 font-medium text-[#26301f]">{item.reference_no}</td>
                     <td className="py-3 px-3">
                       <StatusBadge status={item.status} />
                     </td>
-                    <td className="py-3 px-3">
+                    <td className="py-3 px-3 tabular-nums text-[#6b7663]">
                       {new Date(item.created_at).toLocaleDateString('en-GB')}
                     </td>
                     <td className="py-3 px-3 text-right space-x-2">
@@ -474,13 +473,13 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                           setPreviewLetter(item);
                           setPreviewModalOpen(true);
                         }}
-                        className="text-indigo-600 hover:text-indigo-800 font-semibold"
+                        className="text-[#14776b] hover:text-[#0d524a] font-semibold"
                       >
                         Preview
                       </button>
                       <button
                         onClick={() => downloadPdf(item.id, item.reference_no)}
-                        className="text-slate-600 hover:text-slate-900 font-semibold"
+                        className="text-[#6b7663] hover:text-[#26301f] font-semibold"
                       >
                         Download
                       </button>
@@ -526,8 +525,8 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
       >
         <div className="space-y-4 py-2">
           {(!genForm.monthly_gross || Number(genForm.monthly_gross) <= 0) && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5 text-xs text-amber-800">
-              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="p-3 bg-[#cf9b34]/15 border border-[#cf9b34]/30 rounded-[14px] flex items-start gap-2.5 text-xs text-[#26301f]">
+              <AlertCircle className="w-4 h-4 text-[#cf9b34] shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold block">No Salary Configured</span>
                 Please enter monthly gross or annual CTC below to generate the compensation table.
@@ -540,7 +539,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
               <select
                 value={genForm.template_id}
                 onChange={(e) => setGenForm({ ...genForm, template_id: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 {templates.map((t: any) => (
                   <option key={t.id} value={t.id}>
@@ -555,7 +554,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="text"
                 value={genForm.designation}
                 onChange={(e) => setGenForm({ ...genForm, designation: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 placeholder="e.g. Lead Software Architect"
                 required
               />
@@ -566,7 +565,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="number"
                 value={genForm.monthly_gross}
                 onChange={(e) => handleSalaryChange(e.target.value, true)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] font-mono tabular-nums"
                 placeholder="e.g. 100000"
                 required
               />
@@ -577,7 +576,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="number"
                 value={genForm.annual_ctc}
                 onChange={(e) => handleSalaryChange(e.target.value, false)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] font-mono tabular-nums"
                 placeholder="e.g. 1200000"
                 required
               />
@@ -588,7 +587,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="date"
                 value={genForm.joining_date}
                 onChange={(e) => setGenForm({ ...genForm, joining_date: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 required
               />
             </FormField>
@@ -598,7 +597,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="date"
                 value={genForm.offer_valid_until}
                 onChange={(e) => setGenForm({ ...genForm, offer_valid_until: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 required
               />
             </FormField>
@@ -608,7 +607,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="number"
                 value={genForm.probation_months}
                 onChange={(e) => setGenForm({ ...genForm, probation_months: Number(e.target.value) })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] font-mono"
                 min="0"
               />
             </FormField>
@@ -618,7 +617,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="number"
                 value={genForm.notice_period_days}
                 onChange={(e) => setGenForm({ ...genForm, notice_period_days: Number(e.target.value) })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] font-mono"
                 min="0"
               />
             </FormField>
@@ -628,7 +627,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="text"
                 value={genForm.work_location}
                 onChange={(e) => setGenForm({ ...genForm, work_location: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -637,7 +636,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
                 type="text"
                 value={genForm.working_hours}
                 onChange={(e) => setGenForm({ ...genForm, working_hours: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+                className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
           </div>
@@ -671,7 +670,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
               type="email"
               value={sendForm.recipient_email}
               onChange={(e) => setSendForm({ ...sendForm, recipient_email: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+              className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               required
             />
           </FormField>
@@ -682,7 +681,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
               value={sendForm.custom_message}
               onChange={(e) => setSendForm({ ...sendForm, custom_message: e.target.value })}
               placeholder="e.g. Please sign and return by next Monday."
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+              className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             />
           </FormField>
         </div>
@@ -702,7 +701,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
               size="sm"
               onClick={() => declineMutation.mutate()}
               isLoading={declineMutation.isPending}
-              className="bg-rose-600 hover:bg-rose-700 text-white"
+              className="bg-[#c4643f] hover:bg-[#a84f2e] text-white"
             >
               Confirm Decline
             </Button>
@@ -710,7 +709,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
         }
       >
         <div className="space-y-3 py-2 text-xs">
-          <p className="text-slate-600">
+          <p className="text-[#6b7663]">
             Please provide the reason the candidate declined the offer. The employee profile will be set to inactive.
           </p>
           <FormField label="Decline Reason" required>
@@ -719,7 +718,7 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
               value={declineReason}
               onChange={(e) => setDeclineReason(e.target.value)}
               placeholder="e.g. Accepted another offer / Compensation mismatch"
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
+              className="w-full px-3.5 py-2.5 bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               required
             />
           </FormField>
@@ -741,16 +740,16 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
           </Button>
         }
       >
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl max-h-[60vh] overflow-y-auto space-y-4">
-          <div className="border-b border-slate-200 pb-3">
-            <h4 className="text-base font-bold text-slate-900">
+        <div className="p-5 bg-[#dbe2d5]/70 border border-[rgba(76,91,70,0.2)] rounded-[20px] shadow-inner max-h-[60vh] overflow-y-auto space-y-4">
+          <div className="border-b border-[rgba(76,91,70,0.15)] pb-3">
+            <h4 className="font-display text-base font-bold text-[#26301f]">
               {previewLetter?.snapshot?.company_name || 'Qynova Technologies'}
             </h4>
-            <p className="text-xs text-slate-500">{previewLetter?.snapshot?.company_address}</p>
+            <p className="text-xs text-[#6b7663]">{previewLetter?.snapshot?.company_address}</p>
           </div>
 
           <div
-            className="prose prose-sm max-w-none text-slate-800 leading-relaxed text-xs space-y-2 font-sans"
+            className="prose prose-sm max-w-none text-[#26301f] leading-relaxed text-xs space-y-2 font-sans"
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(previewLetter?.snapshot?.rendered_html || ''),
             }}

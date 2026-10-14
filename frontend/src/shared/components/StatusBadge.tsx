@@ -28,10 +28,10 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   const normalized = (status || '').toUpperCase().trim().replace(/[\s_-]+/g, '_');
 
   let styleConfig = {
-    bg: 'bg-[#F1F5F9]',
-    text: 'text-[#475569]',
-    border: 'border-[#E2E8F0]',
-    dot: 'bg-[#94A3B8]',
+    bg: 'bg-[#dbe2d5]',
+    text: 'text-[#3c4535]',
+    border: 'border-[#c0cbba]',
+    dot: 'bg-[#6b7663]',
   };
 
   switch (normalized) {
@@ -45,14 +45,14 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'COMPLETED':
     case 'P':
       styleConfig = {
-        bg: 'bg-[#DCFCE7]',
-        text: 'text-[#15803D]',
-        border: 'border-[#BBF7D0]',
-        dot: 'bg-[#16A34A]',
+        bg: 'bg-[#d8ebd9]',
+        text: 'text-[#1e5725]',
+        border: 'border-[#b8d6ba]',
+        dot: 'bg-[#3f8f4a]',
       };
       break;
 
-    // 2. Absent / Rejected / LOP / Inactive / Cancelled
+    // 2. Absent / Rejected / LOP / Inactive / Cancelled / Failed
     case 'ABSENT':
     case 'REJECTED':
     case 'LOP':
@@ -61,10 +61,10 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'FAILED':
     case 'A':
       styleConfig = {
-        bg: 'bg-[#FEE2E2]',
-        text: 'text-[#B91C1C]',
-        border: 'border-[#FECACA]',
-        dot: 'bg-[#DC2626]',
+        bg: 'bg-[#f6dfd8]',
+        text: 'text-[#8a3114]',
+        border: 'border-[#e8beae]',
+        dot: 'bg-[#c4643f]',
       };
       break;
 
@@ -80,10 +80,10 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'SUBMITTED':
     case 'HD':
       styleConfig = {
-        bg: 'bg-[#FEF3C7]',
-        text: 'text-[#B45309]',
-        border: 'border-[#FDE68A]',
-        dot: 'bg-[#D97706]',
+        bg: 'bg-[#f7efdd]',
+        text: 'text-[#855b11]',
+        border: 'border-[#e6d4a8]',
+        dot: 'bg-[#cf9b34]',
       };
       break;
 
@@ -93,10 +93,10 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'RESIGNED':
     case 'L':
       styleConfig = {
-        bg: 'bg-[#E0F2FE]',
-        text: 'text-[#0369A1]',
-        border: 'border-[#BAE6FD]',
-        dot: 'bg-[#0284C7]',
+        bg: 'bg-[#dde5f0]',
+        text: 'text-[#1c2a42]',
+        border: 'border-[#b5c7db]',
+        dot: 'bg-[#22304a]',
       };
       break;
 
@@ -104,10 +104,10 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'HOLIDAY':
     case 'H':
       styleConfig = {
-        bg: 'bg-[#EDE9FE]',
-        text: 'text-[#6D28D9]',
-        border: 'border-[#DDD6FE]',
-        dot: 'bg-[#7C3AED]',
+        bg: 'bg-[#eadef2]',
+        text: 'text-[#44295c]',
+        border: 'border-[#d2bfe3]',
+        dot: 'bg-[#60437a]',
       };
       break;
 
@@ -115,10 +115,10 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'WFH':
     case 'WORK_FROM_HOME':
       styleConfig = {
-        bg: 'bg-[#CCFBF1]',
-        text: 'text-[#0F766E]',
-        border: 'border-[#99F6E4]',
-        dot: 'bg-[#0D9488]',
+        bg: 'bg-[#d3ebe7]',
+        text: 'text-[#0e5950]',
+        border: 'border-[#a9d6cf]',
+        dot: 'bg-[#14776b]',
       };
       break;
 
@@ -134,10 +134,10 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'WEEK_OFF':
     default:
       styleConfig = {
-        bg: 'bg-[#F1F5F9]',
-        text: 'text-[#475569]',
-        border: 'border-[#E2E8F0]',
-        dot: 'bg-[#94A3B8]',
+        bg: 'bg-[#dbe2d5]',
+        text: 'text-[#3c4535]',
+        border: 'border-[#c0cbba]',
+        dot: 'bg-[#6b7663]',
       };
       break;
   }
@@ -162,19 +162,19 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   const sizeClasses =
     size === 'sm'
-      ? 'px-2 py-0.5 text-xs font-medium gap-1'
-      : 'px-2.5 py-1 text-xs font-semibold gap-1.5';
+      ? 'px-2 py-0.5 text-[11px] font-semibold gap-1'
+      : 'px-2.5 py-1 text-xs font-bold gap-1.5';
 
   const dotSize = size === 'sm' ? 'w-1.5 h-1.5' : 'w-2 h-2';
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border ${styleConfig.bg} ${styleConfig.text} ${styleConfig.border} ${sizeClasses} ${className}`}
+      className={`inline-flex items-center rounded-full border shadow-[inset_1px_1px_2px_rgba(88,104,84,0.12),1px_1px_3px_rgba(255,255,255,0.7)] ${styleConfig.bg} ${styleConfig.text} ${styleConfig.border} ${sizeClasses} ${className}`}
     >
       {showDot && (
         <span className={`rounded-full ${styleConfig.dot} ${dotSize} shrink-0`} />
       )}
-      <span>{formatText(status)}</span>
+      <span className="truncate">{formatText(status)}</span>
     </span>
   );
 };

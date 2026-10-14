@@ -173,24 +173,24 @@ export const EmployeeEditPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3.5">
         <Link
           to={`/employees/${id}`}
-          className="p-2 text-slate-400 hover:text-slate-700 bg-white border border-slate-200 rounded-xl transition"
+          className="p-2.5 text-[#35422d] hover:text-[#26301f] bg-[#e2e8dc] border border-[rgba(76,91,70,0.18)] rounded-[14px] shadow-[inset_1px_1px_3px_rgba(255,255,255,0.7),2px_3px_8px_rgba(88,104,84,0.15)] transition"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Edit Employee: {employee?.employee_code}
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#26301f] tracking-tight">
+            Edit Employee: <span className="font-mono text-[#14776b]">{employee?.employee_code}</span>
           </h1>
-          <p className="text-xs text-slate-500">Update personal, work, bank, and emergency particulars</p>
+          <p className="text-xs sm:text-sm text-[#6b7663] mt-0.5">Update personal, work, bank, and emergency particulars</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-          <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3">Personal Details</h3>
+        <div className="bg-[#e2e8dc] rounded-[24px] p-6 sm:p-7 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] space-y-4">
+          <h3 className="font-display text-base font-bold text-[#26301f] border-b border-[rgba(76,91,70,0.15)] pb-3">Personal Details</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField label="First Name" required>
               <input
@@ -198,7 +198,7 @@ export const EmployeeEditPage: React.FC = () => {
                 value={formData.first_name}
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                 required
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -208,7 +208,7 @@ export const EmployeeEditPage: React.FC = () => {
                 value={formData.last_name}
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                 required
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -217,7 +217,7 @@ export const EmployeeEditPage: React.FC = () => {
                 type="text"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -226,7 +226,7 @@ export const EmployeeEditPage: React.FC = () => {
                 type="date"
                 value={formData.date_of_birth}
                 onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -235,7 +235,7 @@ export const EmployeeEditPage: React.FC = () => {
                 type="url"
                 value={formData.photo_url}
                 onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -245,7 +245,7 @@ export const EmployeeEditPage: React.FC = () => {
                 step="0.5"
                 value={formData.experience_years}
                 onChange={(e) => setFormData({ ...formData, experience_years: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
 
@@ -255,21 +255,21 @@ export const EmployeeEditPage: React.FC = () => {
                   rows={2}
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 />
               </FormField>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-          <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3">Work Placement</h3>
+        <div className="bg-[#e2e8dc] rounded-[24px] p-6 sm:p-7 border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] space-y-4">
+          <h3 className="font-display text-base font-bold text-[#26301f] border-b border-[rgba(76,91,70,0.15)] pb-3">Work Placement</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <FormField label="Department">
               <select
                 value={formData.department_id}
                 onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">None</option>
                 {departments.map((d: any) => (
@@ -284,7 +284,7 @@ export const EmployeeEditPage: React.FC = () => {
               <select
                 value={formData.designation_id}
                 onChange={(e) => setFormData({ ...formData, designation_id: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">None</option>
                 {designations.map((d: any) => (
@@ -299,7 +299,7 @@ export const EmployeeEditPage: React.FC = () => {
               <select
                 value={formData.reporting_manager_id}
                 onChange={(e) => setFormData({ ...formData, reporting_manager_id: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">None</option>
                 {managers
@@ -316,7 +316,7 @@ export const EmployeeEditPage: React.FC = () => {
               <select
                 value={formData.employment_type}
                 onChange={(e) => setFormData({ ...formData, employment_type: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="full_time">Full Time</option>
                 <option value="intern">Intern</option>
@@ -328,7 +328,7 @@ export const EmployeeEditPage: React.FC = () => {
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -341,7 +341,7 @@ export const EmployeeEditPage: React.FC = () => {
                 value={formData.skills}
                 onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
                 placeholder="Comma separated"
-                className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
           </div>
@@ -350,14 +350,14 @@ export const EmployeeEditPage: React.FC = () => {
         <div className="flex items-center justify-end gap-3 pt-4">
           <Link
             to={`/employees/${id}`}
-            className="px-5 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition"
+            className="px-5 py-2.5 text-xs font-bold text-[#35422d] bg-[#dbe2d5] border border-[rgba(76,91,70,0.2)] rounded-[14px] hover:bg-[#e2e8dc] transition shadow-xs"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={updateMutation.isPending}
-            className="px-6 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-600/30 transition flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-2.5 text-xs font-bold text-white bg-[#14776b] hover:bg-[#0d524a] rounded-[14px] shadow-[3px_4px_12px_rgba(20,119,107,0.35)] transition flex items-center gap-2 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {updateMutation.isPending ? 'Saving Changes...' : 'Save Profile Changes'}

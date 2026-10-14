@@ -76,9 +76,9 @@ export const WidgetRenderer: React.FC<WidgetRendererProps> = ({ widgetKey, title
       break;
     default:
       content = (
-        <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm">
-          <h3 className="text-sm font-bold text-[#0F172A]">{title}</h3>
-          <p className="text-xs text-[#64748B] mt-2">Custom widget registered under key: {widgetKey}</p>
+        <div className="bg-[#e2e8dc] rounded-[26px] p-6 border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.24),-6px_-7px_18px_rgba(255,255,255,0.7)]">
+          <h3 className="text-sm font-bold text-[#26301f] font-display">{title}</h3>
+          <p className="text-xs text-[#6b7663] mt-2">Custom widget registered under key: {widgetKey}</p>
         </div>
       );
       break;

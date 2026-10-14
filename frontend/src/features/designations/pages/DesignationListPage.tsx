@@ -7,6 +7,7 @@ import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { FormField } from '../../../shared/components/FormField';
 import { Can } from '../../../shared/components/Can';
 import { useToast } from '../../../shared/context/ToastContext';
+import { Button } from '../../../shared/components/Button';
 import { Briefcase, Plus, Edit2, Trash2, Users } from 'lucide-react';
 
 export const DesignationListPage: React.FC = () => {
@@ -96,7 +97,7 @@ export const DesignationListPage: React.FC = () => {
       header: 'Designation Code',
       accessorKey: 'code',
       cell: (row) => (
-        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-[8px] bg-[#dbe2d5] text-[#14776b] border border-[rgba(76,91,70,0.2)] shadow-xs">
           {row.code}
         </span>
       ),
@@ -105,21 +106,21 @@ export const DesignationListPage: React.FC = () => {
       header: 'Designation Title',
       accessorKey: 'name',
       sortable: true,
-      cell: (row) => <span className="font-bold text-slate-800">{row.name}</span>,
+      cell: (row) => <span className="font-bold text-[#26301f]">{row.name}</span>,
     },
     {
       header: 'Assigned Employees',
       cell: (row) => (
-        <span className="inline-flex items-center gap-1.5 text-xs text-slate-600 font-semibold">
-          <Users className="w-3.5 h-3.5 text-slate-400" />
-          {row.employee_count} Personnel
+        <span className="inline-flex items-center gap-1.5 text-xs text-[#35422d] font-semibold">
+          <Users className="w-3.5 h-3.5 text-[#6b7663]" />
+          <span className="tabular-nums font-mono">{row.employee_count}</span> Personnel
         </span>
       ),
     },
     {
       header: 'Description',
       accessorKey: 'description',
-      cell: (row) => <span className="text-xs text-slate-500 line-clamp-1">{row.description || '—'}</span>,
+      cell: (row) => <span className="text-xs text-[#6b7663] line-clamp-1">{row.description || '—'}</span>,
     },
     {
       header: 'Actions',
@@ -128,7 +129,7 @@ export const DesignationListPage: React.FC = () => {
           <Can permission="designations.edit">
             <button
               onClick={() => openEditModal(row)}
-              className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#dbe2d5] rounded-lg transition"
               title="Edit Designation"
             >
               <Edit2 className="w-4 h-4" />
@@ -137,7 +138,7 @@ export const DesignationListPage: React.FC = () => {
           <Can permission="designations.delete">
             <button
               onClick={() => setDeleteTarget(row)}
-              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#c4643f] hover:bg-[#c4643f]/10 rounded-lg transition"
               title="Delete Designation"
             >
               <Trash2 className="w-4 h-4" />
@@ -152,20 +153,21 @@ export const DesignationListPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Designations & Titles</h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#26301f] tracking-tight">Designations & Titles</h1>
+          <p className="text-xs sm:text-sm text-[#6b7663] mt-1">
             Standard job roles, titles, and grade definitions across departments.
           </p>
         </div>
 
         <Can permission="designations.create">
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition"
+            leftIcon={<Plus className="w-4 h-4" />}
           >
-            <Plus className="w-4 h-4" />
             Add Designation
-          </button>
+          </Button>
         </Can>
       </div>
 
@@ -188,24 +190,26 @@ export const DesignationListPage: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         title={editingDesig ? 'Edit Designation' : 'Create Designation'}
         footer={
-          <>
-            <button
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
               onClick={handleSave}
-              disabled={saveMutation.isPending}
-              className="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition"
+              isLoading={saveMutation.isPending}
             >
-              {saveMutation.isPending ? 'Saving...' : 'Save Designation'}
-            </button>
-          </>
+              Save Designation
+            </Button>
+          </div>
         }
       >
-        <form onSubmit={handleSave} className="space-y-4">
+        <form onSubmit={handleSave} className="space-y-4 text-xs">
           <FormField label="Designation Title" required>
             <input
               type="text"
@@ -213,7 +217,7 @@ export const DesignationListPage: React.FC = () => {
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Senior Software Engineer"
               required
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             />
           </FormField>
 
@@ -224,7 +228,7 @@ export const DesignationListPage: React.FC = () => {
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="SSE"
               required
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-mono"
+              className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] font-mono"
             />
           </FormField>
 
@@ -234,7 +238,7 @@ export const DesignationListPage: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Responsibilities and seniority level"
-              className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full px-3.5 py-2.5 text-xs font-semibold bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             />
           </FormField>
         </form>

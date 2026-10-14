@@ -129,16 +129,16 @@ export const ResetPasswordPage: React.FC = () => {
         <div className="space-y-6 animate-auth-fade">
           <div
             role="alert"
-            className="p-5 rounded-2xl bg-rose-50/80 border border-rose-200 text-rose-900 space-y-3"
+            className="p-5 rounded-[22px] bg-[#f4ded6] border border-[#c4643f]/30 text-[#632a17] space-y-3 shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)]"
           >
-            <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-[14px] bg-[#f0ccc0] text-[#c4643f] flex items-center justify-center shadow-[inset_1px_2px_4px_rgba(196,100,63,0.15)]">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-rose-950">
+              <h3 className="text-sm font-bold text-[#632a17] font-display">
                 Invalid or Expired Link
               </h3>
-              <p className="text-xs text-rose-800/90 leading-relaxed mt-1">
+              <p className="text-xs text-[#632a17]/90 leading-relaxed mt-1">
                 This password reset link is invalid or has expired. For your security, reset links are single-use and expire after a short time.
               </p>
             </div>
@@ -147,7 +147,7 @@ export const ResetPasswordPage: React.FC = () => {
           <div className="space-y-3">
             <Link
               to="/forgot-password"
-              className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-500/20 transition"
+              className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#14776b] hover:bg-[#106258] text-white rounded-full text-xs font-bold shadow-[6px_8px_18px_rgba(20,119,107,0.35),-4px_-4px_12px_rgba(255,255,255,0.6)] transition"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               Request a new reset link
@@ -155,7 +155,7 @@ export const ResetPasswordPage: React.FC = () => {
 
             <Link
               to="/login"
-              className="w-full min-h-[44px] inline-flex items-center justify-center text-xs font-bold text-slate-600 hover:text-slate-900 transition"
+              className="w-full min-h-[46px] inline-flex items-center justify-center text-xs font-bold text-[#6b7663] hover:text-[#26301f] transition"
             >
               Back to sign in
             </Link>
@@ -166,16 +166,16 @@ export const ResetPasswordPage: React.FC = () => {
         <div className="space-y-6 animate-auth-fade">
           <div
             role="status"
-            className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-emerald-900 space-y-3"
+            className="p-5 rounded-[22px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] text-[#26301f] space-y-3 shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)]"
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-[14px] bg-[#daebd9] text-[#1b4e23] flex items-center justify-center shadow-[inset_1px_2px_4px_rgba(63,143,74,0.15)]">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-emerald-950">
+              <h3 className="text-sm font-bold text-[#26301f] font-display">
                 Password reset successfully
               </h3>
-              <p className="text-xs text-emerald-800/90 leading-relaxed mt-1">
+              <p className="text-xs text-[#6b7663] leading-relaxed mt-1">
                 Your new password has been set. You can now sign in to your Qynova account with your updated credentials.
               </p>
             </div>
@@ -183,7 +183,7 @@ export const ResetPasswordPage: React.FC = () => {
 
           <Link
             to="/login"
-            className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-500/20 transition"
+            className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#14776b] hover:bg-[#106258] text-white rounded-full text-xs font-bold shadow-[6px_8px_18px_rgba(20,119,107,0.35),-4px_-4px_12px_rgba(255,255,255,0.6)] transition"
           >
             Sign in with new password
             <ArrowRight className="w-4 h-4" />
@@ -196,9 +196,9 @@ export const ResetPasswordPage: React.FC = () => {
             <div
               role="alert"
               aria-live="polite"
-              className="mb-5 p-4 rounded-xl text-xs font-medium border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-2.5"
+              className="mb-5 p-4 rounded-[18px] text-xs font-medium border bg-[#f4ded6] border-[#c4643f]/30 text-[#632a17] flex items-start gap-2.5 shadow-[inset_2px_2px_4px_rgba(196,100,63,0.15)]"
             >
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-[#c4643f] shrink-0 mt-0.5" />
               <span className="leading-relaxed">{errorMessage}</span>
             </div>
           )}
@@ -216,14 +216,14 @@ export const ResetPasswordPage: React.FC = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full min-h-[44px] px-3.5 py-2.5 pr-11 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 transition"
+                className="w-full min-h-[46px] px-4 py-2.5 pr-11 text-sm bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] rounded-[16px] text-[#26301f] placeholder:text-[#6b7663] shadow-[inset_2px_3px_6px_rgba(104,118,100,0.22),inset_-2px_-2px_5px_rgba(255,255,255,0.7)] focus:outline-none focus:ring-2 focus:ring-[#14776b] focus:border-[#14776b] disabled:opacity-60 transition"
               />
               <button
                 type="button"
                 disabled={isLoading}
                 onClick={() => setShowNewPass(!showNewPass)}
                 aria-label={showNewPass ? 'Hide password' : 'Show password'}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] rounded-lg transition"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 text-[#6b7663] hover:text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b] rounded-lg transition"
               >
                 {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -231,19 +231,19 @@ export const ResetPasswordPage: React.FC = () => {
 
             {/* Strength meter */}
             {newPassword.length > 0 && (
-              <div className="mt-2 space-y-1">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500">
+              <div className="mt-2.5 space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] font-semibold text-[#6b7663]">
                   <span>Password strength</span>
                   <span className={strength.color.replace('bg-', 'text-')}>
                     {strength.label}
                   </span>
                 </div>
-                <div className="grid grid-cols-4 gap-1.5 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="grid grid-cols-4 gap-1.5 h-1.5 w-full bg-[#c5d0be]/50 rounded-full overflow-hidden p-0.5 shadow-inner">
                   {[1, 2, 3, 4].map((step) => (
                     <div
                       key={step}
                       className={`h-full rounded-full transition-all duration-300 ${
-                        step <= strength.score ? strength.color : 'bg-slate-200'
+                        step <= strength.score ? strength.color : 'bg-[#c5d0be]/70'
                       }`}
                     />
                   ))}
@@ -268,14 +268,14 @@ export const ResetPasswordPage: React.FC = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full min-h-[44px] px-3.5 py-2.5 pr-11 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 transition"
+                className="w-full min-h-[46px] px-4 py-2.5 pr-11 text-sm bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] rounded-[16px] text-[#26301f] placeholder:text-[#6b7663] shadow-[inset_2px_3px_6px_rgba(104,118,100,0.22),inset_-2px_-2px_5px_rgba(255,255,255,0.7)] focus:outline-none focus:ring-2 focus:ring-[#14776b] focus:border-[#14776b] disabled:opacity-60 transition"
               />
               <button
                 type="button"
                 disabled={isLoading}
                 onClick={() => setShowConfirmPass(!showConfirmPass)}
                 aria-label={showConfirmPass ? 'Hide password' : 'Show password'}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] rounded-lg transition"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 text-[#6b7663] hover:text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b] rounded-lg transition"
               >
                 {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -283,20 +283,20 @@ export const ResetPasswordPage: React.FC = () => {
           </FormField>
 
           {/* Live Rule Checklist */}
-          <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2 mt-1">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+          <div className="p-4 bg-[#dbe2d5]/60 border border-[rgba(76,91,70,0.14)] rounded-[18px] space-y-2 mt-1 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.12)]">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[#6b7663] mb-2 font-display">
               Password requirements:
             </p>
             {rules.map((rule) => (
               <div
                 key={rule.id}
                 className={`flex items-center gap-2 text-xs transition-colors ${
-                  rule.valid ? 'text-emerald-700 font-medium' : 'text-slate-500'
+                  rule.valid ? 'text-[#1b4e23] font-semibold' : 'text-[#6b7663]'
                 }`}
               >
                 <div
                   className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-white ${
-                    rule.valid ? 'bg-emerald-500' : 'bg-slate-300'
+                    rule.valid ? 'bg-[#3f8f4a]' : 'bg-[#c5d0be]'
                   }`}
                 >
                   <Check className="w-2.5 h-2.5" />
@@ -312,7 +312,7 @@ export const ResetPasswordPage: React.FC = () => {
             size="lg"
             isLoading={isLoading}
             disabled={isLoading || !allRulesValid || newPassword !== confirmPassword}
-            className="w-full min-h-[44px] font-bold text-sm shadow-md shadow-indigo-500/20 mt-2"
+            className="w-full min-h-[46px] font-bold text-sm mt-3"
           >
             {isLoading ? 'Resetting password...' : 'Reset password'}
           </Button>
@@ -320,7 +320,7 @@ export const ResetPasswordPage: React.FC = () => {
           <div className="text-center pt-2">
             <Link
               to="/login"
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
+              className="text-xs font-semibold text-[#6b7663] hover:text-[#26301f] transition"
             >
               Back to sign in
             </Link>

@@ -24,23 +24,23 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center font-medium rounded-xl border transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none shadow-sm';
+    'inline-flex items-center justify-center font-semibold rounded-full border transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#14776b] focus:ring-offset-2 focus:ring-offset-[#c5d0be] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none select-none';
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs gap-1.5',
-    md: 'px-4 py-2 text-sm gap-2',
-    lg: 'px-5 py-2.5 text-base gap-2.5',
+    sm: 'px-3.5 py-1.5 text-xs gap-1.5',
+    md: 'px-5 py-2.5 text-sm gap-2',
+    lg: 'px-6 py-3 text-base gap-2.5',
   }[size];
 
   const variantClasses = {
     primary:
-      'bg-[#4F46E5] hover:bg-[#4338CA] text-white border-transparent active:bg-[#3730A3]',
+      'bg-[#14776b] hover:bg-[#106258] text-white border-transparent shadow-[4px_6px_14px_rgba(20,119,107,0.32),-3px_-3px_9px_rgba(255,255,255,0.70)] active:shadow-[inset_2px_3px_6px_rgba(10,50,45,0.45)]',
     secondary:
-      'bg-white hover:bg-[#F8FAFC] text-[#0F172A] border-[#E2E8F0] active:bg-[#F1F5F9]',
+      'bg-[#e2e8dc] hover:bg-[#dbe2d5] text-[#26301f] border-[rgba(76,91,70,0.18)] shadow-[4px_5px_12px_rgba(88,104,84,0.22),-3px_-3px_9px_rgba(255,255,255,0.85)] active:shadow-[inset_2px_3px_6px_rgba(88,104,84,0.28)]',
     danger:
-      'bg-[#DC2626] hover:bg-[#B91C1C] text-white border-transparent active:bg-[#991B1B]',
+      'bg-[#c4643f] hover:bg-[#af5533] text-white border-transparent shadow-[4px_6px_14px_rgba(196,100,63,0.32),-3px_-3px_9px_rgba(255,255,255,0.70)] active:shadow-[inset_2px_3px_6px_rgba(120,40,20,0.45)]',
     success:
-      'bg-[#16A34A] hover:bg-[#15803D] text-white border-transparent active:bg-[#166534]',
+      'bg-[#3f8f4a] hover:bg-[#34783d] text-white border-transparent shadow-[4px_6px_14px_rgba(63,143,74,0.32),-3px_-3px_9px_rgba(255,255,255,0.70)] active:shadow-[inset_2px_3px_6px_rgba(30,80,35,0.45)]',
   }[variant];
 
   return (

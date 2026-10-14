@@ -230,26 +230,26 @@ export const MyAttendancePage: React.FC = () => {
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
-          <Clock className="w-7 h-7 text-[#4F46E5]" />
+        <h1 className="text-2xl font-bold text-[#26301f] font-display flex items-center gap-2.5">
+          <Clock className="w-7 h-7 text-[#14776b]" />
           My Attendance
         </h1>
-        <p className="text-[#64748B] text-sm mt-1">
+        <p className="text-[#6b7663] text-sm mt-1">
           Punch in/out, view daily timer, and track your monthly work calendar.
         </p>
         {formattedJoiningDate && (
-          <p className="text-xs text-[#475569] font-semibold mt-1">
-            Joining Date: <span className="text-[#4F46E5]">{formattedJoiningDate}</span>
+          <p className="text-xs text-[#6b7663] font-semibold mt-1">
+            Joining Date: <span className="text-[#14776b] font-display tabular-nums">{formattedJoiningDate}</span>
           </p>
         )}
       </div>
 
       {/* BIG MAIN PUNCH CARD */}
-      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden p-6 sm:p-8">
+      <div className="bg-[#e2e8dc] rounded-[26px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.24),-6px_-7px_18px_rgba(255,255,255,0.7)] overflow-hidden p-6 sm:p-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           {/* Left: Date & Status */}
           <div className="space-y-2 text-center lg:text-left">
-            <div className="text-xs font-semibold uppercase tracking-wider text-[#4F46E5] flex items-center justify-center lg:justify-start gap-1.5">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#14776b] font-display flex items-center justify-center lg:justify-start gap-1.5">
               <Calendar className="w-4 h-4" />
               <span>{todayDisplayDate}</span>
             </div>
@@ -262,22 +262,22 @@ export const MyAttendancePage: React.FC = () => {
             </div>
 
             {isCheckedIn && (
-              <div className="text-xs text-[#64748B] pt-1">
-                Checked in at: <strong className="text-[#0F172A] font-mono">{formatTimeStr(attendance?.check_in)}</strong>
+              <div className="text-xs text-[#6b7663] pt-1">
+                Checked in at: <strong className="text-[#26301f] font-display tabular-nums">{formatTimeStr(attendance?.check_in)}</strong>
               </div>
             )}
           </div>
 
-          {/* Center: Running Timer Display */}
-          <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl px-8 py-4 text-center min-w-[240px]">
-            <span className="text-[11px] uppercase font-bold text-[#64748B] tracking-wider">
+          {/* Center: Running Timer Display (Sunken Inset Surface) */}
+          <div className="bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] rounded-[22px] px-8 py-5 text-center min-w-[240px] shadow-[inset_3px_4px_8px_rgba(104,118,100,0.22),inset_-2px_-3px_6px_rgba(255,255,255,0.7)]">
+            <span className="text-[11px] uppercase font-bold text-[#6b7663] tracking-wider font-display">
               Work Timer Today
             </span>
-            <div className="text-3xl sm:text-4xl font-mono font-extrabold text-[#0F172A] mt-1">
+            <div className="text-3xl sm:text-4xl font-extrabold text-[#26301f] font-display tabular-nums mt-1">
               {isCheckedIn ? elapsedFormatted : '00:00:00'}
             </div>
             {attendance?.break_minutes ? (
-              <div className="text-[11px] text-[#B45309] font-medium mt-1">
+              <div className="text-[11px] text-[#cf9b34] font-medium mt-1 font-display tabular-nums">
                 Total break: {attendance.break_minutes} mins
               </div>
             ) : null}
@@ -288,14 +288,14 @@ export const MyAttendancePage: React.FC = () => {
             {!isCheckedIn ? (
               <div className="w-full max-w-xs space-y-3">
                 {/* Office / WFH Toggle */}
-                <div className="flex bg-[#F1F5F9] p-1 rounded-xl text-xs font-semibold border border-[#E2E8F0]">
+                <div className="flex bg-[#dbe2d5] p-1 rounded-full text-xs font-semibold border border-[rgba(76,91,70,0.14)] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)]">
                   <button
                     type="button"
                     onClick={() => setWorkType('office')}
-                    className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                    className={`flex-1 py-1.5 rounded-full flex items-center justify-center gap-1.5 transition-all font-display ${
                       workType === 'office'
-                        ? 'bg-white text-[#4F46E5] shadow-sm font-bold'
-                        : 'text-[#475569] hover:text-[#0F172A]'
+                        ? 'bg-[#14776b] text-white shadow-sm font-bold'
+                        : 'text-[#35422d] hover:text-[#26301f]'
                     }`}
                   >
                     <Building2 className="w-3.5 h-3.5" />
@@ -304,10 +304,10 @@ export const MyAttendancePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setWorkType('wfh')}
-                    className={`flex-1 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                    className={`flex-1 py-1.5 rounded-full flex items-center justify-center gap-1.5 transition-all font-display ${
                       workType === 'wfh'
-                        ? 'bg-white text-[#0F766E] shadow-sm font-bold'
-                        : 'text-[#475569] hover:text-[#0F172A]'
+                        ? 'bg-[#14776b] text-white shadow-sm font-bold'
+                        : 'text-[#35422d] hover:text-[#26301f]'
                     }`}
                   >
                     <Home className="w-3.5 h-3.5" />
@@ -319,7 +319,7 @@ export const MyAttendancePage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full"
+                  className="w-full font-bold"
                   isLoading={checkInMutation.isPending}
                   leftIcon={<LogIn className="w-5 h-5" />}
                   onClick={() => checkInMutation.mutate()}
@@ -333,7 +333,7 @@ export const MyAttendancePage: React.FC = () => {
                 <Button
                   variant="danger"
                   size="lg"
-                  className="w-full"
+                  className="w-full font-bold"
                   isLoading={checkOutMutation.isPending}
                   leftIcon={<LogOut className="w-5 h-5" />}
                   onClick={() => checkOutMutation.mutate()}
@@ -346,7 +346,7 @@ export const MyAttendancePage: React.FC = () => {
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="w-full"
+                      className="w-full font-bold"
                       isLoading={endBreakMutation.isPending}
                       leftIcon={<Coffee className="w-3.5 h-3.5" />}
                       onClick={() => endBreakMutation.mutate()}
@@ -357,9 +357,9 @@ export const MyAttendancePage: React.FC = () => {
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="w-full"
+                      className="w-full font-bold"
                       isLoading={startBreakMutation.isPending}
-                      leftIcon={<Coffee className="w-3.5 h-3.5 text-[#D97706]" />}
+                      leftIcon={<Coffee className="w-3.5 h-3.5 text-[#cf9b34]" />}
                       onClick={() => startBreakMutation.mutate()}
                     >
                       Take Break
@@ -368,8 +368,8 @@ export const MyAttendancePage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-center p-3 bg-[#DCFCE7] border border-[#BBF7D0] rounded-xl text-[#15803D] text-xs font-semibold">
-                <CheckCircle2 className="w-5 h-5 text-[#16A34A] mx-auto mb-1" />
+              <div className="text-center p-3.5 bg-[#daebd9] border border-[#3f8f4a]/30 rounded-[18px] text-[#1b4e23] text-xs font-semibold shadow-[inset_1px_1px_3px_rgba(63,143,74,0.15)]">
+                <CheckCircle2 className="w-5 h-5 text-[#3f8f4a] mx-auto mb-1" />
                 Punch Out Recorded
               </div>
             )}
@@ -378,18 +378,18 @@ export const MyAttendancePage: React.FC = () => {
       </div>
 
       {/* MONTHLY CALENDAR WITH COLOURED BADGES */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-[#E2E8F0]">
+      <div className="bg-[#e2e8dc] rounded-[26px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.24),-6px_-7px_18px_rgba(255,255,255,0.7)] p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-[rgba(76,91,70,0.14)]">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-[#4F46E5]" />
-            <h2 className="text-lg font-bold text-[#0F172A]">Monthly Calendar</h2>
+            <Calendar className="w-5 h-5 text-[#14776b]" />
+            <h2 className="text-lg font-bold text-[#26301f] font-display">Monthly Calendar</h2>
           </div>
 
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" onClick={handlePrevMonth}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <span className="text-sm font-semibold text-[#0F172A] font-mono px-2">
+            <span className="text-sm font-semibold text-[#26301f] font-display tabular-nums px-2">
               {selectedMonth}
             </span>
             <Button variant="secondary" size="sm" onClick={handleNextMonth}>
@@ -399,7 +399,7 @@ export const MyAttendancePage: React.FC = () => {
         </div>
 
         {/* Badges Legend using StatusBadge */}
-        <div className="flex flex-wrap gap-2 text-xs font-medium text-[#475569] bg-[#F8FAFC] p-3 rounded-lg border border-[#E2E8F0]">
+        <div className="flex flex-wrap gap-2 text-xs font-medium text-[#35422d] bg-[#dbe2d5] p-3.5 rounded-[18px] border border-[rgba(76,91,70,0.14)] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.12)]">
           <StatusBadge status="present" label="Present" size="sm" />
           <StatusBadge status="absent" label="Absent" size="sm" />
           <StatusBadge status="half_day" label="Half Day" size="sm" />
@@ -411,7 +411,7 @@ export const MyAttendancePage: React.FC = () => {
 
         {/* Monthly Grid */}
         {isLoadingMonthly ? (
-          <div className="py-12 text-center text-[#64748B] text-sm">Loading attendance calendar...</div>
+          <div className="py-12 text-center text-[#6b7663] text-sm">Loading attendance calendar...</div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
             {Object.entries(monthlyData?.days || {}).map(([dateStr, dayInfo]: [string, any]) => {
@@ -424,17 +424,17 @@ export const MyAttendancePage: React.FC = () => {
                 <div
                   key={dateStr}
                   onClick={() => setSelectedDayPopup({ date: dateStr, dayInfo, record })}
-                  className="p-3 rounded-xl border border-[#E2E8F0] bg-white text-left flex flex-col justify-between min-h-[85px] cursor-pointer hover:shadow-md transition-all hover:border-[#4F46E5]"
+                  className="p-3 rounded-[18px] border border-[rgba(76,91,70,0.14)] bg-[#e2e8dc] text-left flex flex-col justify-between min-h-[88px] cursor-pointer shadow-[3px_4px_10px_rgba(88,104,84,0.15),-2px_-3px_8px_rgba(255,255,255,0.7)] hover:shadow-[5px_6px_14px_rgba(88,104,84,0.22),-3px_-4px_10px_rgba(255,255,255,0.85)] transition-all hover:border-[#14776b]/40"
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-[#0F172A]">{dayNum}</span>
-                    <span className="text-[10px] text-[#64748B] uppercase">{dayOfWeek}</span>
+                    <span className="text-xs font-bold text-[#26301f] font-display tabular-nums">{dayNum}</span>
+                    <span className="text-[10px] text-[#6b7663] uppercase font-bold">{dayOfWeek}</span>
                   </div>
 
                   <div className="mt-2 flex flex-col items-start gap-1">
                     <StatusBadge status={dayInfo.status} size="sm" />
                     {record?.is_late && (
-                      <span className="text-[9px] font-bold px-1 rounded bg-[#FEF3C7] text-[#B45309]">
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#f7eed9] text-[#cf9b34] border border-[#cf9b34]/30">
                         LATE
                       </span>
                     )}
@@ -453,15 +453,15 @@ export const MyAttendancePage: React.FC = () => {
         title={`Attendance Detail: ${selectedDayPopup?.date}`}
       >
         {selectedDayPopup && (
-          <div className="space-y-3 text-sm text-[#475569]">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
-              <span className="font-medium text-[#64748B]">Status</span>
+          <div className="space-y-3 text-sm text-[#35422d]">
+            <div className="flex items-center justify-between pb-2 border-b border-[rgba(76,91,70,0.12)]">
+              <span className="font-medium text-[#6b7663]">Status</span>
               <StatusBadge status={selectedDayPopup.dayInfo?.status || 'normal'} />
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-[#64748B]">Check In</span>
-              <span className="font-mono font-semibold text-[#0F172A]">
+              <span className="text-[#6b7663]">Check In</span>
+              <span className="font-mono font-semibold text-[#26301f]">
                 {selectedDayPopup.record?.check_in
                   ? new Date(selectedDayPopup.record.check_in).toLocaleTimeString('en-IN')
                   : '--'}
@@ -469,8 +469,8 @@ export const MyAttendancePage: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-[#64748B]">Check Out</span>
-              <span className="font-mono font-semibold text-[#0F172A]">
+              <span className="text-[#6b7663]">Check Out</span>
+              <span className="font-mono font-semibold text-[#26301f]">
                 {selectedDayPopup.record?.check_out
                   ? new Date(selectedDayPopup.record.check_out).toLocaleTimeString('en-IN')
                   : '--'}
@@ -478,8 +478,8 @@ export const MyAttendancePage: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-[#64748B]">Net Hours</span>
-              <span className="font-mono font-semibold text-[#0F172A]">
+              <span className="text-[#6b7663]">Net Hours</span>
+              <span className="font-mono font-semibold text-[#26301f] tabular-nums">
                 {selectedDayPopup.record?.working_minutes
                   ? `${(selectedDayPopup.record.working_minutes / 60).toFixed(1)} hrs`
                   : '0 hrs'}
@@ -487,14 +487,14 @@ export const MyAttendancePage: React.FC = () => {
             </div>
 
             {selectedDayPopup.dayInfo?.leave_details && (
-              <div className="p-3 bg-[#E0F2FE] border border-[#BAE6FD] rounded-lg text-xs text-[#0369A1]">
+              <div className="p-3 bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] rounded-[14px] text-xs text-[#22304a] shadow-[inset_1px_1px_3px_rgba(104,118,100,0.12)]">
                 <strong>Leave Info:</strong> {selectedDayPopup.dayInfo.leave_details}
               </div>
             )}
 
             {selectedDayPopup.record?.is_late && (
-              <div className="p-2 bg-[#FEF3C7] border border-[#FDE68A] rounded-lg text-xs text-[#B45309] flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-[#D97706]" />
+              <div className="p-2.5 bg-[#f7eed9] border border-[#cf9b34]/30 rounded-[14px] text-xs text-[#cf9b34] flex items-center gap-1.5 shadow-[inset_1px_1px_3px_rgba(207,155,52,0.12)]">
+                <AlertTriangle className="w-4 h-4 text-[#cf9b34]" />
                 Checked in after shift grace period.
               </div>
             )}

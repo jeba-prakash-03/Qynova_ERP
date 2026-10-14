@@ -29,20 +29,20 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   const iconConfig = {
     danger: {
       icon: Trash2,
-      bgColor: 'bg-[#FEE2E2]',
-      textColor: 'text-[#DC2626]',
+      bgColor: 'bg-[#f6dfd8] border border-[#e8beae]',
+      textColor: 'text-[#8a3114]',
       btnVariant: 'danger' as const,
     },
     warning: {
       icon: AlertTriangle,
-      bgColor: 'bg-[#FEF3C7]',
-      textColor: 'text-[#D97706]',
+      bgColor: 'bg-[#f7efdd] border border-[#e6d4a8]',
+      textColor: 'text-[#855b11]',
       btnVariant: 'danger' as const,
     },
     primary: {
       icon: Check,
-      bgColor: 'bg-[#EEF2FF]',
-      textColor: 'text-[#4F46E5]',
+      bgColor: 'bg-[#d8ebd9] border border-[#b8d6ba]',
+      textColor: 'text-[#1e5725]',
       btnVariant: 'primary' as const,
     },
   }[variant];
@@ -75,10 +75,10 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       }
     >
       <div className="flex items-start gap-4 py-2">
-        <div className={`p-3 rounded-xl shrink-0 ${iconConfig.bgColor} ${iconConfig.textColor}`}>
+        <div className={`p-3 rounded-2xl shrink-0 shadow-[inset_1px_1px_3px_rgba(88,104,84,0.15)] ${iconConfig.bgColor} ${iconConfig.textColor}`}>
           <Icon className="w-6 h-6" />
         </div>
-        <div className="text-sm text-[#475569] leading-relaxed pt-1">{message}</div>
+        <div className="text-sm text-[#35422d] leading-relaxed pt-1 font-medium">{message}</div>
       </div>
     </Modal>
   );

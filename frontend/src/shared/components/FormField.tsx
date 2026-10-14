@@ -24,15 +24,15 @@ export const FormField: React.FC<FormFieldProps> = ({
       {label && (
         <label
           htmlFor={htmlFor}
-          className="text-xs font-semibold uppercase tracking-wider text-slate-600 flex items-center gap-1 cursor-pointer"
+          className="text-xs font-bold uppercase tracking-wider text-[#6b7663] flex items-center gap-1 cursor-pointer select-none"
         >
           {label}
-          {required && <span className="text-rose-500 font-bold" aria-hidden="true">*</span>}
+          {required && <span className="text-[#c4643f] font-bold" aria-hidden="true">*</span>}
         </label>
       )}
       {children}
-      {error && <span className="text-xs text-rose-600 font-medium">{error}</span>}
-      {!error && helperText && <span className="text-xs text-slate-500">{helperText}</span>}
+      {error && <span className="text-xs text-[#c4643f] font-semibold">{error}</span>}
+      {!error && helperText && <span className="text-xs text-[#6b7663]">{helperText}</span>}
     </div>
   );
 };

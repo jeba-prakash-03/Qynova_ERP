@@ -49,10 +49,12 @@ export const usePushNotifications = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Register service worker and fetch FCM token
-  const registerFcmToken = useCallback(async (): Promise<string | null> => {
+  const registerFcmToken = useCallback(async (): Promise<{ success: boolean; token?: string; error?: string }> => {
     try {
       const messaging = await getMessagingInstance();
-      if (!messaging) return null;
+      if (!messaging) {
+        return { success: false, error: 'Firebase messaging is not configured or not supported in this browser.' };
+      }
 
       // Register or retrieve service worker registration
       const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
@@ -69,18 +71,28 @@ export const usePushNotifications = () => {
           token: currentToken,
           platform: 'web',
         });
-        return currentToken;
+        queryClient.invalidateQueries({ queryKey: ['push', 'status'] });
+        return { success: true, token: currentToken };
       }
-      return null;
-    } catch (error) {
+      return { success: false, error: 'No FCM token returned from browser.' };
+    } catch (error: any) {
       console.warn('[FCM] Failed to register token with server:', error);
-      return null;
+      let errorMsg = error?.message || 'Failed to register push token.';
+      if (
+        (navigator as any).brave ||
+        navigator.userAgent.includes('Brave') ||
+        errorMsg.includes('push service error') ||
+        errorMsg.includes('AbortError')
+      ) {
+        errorMsg = 'Brave browser blocked push service. Go to brave://settings/privacy, enable "Use Google services for push messaging", and restart Brave.';
+      }
+      return { success: false, error: errorMsg };
     }
-  }, []);
+  }, [queryClient]);
 
   // Request permission and register on user click
-  const enable = async () => {
-    if (!isSupported) return;
+  const enable = async (): Promise<{ success: boolean; error?: string }> => {
+    if (!isSupported) return { success: false, error: 'Push notifications are not supported in this browser' };
     setIsLoading(true);
 
     try {
@@ -88,11 +100,20 @@ export const usePushNotifications = () => {
       setPermission(result);
 
       if (result === 'granted') {
-        await registerFcmToken();
-        info('Push notifications enabled successfully!');
+        const reg = await registerFcmToken();
+        if (reg.success) {
+          info('Push notifications enabled successfully!');
+          return { success: true };
+        } else {
+          return { success: false, error: reg.error };
+        }
+      } else if (result === 'denied') {
+        return { success: false, error: 'Push notification permission was denied in your browser settings.' };
       }
-    } catch (err) {
+      return { success: false };
+    } catch (err: any) {
       console.error('[FCM] Permission request error:', err);
+      return { success: false, error: err?.message || 'Failed to request notification permission' };
     } finally {
       setIsLoading(false);
     }
@@ -148,6 +169,7 @@ export const usePushNotifications = () => {
     isDenied,
     isLoading,
     enable,
+    registerDevice: registerFcmToken,
     dismiss,
     unregister: unregisterPushToken,
   };

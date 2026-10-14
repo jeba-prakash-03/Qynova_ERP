@@ -11,7 +11,7 @@ import {
   Legend,
 } from 'recharts';
 
-const COLORS = ['#4F46E5', '#0284C7', '#0D9488', '#D97706', '#7C3AED', '#DC2626'];
+const COLORS = ['#14776b', '#c4643f', '#cf9b34', '#22304a', '#3f8f4a', '#6b7663'];
 
 export const LeaveByTypeChart: React.FC = () => {
   const { data, isLoading } = useQuery({
@@ -23,11 +23,11 @@ export const LeaveByTypeChart: React.FC = () => {
   });
 
   return (
-    <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm">
+    <div className="bg-[#e2e8dc] rounded-[26px] p-6 border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.24),-6px_-7px_18px_rgba(255,255,255,0.7)]">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-base font-bold text-[#0F172A]">Leave Distribution by Type</h3>
-          <p className="text-xs text-[#64748B]">Total days taken across active employees this year</p>
+          <h3 className="text-base font-bold text-[#26301f] font-display">Leave Distribution by Type</h3>
+          <p className="text-xs text-[#6b7663]">Total days taken across active employees this year</p>
         </div>
       </div>
 
@@ -36,7 +36,7 @@ export const LeaveByTypeChart: React.FC = () => {
           <Loader size="sm" text="Loading leave chart..." />
         </div>
       ) : !data || data.length === 0 ? (
-        <div className="h-64 flex items-center justify-center text-xs text-[#64748B]">
+        <div className="h-64 flex items-center justify-center text-xs text-[#6b7663]">
           No leave data recorded for this year
         </div>
       ) : (
@@ -45,11 +45,12 @@ export const LeaveByTypeChart: React.FC = () => {
             <PieChart>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#0F172A',
-                  border: 'none',
-                  borderRadius: '12px',
-                  color: '#FFFFFF',
+                  backgroundColor: '#26301f',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '16px',
+                  color: '#e2e8dc',
                   fontSize: '12px',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.25)',
                 }}
               />
               <Legend

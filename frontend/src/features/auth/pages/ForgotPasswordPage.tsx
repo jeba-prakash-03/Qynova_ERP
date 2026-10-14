@@ -71,9 +71,9 @@ export const ForgotPasswordPage: React.FC = () => {
         <div
           role="alert"
           aria-live="polite"
-          className="mb-6 p-4 rounded-xl text-xs font-medium border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-2.5"
+          className="mb-6 p-4 rounded-[18px] text-xs font-medium border bg-[#f4ded6] border-[#c4643f]/30 text-[#632a17] flex items-start gap-2.5 shadow-[inset_2px_2px_4px_rgba(196,100,63,0.15)]"
         >
-          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <AlertCircle className="w-4 h-4 text-[#c4643f] shrink-0 mt-0.5" />
           <span className="leading-relaxed">{errorMsg}</span>
         </div>
       )}
@@ -83,16 +83,16 @@ export const ForgotPasswordPage: React.FC = () => {
           {/* Generic confirmation card */}
           <div
             role="status"
-            className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 text-emerald-900 space-y-3"
+            className="p-5 rounded-[22px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] text-[#26301f] space-y-3 shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)]"
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-[14px] bg-[#daebd9] text-[#1b4e23] flex items-center justify-center shadow-[inset_1px_2px_4px_rgba(63,143,74,0.15)]">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-emerald-950">
+              <h3 className="text-sm font-bold text-[#26301f] font-display">
                 Check your inbox
               </h3>
-              <p className="text-xs text-emerald-800/90 leading-relaxed mt-1">
+              <p className="text-xs text-[#6b7663] leading-relaxed mt-1">
                 If an account exists for that email, we've sent a reset link. Please check your spam folder if it doesn't arrive shortly.
               </p>
             </div>
@@ -106,7 +106,7 @@ export const ForgotPasswordPage: React.FC = () => {
               disabled={cooldownSec > 0 || isLoading}
               isLoading={isLoading}
               onClick={() => handleSubmit()}
-              className="w-full min-h-[44px] text-xs font-bold"
+              className="w-full min-h-[46px] text-xs font-bold"
             >
               {cooldownSec > 0
                 ? `Resend link (${cooldownSec}s)`
@@ -115,7 +115,7 @@ export const ForgotPasswordPage: React.FC = () => {
 
             <Link
               to="/login"
-              className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 text-xs font-bold text-slate-700 hover:text-slate-900 transition border border-slate-200 rounded-xl"
+              className="w-full min-h-[46px] inline-flex items-center justify-center gap-2 text-xs font-bold text-[#26301f] hover:text-[#14776b] transition bg-[#e2e8dc] border border-[rgba(76,91,70,0.14)] rounded-full shadow-[4px_5px_12px_rgba(88,104,84,0.18),-3px_-4px_10px_rgba(255,255,255,0.7)]"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to sign in
@@ -143,8 +143,8 @@ export const ForgotPasswordPage: React.FC = () => {
                 if (fieldError) setFieldError(null);
               }}
               placeholder="name@company.com"
-              className={`w-full min-h-[44px] px-3.5 py-2.5 text-sm bg-white border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] disabled:bg-slate-50 transition ${
-                fieldError ? 'border-rose-300 ring-1 ring-rose-300' : 'border-slate-200'
+              className={`w-full min-h-[46px] px-4 py-2.5 text-sm bg-[#dbe2d5] border rounded-[16px] text-[#26301f] placeholder:text-[#6b7663] shadow-[inset_2px_3px_6px_rgba(104,118,100,0.22),inset_-2px_-2px_5px_rgba(255,255,255,0.7)] focus:outline-none focus:ring-2 focus:ring-[#14776b] focus:border-[#14776b] disabled:opacity-60 transition ${
+                fieldError ? 'border-[#c4643f] ring-1 ring-[#c4643f]' : 'border-[rgba(76,91,70,0.18)]'
               }`}
             />
           </FormField>
@@ -155,7 +155,7 @@ export const ForgotPasswordPage: React.FC = () => {
             size="lg"
             isLoading={isLoading}
             disabled={isLoading || cooldownSec > 0}
-            className="w-full min-h-[44px] font-bold text-sm shadow-md shadow-indigo-500/20"
+            className="w-full min-h-[46px] font-bold text-sm"
           >
             {isLoading ? 'Sending reset link...' : 'Send reset link'}
           </Button>
@@ -163,7 +163,7 @@ export const ForgotPasswordPage: React.FC = () => {
           <div className="text-center pt-2">
             <Link
               to="/login"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6b7663] hover:text-[#26301f] transition"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Back to sign in

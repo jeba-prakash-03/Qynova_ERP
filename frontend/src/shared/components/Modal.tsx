@@ -45,35 +45,35 @@ export const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-[#26301f]/50 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
       <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
         <div
-          className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full ${maxWidthClasses[maxWidth]} border border-slate-200/80`}
+          className={`relative transform overflow-hidden rounded-[26px] bg-[#e2e8dc] text-left shadow-[14px_18px_36px_rgba(50,65,45,0.32),-10px_-10px_24px_rgba(255,255,255,0.85)] border border-[rgba(76,91,70,0.18)] transition-all sm:my-8 w-full ${maxWidthClasses[maxWidth]}`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 bg-slate-50/50">
+          <div className="flex items-center justify-between border-b border-[rgba(76,91,70,0.12)] px-6 py-4 bg-[#dbe2d5]/60">
             <div>
-              <h3 className="text-lg font-bold text-slate-800">{title}</h3>
-              {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+              <h3 className="font-display text-lg font-bold text-[#26301f] leading-snug">{title}</h3>
+              {subtitle && <p className="text-xs text-[#6b7663] mt-0.5">{subtitle}</p>}
             </div>
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+              className="rounded-full p-1.5 text-[#6b7663] hover:bg-[#dbe2d5] hover:text-[#26301f] transition"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="px-6 py-5 max-h-[calc(85vh-120px)] overflow-y-auto">{children}</div>
+          <div className="px-6 py-5 max-h-[calc(85vh-120px)] overflow-y-auto text-[#26301f]">{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-3.5">
+            <div className="flex items-center justify-end gap-3 border-t border-[rgba(76,91,70,0.12)] bg-[#dbe2d5]/60 px-6 py-3.5">
               {footer}
             </div>
           )}

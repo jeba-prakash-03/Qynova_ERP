@@ -58,20 +58,20 @@ export function DataTable<T>({
   keyExtractor,
 }: DataTableProps<T>) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+    <div className="bg-[#e2e8dc] rounded-[26px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.28),-6px_-7px_18px_rgba(255,255,255,0.78)] overflow-hidden flex flex-col">
       {/* Table Toolbar */}
       {(onSearchChange || filters || actions) && (
-        <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-50/40">
+        <div className="p-4 border-b border-[rgba(76,91,70,0.12)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#dbe2d5]/60">
           <div className="flex flex-1 items-center gap-3 flex-wrap">
             {onSearchChange && (
               <div className="relative min-w-[240px] max-w-sm flex-1">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#6b7663] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchValue || ''}
                   onChange={(e) => onSearchChange(e.target.value)}
                   placeholder={searchPlaceholder}
-                  className="w-full pl-9 pr-3 py-1.5 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+                  className="w-full pl-9 pr-3.5 py-2 text-sm bg-[#dbe2d5] border border-[rgba(76,91,70,0.18)] rounded-[16px] text-[#26301f] placeholder:text-[#6b7663] shadow-[inset_2px_3px_6px_rgba(104,118,100,0.22),inset_-2px_-2px_4px_rgba(255,255,255,0.65)] focus:outline-none focus:ring-2 focus:ring-[#14776b] focus:border-[#14776b] transition"
                 />
               </div>
             )}
@@ -92,8 +92,8 @@ export function DataTable<T>({
             <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
           </div>
         ) : (
-          <table className="w-full text-left text-sm text-slate-600 border-collapse">
-            <thead className="bg-slate-50/70 border-b border-slate-100 text-xs uppercase font-semibold text-slate-500 tracking-wider">
+          <table className="w-full text-left text-sm text-[#26301f] border-collapse">
+            <thead className="bg-[#dbe2d5]/85 border-b border-[rgba(76,91,70,0.14)] text-xs uppercase font-bold text-[#6b7663] tracking-wider shadow-[inset_0_-1px_3px_rgba(104,118,100,0.08)]">
               <tr>
                 {columns.map((col, index) => {
                   const isSorted = sortField && col.accessorKey === sortField;
@@ -102,7 +102,7 @@ export function DataTable<T>({
                       key={index}
                       scope="col"
                       className={`px-5 py-3.5 ${col.className || ''} ${
-                        col.sortable && onSort ? 'cursor-pointer select-none hover:bg-slate-100/60' : ''
+                        col.sortable && onSort ? 'cursor-pointer select-none hover:bg-[#dbe2d5]' : ''
                       }`}
                       onClick={() => {
                         if (col.sortable && onSort && col.accessorKey) {
@@ -113,15 +113,15 @@ export function DataTable<T>({
                       <div className="flex items-center gap-1.5">
                         <span>{col.header}</span>
                         {col.sortable && onSort && (
-                          <span className="text-slate-400">
+                          <span className="text-[#6b7663]">
                             {isSorted ? (
                               sortOrder === 'asc' ? (
-                                <ChevronUp className="w-3.5 h-3.5 text-indigo-600" />
+                                <ChevronUp className="w-3.5 h-3.5 text-[#14776b]" />
                               ) : (
-                                <ChevronDown className="w-3.5 h-3.5 text-indigo-600" />
+                                <ChevronDown className="w-3.5 h-3.5 text-[#14776b]" />
                               )
                             ) : (
-                              <ChevronsUpDown className="w-3.5 h-3.5 text-slate-300 hover:text-slate-500" />
+                              <ChevronsUpDown className="w-3.5 h-3.5 text-[#8e9c85] hover:text-[#26301f]" />
                             )}
                           </span>
                         )}
@@ -131,11 +131,11 @@ export function DataTable<T>({
                 })}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[rgba(76,91,70,0.10)]">
               {data.map((row) => (
                 <tr
                   key={keyExtractor(row)}
-                  className="hover:bg-slate-50/60 transition duration-150"
+                  className="hover:bg-[#dbe2d5]/45 transition duration-150"
                 >
                   {columns.map((col, cIndex) => (
                     <td key={cIndex} className={`px-5 py-3.5 ${col.className || ''}`}>
@@ -155,22 +155,22 @@ export function DataTable<T>({
 
       {/* Pagination Footer */}
       {totalPages > 1 && onPageChange && (
-        <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between bg-slate-50/50 text-xs text-slate-500">
+        <div className="px-5 py-3.5 border-t border-[rgba(76,91,70,0.12)] flex items-center justify-between bg-[#dbe2d5]/50 text-xs text-[#6b7663]">
           <div>
-            Showing page <span className="font-semibold text-slate-800">{page}</span> of{' '}
-            <span className="font-semibold text-slate-800">{totalPages}</span>
+            Showing page <span className="font-bold text-[#26301f]">{page}</span> of{' '}
+            <span className="font-bold text-[#26301f]">{totalPages}</span>
             {totalRecords !== undefined && (
               <>
                 {' '}
-                (<span className="font-semibold text-slate-800">{totalRecords}</span> total records)
+                (<span className="font-bold text-[#26301f]">{totalRecords}</span> total records)
               </>
             )}
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1 || isLoading}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition"
+              className="p-1.5 rounded-full border border-[rgba(76,91,70,0.16)] bg-[#e2e8dc] hover:bg-[#dbe2d5] text-[#26301f] shadow-[2px_3px_8px_rgba(88,104,84,0.2),-2px_-2px_6px_rgba(255,255,255,0.8)] disabled:opacity-40 disabled:pointer-events-none transition"
               title="Previous Page"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -178,7 +178,7 @@ export function DataTable<T>({
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages || isLoading}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition"
+              className="p-1.5 rounded-full border border-[rgba(76,91,70,0.16)] bg-[#e2e8dc] hover:bg-[#dbe2d5] text-[#26301f] shadow-[2px_3px_8px_rgba(88,104,84,0.2),-2px_-2px_6px_rgba(255,255,255,0.8)] disabled:opacity-40 disabled:pointer-events-none transition"
               title="Next Page"
             >
               <ChevronRight className="w-4 h-4" />

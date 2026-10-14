@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../../../shared/api/axiosClient';
 import { useToast } from '../../../shared/context/ToastContext';
 import { FormField } from '../../../shared/components/FormField';
+import { Button } from '../../../shared/components/Button';
+import { StatusBadge } from '../../../shared/components/StatusBadge';
 import { Clock, Plus, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 
 export const MyTimesheetsPage: React.FC = () => {
@@ -77,19 +79,19 @@ export const MyTimesheetsPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
-          <Clock className="w-7 h-7 text-indigo-600" />
+        <h1 className="text-2xl font-bold text-[#26301f] font-display flex items-center gap-2.5">
+          <Clock className="w-7 h-7 text-[#14776b]" />
           My Timesheets
         </h1>
-        <p className="text-slate-500 text-sm mt-1">
+        <p className="text-[#6b7663] text-sm mt-1">
           Submit daily work hours and track timesheet approval status.
         </p>
       </div>
 
       {/* SUBMISSION FORM */}
-      <div className="bg-white rounded-xl border border-slate-200/90 shadow-sm p-5">
-        <h2 className="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-          <Plus className="w-5 h-5 text-indigo-600" /> Submit New Timesheet Entry
+      <div className="bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] p-5">
+        <h2 className="font-bold text-[#26301f] font-display text-base mb-4 flex items-center gap-2">
+          <Plus className="w-5 h-5 text-[#14776b]" /> Submit New Timesheet Entry
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,7 +101,7 @@ export const MyTimesheetsPage: React.FC = () => {
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 required
               />
             </FormField>
@@ -112,7 +114,7 @@ export const MyTimesheetsPage: React.FC = () => {
                 max="24"
                 value={hours}
                 onChange={(e) => setHours(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 required
               />
             </FormField>
@@ -126,7 +128,7 @@ export const MyTimesheetsPage: React.FC = () => {
                   setSelectedProjectId(e.target.value ? Number(e.target.value) : '');
                   setSelectedTaskId('');
                 }}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               >
                 <option value="">-- General / Non-Project --</option>
                 {assignments.map((proj: any) => (
@@ -142,7 +144,7 @@ export const MyTimesheetsPage: React.FC = () => {
                 value={selectedTaskId}
                 onChange={(e) => setSelectedTaskId(e.target.value ? Number(e.target.value) : '')}
                 disabled={!selectedProjectId || availableTasks.length === 0}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white disabled:bg-slate-50 disabled:text-slate-400"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="">-- Select Task --</option>
                 {availableTasks.map((tsk: any) => (
@@ -160,78 +162,69 @@ export const MyTimesheetsPage: React.FC = () => {
               placeholder="Describe work completed, tickets closed, or project deliverables..."
               value={taskDescription}
               onChange={(e) => setTaskDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               required
             />
           </FormField>
 
           <div className="flex justify-end">
-            <button
+            <Button
               type="submit"
-              disabled={submitMutation.isPending || !taskDescription.trim()}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg shadow-sm transition-all disabled:opacity-50"
+              variant="primary"
+              isLoading={submitMutation.isPending}
+              disabled={!taskDescription.trim()}
             >
-              {submitMutation.isPending ? 'Submitting...' : 'Submit Entry'}
-            </button>
+              Submit Entry
+            </Button>
           </div>
         </form>
       </div>
 
       {/* TIMESHEET HISTORY TABLE */}
-      <div className="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100 font-bold text-slate-900 text-base">
+      <div className="bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] overflow-hidden">
+        <div className="p-4 border-b border-[rgba(76,91,70,0.14)] bg-[#dbe2d5]/60 font-bold text-[#26301f] font-display text-base">
           Timesheet History
         </div>
 
         {isLoading ? (
-          <div className="p-12 text-center text-slate-400">Loading timesheets...</div>
+          <div className="p-12 text-center text-[#6b7663]">Loading timesheets...</div>
         ) : timesheets.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-sm">No timesheets submitted yet.</div>
+          <div className="p-12 text-center text-[#6b7663] text-sm">No timesheets submitted yet.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs font-semibold text-slate-600 border-b border-slate-200">
+              <thead className="bg-[#dbe2d5] text-xs font-semibold text-[#26301f] border-b border-[rgba(76,91,70,0.14)] font-display">
                 <tr>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">Project</th>
-                  <th className="py-3 px-4 text-center">Hours</th>
-                  <th className="py-3 px-4">Task Description</th>
-                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 font-display">Date</th>
+                  <th className="py-3 px-4 font-display">Project</th>
+                  <th className="py-3 px-4 text-center font-display">Hours</th>
+                  <th className="py-3 px-4 font-display">Task Description</th>
+                  <th className="py-3 px-4 font-display">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
+              <tbody className="divide-y divide-[rgba(76,91,70,0.10)] text-[#35422d]">
                 {timesheets.map((t: any) => (
-                  <tr key={t.id} className="hover:bg-slate-50">
-                    <td className="py-3.5 px-4 font-mono text-xs font-semibold text-slate-900">
+                  <tr key={t.id} className="hover:bg-[#dbe2d5]/60 transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-xs font-semibold text-[#26301f] tabular-nums">
                       {t.date}
                     </td>
-                    <td className="py-3.5 px-4 text-xs font-medium text-slate-800">
+                    <td className="py-3.5 px-4 text-xs font-medium text-[#26301f]">
                       {t.project_name ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[8px] bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.14)]">
                           {t.project_code ? `${t.project_code} - ` : ''}{t.project_name}
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-[#6b7663]">—</span>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 text-center font-bold text-slate-800">
+                    <td className="py-3.5 px-4 text-center font-bold text-[#26301f] tabular-nums">
                       {t.hours} hrs
                     </td>
-                    <td className="py-3.5 px-4 max-w-md truncate text-slate-600">
+                    <td className="py-3.5 px-4 max-w-md truncate text-[#35422d]">
                       {t.task_description}
                     </td>
                     <td className="py-3.5 px-4">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase ${
-                          t.status === 'approved'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : t.status === 'rejected'
-                            ? 'bg-rose-100 text-rose-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        {t.status}
-                      </span>
+                      <StatusBadge status={t.status} size="sm" />
                     </td>
                   </tr>
                 ))}

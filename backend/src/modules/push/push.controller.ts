@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { pushService } from '../../shared/services/push.service';
 import { notificationService } from '../../shared/services/notification.service';
+import { getIsPushEnabled } from '../../shared/firebase';
 import { sendSuccess } from '../../shared/utils/response.util';
 import { asyncHandler } from '../../shared/utils/async-handler.util';
 import { UnauthorizedError, BadRequestError } from '../../shared/errors/app-error';
@@ -94,6 +95,23 @@ export class PushController {
     if (!req.user) throw new UnauthorizedError();
     const result = await pushService.sendTestPush(req.user.userId);
     return sendSuccess(res, result, 200, undefined, 'Test notification dispatched');
+  });
+
+  /**
+   * Get push notification & device registration status
+   * GET /api/v1/push/status
+   */
+  public getStatus = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) throw new UnauthorizedError();
+    const activeDeviceCount = await pushService.getActiveDeviceCount(req.user.userId);
+    return sendSuccess(
+      res,
+      {
+        isPushEnabled: getIsPushEnabled(),
+        activeDeviceCount,
+      },
+      200
+    );
   });
 }
 

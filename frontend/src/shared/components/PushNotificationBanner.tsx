@@ -9,16 +9,16 @@ export const PushNotificationBanner: React.FC = () => {
 
   if (isDenied && !dismissDeniedHelp) {
     return (
-      <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 text-xs text-amber-800 flex items-center justify-between transition-all">
+      <div className="bg-[#f7efdd] border-b border-[#e6d4a8] px-4 py-2.5 text-xs text-[#855b11] flex items-center justify-between transition-all">
         <div className="flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+          <AlertCircle className="w-4 h-4 text-[#cf9b34] shrink-0" />
           <span>
             Notifications are blocked in your browser. To receive leave and payroll alerts, click the lock or site settings icon in your browser URL bar and set <strong>Notifications</strong> to <strong>Allow</strong>.
           </span>
         </div>
         <button
           onClick={() => setDismissDeniedHelp(true)}
-          className="p-1 hover:bg-amber-100 rounded text-amber-600 ml-3 shrink-0"
+          className="p-1 hover:bg-[#eeddb7] rounded-full text-[#855b11] ml-3 shrink-0"
           title="Dismiss"
         >
           <X className="w-3.5 h-3.5" />
@@ -34,17 +34,17 @@ export const PushNotificationBanner: React.FC = () => {
   return (
     <div
       role="banner"
-      className="bg-indigo-50 border-b border-indigo-100 px-4 py-3 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all animate-fadeIn"
+      className="bg-[#dbe2d5] border-b border-[rgba(76,91,70,0.14)] shadow-[0_4px_12px_rgba(88,104,84,0.12)] px-4 py-3 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all animate-fadeIn"
     >
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 rounded-2xl bg-[#e2e8dc] text-[#14776b] border border-[rgba(76,91,70,0.14)] shadow-[2px_3px_8px_rgba(88,104,84,0.18),-2px_-2px_6px_rgba(255,255,255,0.7)] flex items-center justify-center shrink-0">
           <Bell className="w-4 h-4 animate-pulse" />
         </div>
         <div>
-          <p className="text-sm font-medium text-slate-900">
+          <p className="text-sm font-bold text-[#26301f]">
             Turn on notifications to get leave and approval alerts
           </p>
-          <p className="text-xs text-slate-500 hidden sm:block">
+          <p className="text-xs text-[#6b7663] hidden sm:block">
             Stay informed with instant updates for pending approvals, salary payslips, and company announcements.
           </p>
         </div>
@@ -55,7 +55,7 @@ export const PushNotificationBanner: React.FC = () => {
           variant="secondary"
           size="sm"
           onClick={dismiss}
-          className="text-xs text-slate-600 hover:text-slate-900"
+          className="text-xs text-[#35422d]"
         >
           Not now
         </Button>

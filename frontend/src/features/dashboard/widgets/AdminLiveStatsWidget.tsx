@@ -34,28 +34,28 @@ export const AdminLiveStatsWidget: React.FC = () => {
       title: 'Active Employees',
       value: totalActive,
       icon: Users,
-      color: 'text-[#4F46E5] bg-[#EEF2FF]',
+      color: 'text-[#14776b] bg-[#dbe2d5] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)]',
       link: '/employees',
     },
     {
       title: 'Present Today',
       value: presentToday,
       icon: UserCheck,
-      color: 'text-[#16A34A] bg-[#DCFCE7]',
+      color: 'text-[#1b4e23] bg-[#daebd9] shadow-[inset_1px_2px_4px_rgba(63,143,74,0.15)]',
       link: '/attendance',
     },
     {
       title: 'On Leave Today',
       value: onLeaveToday,
       icon: CalendarOff,
-      color: 'text-[#0284C7] bg-[#E0F2FE]',
+      color: 'text-[#22304a] bg-[#dbe2d5] shadow-[inset_1px_2px_4px_rgba(34,48,74,0.15)]',
       link: '/leaves',
     },
     {
       title: 'Pending Approvals',
       value: totalPendingApprovals,
       icon: Clock,
-      color: 'text-[#D97706] bg-[#FEF3C7]',
+      color: 'text-[#cf9b34] bg-[#f7eed9] shadow-[inset_1px_2px_4px_rgba(207,155,52,0.15)]',
       link: '/leaves',
     },
   ];
@@ -68,15 +68,15 @@ export const AdminLiveStatsWidget: React.FC = () => {
           <Link
             key={idx}
             to={s.link}
-            className="bg-white rounded-3xl p-5 border border-[#E2E8F0] shadow-sm hover:border-[#4F46E5]/40 transition"
+            className="bg-[#e2e8dc] rounded-[22px] p-5 border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)] hover:shadow-[10px_12px_28px_rgba(88,104,84,0.28),-7px_-8px_20px_rgba(255,255,255,0.8)] transition-all"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-[#64748B]">{s.title}</span>
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${s.color}`}>
+              <span className="text-xs font-semibold text-[#6b7663]">{s.title}</span>
+              <div className={`w-9 h-9 rounded-[14px] flex items-center justify-center ${s.color}`}>
                 <Icon className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-2xl font-black text-[#0F172A]">{s.value}</div>
+            <div className="text-2xl font-bold text-[#26301f] font-display tabular-nums">{s.value}</div>
           </Link>
         );
       })}

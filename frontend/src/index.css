@@ -3,71 +3,178 @@
 @tailwind utilities;
 
 :root {
-  /* Core Color Tokens */
-  --color-primary: #4F46E5;
-  --color-primary-hover: #4338CA;
-  --color-primary-soft: #EEF2FF;
-  --color-page: #F8FAFC;
-  --color-surface: #FFFFFF;
-  --color-border: #E2E8F0;
-  --color-text: #0F172A;
-  --color-body: #475569;
-  --color-muted: #64748B;
+  /* Reference Design System Tokens: Claymorphism Analytics Dashboard — Soft Dusty Sage Clay UI */
+  --clay-ground: #c5d0be;
+  --clay-surface: #e2e8dc;
+  --clay-surface-secondary: #dbe2d5;
+  --clay-ink: #26301f;
+  --clay-muted: #6b7663;
 
-  /* Status Colors */
-  --status-present: #16A34A;
-  --status-present-bg: #DCFCE7;
-  --status-absent: #DC2626;
-  --status-absent-bg: #FEE2E2;
-  --status-warning: #D97706;
-  --status-warning-bg: #FEF3C7;
-  --status-leave: #0284C7;
-  --status-leave-bg: #E0F2FE;
-  --status-holiday: #7C3AED;
-  --status-holiday-bg: #EDE9FE;
-  --status-wfh: #0D9488;
-  --status-wfh-bg: #CCFBF1;
-  --status-neutral: #94A3B8;
-  --status-neutral-bg: #F1F5F9;
+  --clay-teal: #14776b;
+  --clay-rust: #c4643f;
+  --clay-brass: #cf9b34;
+  --clay-navy: #22304a;
+
+  --clay-positive: #3f8f4a;
+  --clay-border: rgba(76, 91, 70, 0.14);
+
+  --clay-shadow-dark:
+    12px 14px 30px rgba(88, 104, 84, 0.30);
+
+  --clay-shadow-light:
+    -8px -10px 22px rgba(255, 255, 255, 0.85);
+
+  --clay-shadow-raised:
+    8px 10px 24px rgba(88, 104, 84, 0.28),
+    -6px -7px 18px rgba(255, 255, 255, 0.78);
+
+  --clay-shadow-inset:
+    inset 4px 5px 10px rgba(104, 118, 100, 0.30),
+    inset -3px -4px 9px rgba(255, 255, 255, 0.70);
+
+  --clay-radius-card: 26px;
+  --clay-radius-control: 16px;
+  --clay-radius-pill: 999px;
+
+  /* Backward Compatibility Tokens */
+  --color-primary: #14776b;
+  --color-primary-hover: #106258;
+  --color-primary-soft: #d8e6e2;
+  --color-page: #c5d0be;
+  --color-surface: #e2e8dc;
+  --color-border: rgba(76, 91, 70, 0.14);
+  --color-text: #26301f;
+  --color-body: #35422d;
+  --color-muted: #6b7663;
+
+  /* Semantic Status Tokens */
+  --status-present: #3f8f4a;
+  --status-present-bg: #d8ebd9;
+  --status-absent: #c4643f;
+  --status-absent-bg: #f6dfd8;
+  --status-warning: #cf9b34;
+  --status-warning-bg: #f7efdd;
+  --status-leave: #22304a;
+  --status-leave-bg: #dde5f0;
+  --status-holiday: #60437a;
+  --status-holiday-bg: #eadef2;
+  --status-wfh: #14776b;
+  --status-wfh-bg: #d3ebe7;
+  --status-neutral: #6b7663;
+  --status-neutral-bg: #dbe2d5;
 }
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: var(--color-page);
-    color: var(--color-body);
+    font-family: 'Figtree', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--clay-ground);
+    color: var(--clay-ink);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: var(--color-text);
+    font-family: 'Baloo 2', 'Figtree', sans-serif;
+    color: var(--clay-ink);
+    letter-spacing: -0.01em;
+  }
+
+  /* Professional tabular numbers for financial, date, and metrics figures */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Clay Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--clay-surface-secondary);
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #a9b7a1;
   border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #8e9e85;
 }
 
-/* Glassmorphism utility */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+/* Claymorphism physical utilities */
+.clay-card {
+  background-color: var(--clay-surface);
+  border-radius: var(--clay-radius-card);
+  border: 1px solid var(--clay-border);
+  box-shadow: var(--clay-shadow-raised);
+}
+
+.clay-card-flat {
+  background-color: var(--clay-surface-secondary);
+  border-radius: var(--clay-radius-card);
+  border: 1px solid var(--clay-border);
+}
+
+.clay-inset {
+  background-color: var(--clay-surface-secondary);
+  border: 1px solid var(--clay-border);
+  box-shadow: var(--clay-shadow-inset);
+  border-radius: var(--clay-radius-control);
+}
+
+.clay-btn {
+  border-radius: var(--clay-radius-pill);
+  transition: all 180ms ease-in-out;
+}
+
+.clay-btn-teal {
+  background-color: var(--clay-teal);
+  color: #ffffff;
+  box-shadow: 4px 6px 16px rgba(20, 119, 107, 0.32), -3px -3px 9px rgba(255, 255, 255, 0.65);
+}
+
+.clay-btn-teal:hover {
+  background-color: #106258;
+}
+
+.clay-btn-teal:active {
+  box-shadow: inset 3px 4px 8px rgba(10, 50, 45, 0.45);
+}
+
+.clay-btn-surface {
+  background-color: var(--clay-surface);
+  color: var(--clay-ink);
+  border: 1px solid var(--clay-border);
+  box-shadow: 4px 5px 14px rgba(88, 104, 84, 0.22), -3px -3px 9px rgba(255, 255, 255, 0.85);
+}
+
+.clay-btn-surface:hover {
+  background-color: var(--clay-surface-secondary);
+}
+
+.clay-btn-surface:active {
+  box-shadow: inset 2px 3px 6px rgba(88, 104, 84, 0.28);
+}
+
+.clay-btn-rust {
+  background-color: var(--clay-rust);
+  color: #ffffff;
+  box-shadow: 4px 6px 16px rgba(196, 100, 63, 0.32), -3px -3px 9px rgba(255, 255, 255, 0.65);
+}
+
+.clay-btn-rust:hover {
+  background-color: #af5533;
+}
+
+.clay-btn-rust:active {
+  box-shadow: inset 3px 4px 8px rgba(120, 40, 20, 0.45);
+}
+
+.font-display {
+  font-family: 'Baloo 2', 'Figtree', sans-serif;
 }
 
 /* Consistent browser autofill background */
@@ -75,12 +182,12 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px white inset !important;
-  -webkit-text-fill-color: #0F172A !important;
+  -webkit-box-shadow: 0 0 0 30px var(--clay-surface-secondary) inset !important;
+  -webkit-text-fill-color: var(--clay-ink) !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Subtle fade-in animation (150-200ms) */
+/* Subtle fade-in animation */
 @keyframes authFadeIn {
   from {
     opacity: 0;
@@ -103,4 +210,3 @@ input:-webkit-autofill:active {
     transform: none !important;
   }
 }
-

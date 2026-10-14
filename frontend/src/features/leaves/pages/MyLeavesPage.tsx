@@ -298,11 +298,11 @@ export const MyLeavesPage: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0F172A] flex items-center gap-2.5">
-            <CalendarDays className="w-7 h-7 text-[#4F46E5]" />
+          <h1 className="text-2xl font-bold text-[#26301f] font-display flex items-center gap-2.5">
+            <CalendarDays className="w-7 h-7 text-[#14776b]" />
             My Leaves & Time Off
           </h1>
-          <p className="text-sm text-[#64748B] mt-1">
+          <p className="text-sm text-[#6b7663] mt-1">
             Apply for leave, track quota balances for {currentYear}, and monitor partial approval day status.
           </p>
         </div>
@@ -321,14 +321,14 @@ export const MyLeavesPage: React.FC = () => {
       {/* Leave Balance Cards */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-[#0F172A]">Available Quotas ({currentYear})</h2>
-          <span className="text-xs text-[#64748B] font-medium">Updated in real-time</span>
+          <h2 className="text-base font-semibold text-[#26301f] font-display">Available Quotas ({currentYear})</h2>
+          <span className="text-xs text-[#6b7663] font-medium">Updated in real-time</span>
         </div>
 
         {balancesLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-[#F8FAFC] animate-pulse rounded-xl border border-[#E2E8F0]" />
+              <div key={i} className="h-32 bg-[#dbe2d5] animate-pulse rounded-[24px] border border-[rgba(76,91,70,0.14)]" />
             ))}
           </div>
         ) : (
@@ -340,35 +340,35 @@ export const MyLeavesPage: React.FC = () => {
               return (
                 <div
                   key={bal.id}
-                  className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 hover:shadow-md transition-shadow relative overflow-hidden"
+                  className="bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] p-4 hover:shadow-[10px_12px_28px_rgba(88,104,84,0.30),-6px_-7px_18px_rgba(255,255,255,0.85)] transition-all relative overflow-hidden"
                 >
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-[#0F172A] text-sm">{bal.leave_type_name}</span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]">
+                        <span className="font-semibold text-[#26301f] font-display text-sm">{bal.leave_type_name}</span>
+                        <span className="px-1.5 py-0.5 rounded-[8px] text-[10px] font-mono font-medium bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.14)]">
                           {bal.leave_type_code}
                         </span>
                       </div>
-                      <span className="text-xs text-[#64748B] mt-0.5 block">
+                      <span className="text-xs text-[#6b7663] mt-0.5 block">
                         {bal.is_paid ? 'Paid Time Off' : 'Unpaid Leave'}
                       </span>
                     </div>
-                    <Calendar className="w-5 h-5 text-[#64748B]" />
+                    <Calendar className="w-5 h-5 text-[#6b7663]" />
                   </div>
 
                   <div className="mt-4 flex items-baseline justify-between">
                     <div>
-                      <span className="text-3xl font-extrabold text-[#0F172A]">{remaining}</span>
-                      <span className="text-xs text-[#64748B] font-medium ml-1.5">
+                      <span className="text-3xl font-extrabold text-[#26301f] font-display tabular-nums">{remaining}</span>
+                      <span className="text-xs text-[#6b7663] font-medium ml-1.5">
                         {isLop ? 'Unlimited' : 'remaining'}
                       </span>
                     </div>
-                    <div className="text-right text-xs text-[#64748B] space-y-0.5">
-                      <div>Available: <strong className="text-[#0F172A]">{bal.allocated}</strong></div>
-                      <div>Used: <strong className="text-[#0F172A]">{bal.used}</strong></div>
-                      <div>Pending: <strong className="text-[#D97706]">{bal.pending}</strong></div>
-                      <div>Remaining: <strong className="text-[#16A34A]">{remaining}</strong></div>
+                    <div className="text-right text-xs text-[#6b7663] space-y-0.5">
+                      <div>Available: <strong className="text-[#26301f] tabular-nums">{bal.allocated}</strong></div>
+                      <div>Used: <strong className="text-[#26301f] tabular-nums">{bal.used}</strong></div>
+                      <div>Pending: <strong className="text-[#cf9b34] tabular-nums">{bal.pending}</strong></div>
+                      <div>Remaining: <strong className="text-[#3f8f4a] tabular-nums">{remaining}</strong></div>
                     </div>
                   </div>
                 </div>
@@ -379,60 +379,60 @@ export const MyLeavesPage: React.FC = () => {
       </section>
 
       {/* My Leave Requests Table */}
-      <section className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between">
-          <h2 className="text-base font-semibold text-[#0F172A]">My Leave Applications</h2>
-          <span className="text-xs text-[#64748B]">{myRequests.length} record(s)</span>
+      <section className="bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] overflow-hidden">
+        <div className="p-4 border-b border-[rgba(76,91,70,0.14)] bg-[#dbe2d5]/60 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-[#26301f] font-display">My Leave Applications</h2>
+          <span className="text-xs text-[#6b7663] tabular-nums">{myRequests.length} record(s)</span>
         </div>
 
         {requestsLoading ? (
-          <div className="p-8 text-center text-[#64748B]">Loading your leave requests...</div>
+          <div className="p-8 text-center text-[#6b7663]">Loading your leave requests...</div>
         ) : myRequests.length === 0 ? (
           <div className="p-12 text-center">
-            <CalendarDays className="w-12 h-12 text-[#94A3B8] mx-auto mb-3" />
-            <h3 className="text-sm font-semibold text-[#475569]">No leave requests found</h3>
+            <CalendarDays className="w-12 h-12 text-[#6b7663] mx-auto mb-3" />
+            <h3 className="text-sm font-semibold text-[#35422d] font-display">No leave requests found</h3>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#F8FAFC] text-xs font-semibold text-[#64748B] border-b border-[#E2E8F0]">
+              <thead className="bg-[#dbe2d5] text-xs font-semibold text-[#26301f] border-b border-[rgba(76,91,70,0.14)] font-display">
                 <tr>
-                  <th className="py-3 px-4">Leave Type</th>
-                  <th className="py-3 px-4">Dates & Breakdown</th>
-                  <th className="py-3 px-4 text-center">Days</th>
-                  <th className="py-3 px-4">Reason</th>
-                  <th className="py-3 px-4">Overall Status</th>
-                  <th className="py-3 px-4">Decision / Note</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4 font-display">Leave Type</th>
+                  <th className="py-3 px-4 font-display">Dates & Breakdown</th>
+                  <th className="py-3 px-4 text-center font-display">Days</th>
+                  <th className="py-3 px-4 font-display">Reason</th>
+                  <th className="py-3 px-4 font-display">Overall Status</th>
+                  <th className="py-3 px-4 font-display">Decision / Note</th>
+                  <th className="py-3 px-4 text-right font-display">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0] text-[#475569]">
+              <tbody className="divide-y divide-[rgba(76,91,70,0.10)] text-[#35422d]">
                 {myRequests.map((req) => {
                   const canCancel =
                     req.status === 'pending' ||
                     (req.status === 'approved' && req.from_date >= new Date().toISOString().split('T')[0]);
 
                   return (
-                    <tr key={req.id} className="hover:bg-[#F8FAFC] transition-colors">
-                      <td className="py-3.5 px-4 font-medium text-[#0F172A]">
+                    <tr key={req.id} className="hover:bg-[#dbe2d5]/60 transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-[#26301f]">
                         <div className="flex items-center gap-2">
-                          <span>{req.leave_type_name}</span>
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#475569]">
+                          <span className="font-display">{req.leave_type_name}</span>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-[8px] bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.14)]">
                             {req.leave_type_code}
                           </span>
                         </div>
                         {req.is_half_day && (
-                          <span className="text-[11px] text-[#D97706] font-medium block mt-0.5">
+                          <span className="text-[11px] text-[#cf9b34] font-medium block mt-0.5">
                             Half Day ({req.from_time || '09:30'} - {req.to_time || '14:00'})
                           </span>
                         )}
                         {req.leave_type_code === 'PERM' && req.from_time && (
-                          <span className="text-[11px] text-[#4F46E5] font-medium block mt-0.5">
+                          <span className="text-[11px] text-[#14776b] font-medium block mt-0.5">
                             Permission ({req.from_time} - {req.to_time})
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-xs space-y-1">
+                      <td className="py-3.5 px-4 font-mono text-xs space-y-1 tabular-nums">
                         <div>{req.from_date === req.to_date ? req.from_date : `${req.from_date} to ${req.to_date}`}</div>
                         {req.days_breakdown && req.days_breakdown.length > 0 && (
                           <div className="flex flex-wrap gap-1 pt-1">
@@ -447,11 +447,11 @@ export const MyLeavesPage: React.FC = () => {
                           </div>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="font-semibold text-[#0F172A]">{req.days}</span>{' '}
-                        <span className="text-xs text-[#64748B]">day(s)</span>
+                      <td className="py-3.5 px-4 text-center tabular-nums">
+                        <span className="font-semibold text-[#26301f]">{req.days}</span>{' '}
+                        <span className="text-xs text-[#6b7663]">day(s)</span>
                       </td>
-                      <td className="py-3.5 px-4 max-w-xs truncate text-[#475569]" title={req.reason}>
+                      <td className="py-3.5 px-4 max-w-xs truncate text-[#35422d]" title={req.reason}>
                         {req.reason}
                       </td>
                       <td className="py-3.5 px-4">
@@ -459,10 +459,10 @@ export const MyLeavesPage: React.FC = () => {
                       </td>
                       <td className="py-3.5 px-4 text-xs">
                         {req.approver_name && (
-                          <div className="font-medium text-[#0F172A]">{req.approver_name}</div>
+                          <div className="font-medium text-[#26301f] font-display">{req.approver_name}</div>
                         )}
                         {req.decision_note && (
-                          <div className="text-[#64748B] italic mt-0.5" title={req.decision_note}>
+                          <div className="text-[#6b7663] italic mt-0.5" title={req.decision_note}>
                             "{req.decision_note}"
                           </div>
                         )}
@@ -477,7 +477,7 @@ export const MyLeavesPage: React.FC = () => {
                             Cancel
                           </Button>
                         ) : (
-                          <span className="text-xs text-[#64748B]">—</span>
+                          <span className="text-xs text-[#6b7663]">—</span>
                         )}
                       </td>
                     </tr>
@@ -503,7 +503,7 @@ export const MyLeavesPage: React.FC = () => {
                 const val = e.target.value ? Number(e.target.value) : '';
                 setFormData({ ...formData, leave_type_id: val });
               }}
-              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               required
             >
               <option value="">-- Select Leave Type --</option>
@@ -533,7 +533,7 @@ export const MyLeavesPage: React.FC = () => {
                     to_date: formData.is_half_day || isPermission ? val : formData.to_date || val,
                   });
                 }}
-                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                 required
               />
             </FormField>
@@ -545,7 +545,7 @@ export const MyLeavesPage: React.FC = () => {
                 disabled={formData.is_half_day || isPermission}
                 min={formData.from_date}
                 onChange={(e) => setFormData({ ...formData, to_date: e.target.value })}
-                className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5] disabled:bg-[#F1F5F9] disabled:text-[#64748B]"
+                className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b] disabled:opacity-50 disabled:cursor-not-allowed"
                 required
               />
             </FormField>
@@ -553,13 +553,13 @@ export const MyLeavesPage: React.FC = () => {
 
           {/* Permission or Half Day custom times */}
           {(formData.is_half_day || isPermission) && (
-            <div className="grid grid-cols-2 gap-3 p-3 bg-[#EEF2FF] rounded-xl border border-[#C7D2FE] text-xs">
+            <div className="grid grid-cols-2 gap-3 p-3 bg-[#dbe2d5] rounded-[16px] border border-[rgba(76,91,70,0.18)] text-xs shadow-[inset_1px_2px_4px_rgba(104,118,100,0.10)]">
               <FormField label="From Time (HH:mm)" required>
                 <input
                   type="time"
                   value={formData.from_time}
                   onChange={(e) => setFormData({ ...formData, from_time: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-[#E2E8F0] rounded-lg text-sm"
+                  className="w-full px-3 py-1.5 border border-[rgba(76,91,70,0.18)] bg-[#d5ded0] text-[#26301f] rounded-[10px] text-sm shadow-[inset_1px_2px_3px_rgba(104,118,100,0.12)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                   required
                 />
               </FormField>
@@ -569,7 +569,7 @@ export const MyLeavesPage: React.FC = () => {
                   type="time"
                   value={formData.to_time}
                   onChange={(e) => setFormData({ ...formData, to_time: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-[#E2E8F0] rounded-lg text-sm"
+                  className="w-full px-3 py-1.5 border border-[rgba(76,91,70,0.18)] bg-[#d5ded0] text-[#26301f] rounded-[10px] text-sm shadow-[inset_1px_2px_3px_rgba(104,118,100,0.12)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
                   required
                 />
               </FormField>
@@ -578,8 +578,8 @@ export const MyLeavesPage: React.FC = () => {
 
           {/* Half day toggle */}
           {selectedTypeObj?.allow_half_day && !isPermission && (
-            <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] space-y-2">
-              <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-[#0F172A]">
+            <div className="p-3 bg-[#dbe2d5]/60 rounded-[16px] border border-[rgba(76,91,70,0.14)] space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-[#26301f]">
                 <input
                   type="checkbox"
                   checked={formData.is_half_day}
@@ -591,30 +591,32 @@ export const MyLeavesPage: React.FC = () => {
                       to_date: checked ? formData.from_date : formData.to_date,
                     });
                   }}
-                  className="rounded text-[#4F46E5] focus:ring-[#4F46E5]"
+                  className="rounded text-[#14776b] focus:ring-[#14776b]"
                 />
                 Half Day Leave (0.5 day)
               </label>
 
               {formData.is_half_day && (
                 <div className="flex items-center gap-4 pt-1 pl-6">
-                  <label className="inline-flex items-center gap-1.5 text-xs text-[#475569]">
+                  <label className="inline-flex items-center gap-1.5 text-xs text-[#35422d]">
                     <input
                       type="radio"
                       name="half_session"
                       value="first"
                       checked={formData.half_day_session === 'first'}
                       onChange={() => setFormData({ ...formData, half_day_session: 'first', from_time: '09:30', to_time: '14:00' })}
+                      className="text-[#14776b] focus:ring-[#14776b]"
                     />
                     First Half (09:30 - 14:00)
                   </label>
-                  <label className="inline-flex items-center gap-1.5 text-xs text-[#475569]">
+                  <label className="inline-flex items-center gap-1.5 text-xs text-[#35422d]">
                     <input
                       type="radio"
                       name="half_session"
                       value="second"
                       checked={formData.half_day_session === 'second'}
                       onChange={() => setFormData({ ...formData, half_day_session: 'second', from_time: '14:00', to_time: '18:30' })}
+                      className="text-[#14776b] focus:ring-[#14776b]"
                     />
                     Second Half (14:00 - 18:30)
                   </label>
@@ -625,29 +627,29 @@ export const MyLeavesPage: React.FC = () => {
 
           {/* Live Working Days Calculation Preview */}
           {formData.from_date && formData.to_date && (
-            <div className="p-3 rounded-lg border bg-[#EEF2FF] border-[#C7D2FE] text-xs text-[#312E81] space-y-1.5">
+            <div className="p-3.5 rounded-[16px] border bg-[#dbe2d5] border-[rgba(76,91,70,0.18)] text-xs text-[#26301f] space-y-1.5 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.12)]">
               <div className="flex items-center justify-between font-semibold">
-                <span>Working Days Summary:</span>
+                <span className="font-display">Working Days Summary:</span>
                 {isCalculating ? (
-                  <span className="text-[#4F46E5]">Calculating...</span>
+                  <span className="text-[#14776b]">Calculating...</span>
                 ) : calcPreview ? (
-                  <span className="text-base text-[#4338CA] font-bold">
+                  <span className="text-base text-[#14776b] font-bold font-display tabular-nums">
                     {isPermission ? 'Permission (0 days deducted)' : `${calcPreview.days} day(s)`}
                   </span>
                 ) : null}
               </div>
 
               {calcError && (
-                <div className="flex items-center gap-1.5 text-[#DC2626] font-medium">
+                <div className="flex items-center gap-1.5 text-[#c4643f] font-medium">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                   {calcError}
                 </div>
               )}
 
               {calcPreview && (
-                <div className="space-y-1 text-[#475569] pt-1 border-t border-[#C7D2FE]">
+                <div className="space-y-1 text-[#6b7663] pt-1.5 border-t border-[rgba(76,91,70,0.14)]">
                   {calcPreview.holidayDates.length > 0 && (
-                    <div className="text-[#B45309] font-medium">
+                    <div className="text-[#cf9b34] font-medium">
                       Holidays excluded: {calcPreview.holidayDates.join(', ')}
                     </div>
                   )}
@@ -665,12 +667,12 @@ export const MyLeavesPage: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
               rows={3}
               placeholder="State the reason for your leave application..."
-              className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              className="w-full px-3 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] rounded-[14px] text-sm shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               required
             />
           </FormField>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E2E8F0]">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[rgba(76,91,70,0.14)]">
             <Button variant="secondary" onClick={() => setIsApplyModalOpen(false)}>
               Cancel
             </Button>

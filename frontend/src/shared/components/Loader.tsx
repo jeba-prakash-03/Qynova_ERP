@@ -15,9 +15,9 @@ export const Loader: React.FC<LoaderProps> = ({ size = 'md', text = 'Loading...'
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center p-8 gap-3 text-slate-500 ${className}`}>
-      <Loader2 className={`${sizeClasses[size]} animate-spin text-indigo-600`} />
-      {text && <span className="text-sm font-medium text-slate-600">{text}</span>}
+    <div className={`flex flex-col items-center justify-center p-8 gap-3 text-[#6b7663] ${className}`}>
+      <Loader2 className={`${sizeClasses[size]} animate-spin text-[#14776b]`} />
+      {text && <span className="text-sm font-semibold text-[#6b7663]">{text}</span>}
     </div>
   );
 };

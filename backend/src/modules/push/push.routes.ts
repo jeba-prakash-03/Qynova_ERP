@@ -11,6 +11,7 @@ router.post('/register', pushController.register);
 router.delete('/register', pushController.unregister);
 router.get('/preferences', pushController.getPreferences);
 router.put('/preferences', pushController.updatePreferences);
+router.get('/status', pushController.getStatus);
 router.post('/test', pushController.sendTest);
 
 export default router;
