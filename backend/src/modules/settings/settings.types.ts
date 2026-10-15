@@ -74,6 +74,15 @@ export interface UpdateCompanySettingsDTO {
   overtime_multiplier?: number;
 }
 
+export interface OfficeLocationDTO {
+  id?: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  radius_meters: number;
+  is_active?: boolean;
+}
+
 export interface WorkSettingsDTO {
   shift_start: string;
   shift_end: string;
@@ -81,6 +90,13 @@ export interface WorkSettingsDTO {
   late_grace_minutes: number;
   min_hours_full_day: number;
   min_hours_half_day: number;
+  geofencing_enabled?: boolean;
+  office_name?: string | null;
+  office_latitude?: number | null;
+  office_longitude?: number | null;
+  office_radius_meters?: number;
+  min_location_accuracy_meters?: number;
+  office_locations?: OfficeLocationDTO[];
 }
 
 export interface LeavePolicySettingsDTO {

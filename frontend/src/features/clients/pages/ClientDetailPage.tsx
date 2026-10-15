@@ -14,27 +14,21 @@ import {
   CreditCard,
   Plus,
   Trash2,
-  Clock,
   Briefcase,
-  Layers,
-  Send,
-  User,
 } from 'lucide-react';
 import { clientsApi } from '../api';
 import { projectsApi } from '../../projects/api';
 import {
   ClientWithDetails,
-  ClientContact,
-  ClientAddress,
-  ClientCommunication,
 } from '../types';
 import { Modal } from '../../../shared/components/Modal';
 import { FormField } from '../../../shared/components/FormField';
 import { Can } from '../../../shared/components/Can';
-import { Loader } from '../../../shared/components/Loader';
+import { SkeletonCard, SkeletonTable } from '../../../shared/components/Loader';
 import { ErrorState } from '../../../shared/components/ErrorState';
 import { EmptyState } from '../../../shared/components/EmptyState';
 import { useToast } from '../../../shared/context/ToastContext';
+import { formatCurrency } from '../../../shared/utils/format.util';
 
 type TabType =
   | 'overview'
@@ -121,7 +115,7 @@ export const ClientDetailPage: React.FC = () => {
     mutationFn: (payload: any) => clientsApi.addAddress(id!, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['client', id] });
-      success('Address added successfully');
+      success('Address registered successfully');
       setIsAddressModalOpen(false);
       resetAddressForm();
     },
@@ -142,7 +136,7 @@ export const ClientDetailPage: React.FC = () => {
     mutationFn: (payload: any) => clientsApi.addCommunication(id!, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['client', id] });
-      success('Communication log added');
+      success('Communication logged successfully');
       setIsCommModalOpen(false);
       resetCommForm();
     },
@@ -155,7 +149,7 @@ export const ClientDetailPage: React.FC = () => {
     mutationFn: (commId: number) => clientsApi.deleteCommunication(id!, commId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['client', id] });
-      success('Communication entry removed');
+      success('Communication log removed');
     },
   });
 
@@ -185,8 +179,9 @@ export const ClientDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="py-20 flex justify-center">
-        <Loader text="Loading client details..." />
+      <div className="space-y-6">
+        <SkeletonCard lines={5} />
+        <SkeletonCard lines={4} />
       </div>
     );
   }
@@ -195,13 +190,13 @@ export const ClientDetailPage: React.FC = () => {
     return (
       <div className="space-y-4">
         <ErrorState
-          title="Client Not Found"
-          message="The client account you requested could not be located or may have been deleted."
+          title="Client Not Accessible"
+          message="This client record either does not exist or you do not have permission to view it."
         />
         <div className="text-center">
           <Link
             to="/clients"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-sm font-semibold transition shadow-sm"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Clients
           </Link>
@@ -230,41 +225,41 @@ export const ClientDetailPage: React.FC = () => {
       <div className="flex items-center gap-2">
         <Link
           to="/clients"
-          className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6b7663] hover:text-[#14776b] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Clients Directory
         </Link>
       </div>
 
       {/* Header Card */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <div className="clay-card rounded-2xl border border-[#c5d0be]/50 p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+            <div className="p-3 bg-[#14776b]/15 text-[#14776b] rounded-2xl clay-card">
               <Building2 className="w-8 h-8" />
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <span className="px-2.5 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold clay-inset text-[#14776b] border border-[#14776b]/20">
                   {client.client_code}
                 </span>
-                <h1 className="text-2xl font-bold text-slate-900">{client.company_name}</h1>
+                <h1 className="text-2xl font-bold font-baloo text-[#26301f]">{client.company_name}</h1>
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize ${
                     client.status === 'active'
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      ? 'bg-emerald-100/70 text-emerald-800 border-emerald-300'
                       : client.status === 'lead'
-                      ? 'bg-amber-50 text-amber-700 border-amber-200'
-                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                      ? 'bg-[#cf9b34]/15 text-[#916515] border-[#cf9b34]/30'
+                      : 'bg-[#dbe2d5] text-[#6b7663] border-[#c5d0be]'
                   }`}
                 >
                   {client.status}
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2">
+              <div className="flex flex-wrap items-center gap-4 text-xs text-[#6b7663] mt-2">
                 {client.industry && (
-                  <span className="flex items-center gap-1">
-                    <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="flex items-center gap-1.5">
+                    <Briefcase className="w-3.5 h-3.5 text-[#6b7663]/70" />
                     {client.industry}
                   </span>
                 )}
@@ -273,15 +268,15 @@ export const ClientDetailPage: React.FC = () => {
                     href={client.website}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 hover:text-indigo-600 hover:underline"
+                    className="flex items-center gap-1.5 hover:text-[#14776b] hover:underline"
                   >
-                    <Globe className="w-3.5 h-3.5 text-slate-400" />
+                    <Globe className="w-3.5 h-3.5 text-[#6b7663]/70" />
                     {client.website.replace(/^https?:\/\//, '')}
                   </a>
                 )}
                 {client.gstin && (
-                  <span className="flex items-center gap-1">
-                    <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="flex items-center gap-1.5">
+                    <CreditCard className="w-3.5 h-3.5 text-[#6b7663]/70" />
                     GSTIN: {client.gstin}
                   </span>
                 )}
@@ -291,24 +286,24 @@ export const ClientDetailPage: React.FC = () => {
         </div>
 
         {/* Tab navigation bar */}
-        <div className="flex overflow-x-auto border-b border-slate-200 mt-6 -mb-6">
+        <div className="flex overflow-x-auto border-b border-[#c5d0be]/40 mt-6 -mb-6 scrollbar-none">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-2 py-3 px-4 text-sm font-medium border-b-2 whitespace-nowrap transition ${
+              className={`flex items-center gap-2 py-3 px-4 text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-180 ${
                 activeTab === tab.key
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                  ? 'border-[#14776b] text-[#14776b]'
+                  : 'border-transparent text-[#6b7663] hover:text-[#26301f] hover:border-[#c5d0be]'
               }`}
             >
               {tab.label}
               {tab.count !== undefined && tab.count > 0 && (
                 <span
-                  className={`text-xs px-2 py-0.5 rounded-full ${
+                  className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                     activeTab === tab.key
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'bg-slate-100 text-slate-600'
+                      ? 'bg-[#14776b]/15 text-[#14776b]'
+                      : 'clay-inset text-[#6b7663]'
                   }`}
                 >
                   {tab.count}
@@ -325,20 +320,20 @@ export const ClientDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             {/* Notes & Summary */}
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-              <h3 className="text-base font-semibold text-slate-900 mb-2">Account Overview</h3>
-              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+            <div className="clay-card p-6 rounded-2xl border border-[#c5d0be]/50">
+              <h3 className="text-base font-bold font-baloo text-[#26301f] mb-2">Account Overview</h3>
+              <p className="text-sm text-[#26301f]/85 leading-relaxed whitespace-pre-line">
                 {client.notes || 'No detailed account notes entered for this client.'}
               </p>
             </div>
 
             {/* Quick Contacts preview */}
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="clay-card p-6 rounded-2xl border border-[#c5d0be]/50">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-semibold text-slate-900">Key Stakeholders</h3>
+                <h3 className="text-base font-bold font-baloo text-[#26301f]">Key Stakeholders</h3>
                 <button
                   onClick={() => setActiveTab('contacts')}
-                  className="text-xs font-medium text-indigo-600 hover:underline"
+                  className="text-xs font-semibold text-[#14776b] hover:underline"
                 >
                   View All ({client.contacts?.length || 0})
                 </button>
@@ -348,54 +343,54 @@ export const ClientDetailPage: React.FC = () => {
                   {client.contacts.slice(0, 4).map((c) => (
                     <div
                       key={c.id}
-                      className="p-3 rounded-lg border border-slate-100 bg-slate-50 flex items-start gap-3"
+                      className="clay-card-interactive bg-[#e2e8dc] p-3.5 rounded-xl border border-[#c5d0be]/40 flex items-start gap-3 transition-all duration-180"
                     >
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-semibold flex items-center justify-center text-xs">
+                      <div className="w-8 h-8 rounded-full bg-[#14776b]/20 text-[#14776b] font-bold flex items-center justify-center text-xs">
                         {c.name.charAt(0)}
                       </div>
                       <div className="text-xs">
-                        <div className="font-semibold text-slate-800 flex items-center gap-1.5">
+                        <div className="font-semibold text-[#26301f] flex items-center gap-1.5">
                           {c.name}
                           {c.is_primary && (
-                            <span className="text-[10px] bg-amber-100 text-amber-800 px-1 rounded">
+                            <span className="text-[10px] bg-[#cf9b34]/20 text-[#916515] px-1.5 py-0.2 rounded-md font-semibold">
                               Primary
                             </span>
                           )}
                         </div>
-                        <div className="text-slate-500">{c.designation || 'Stakeholder'}</div>
-                        <div className="text-slate-600 mt-1">{c.email}</div>
+                        <div className="text-[#6b7663]">{c.designation || 'Stakeholder'}</div>
+                        <div className="text-[#14776b] font-medium mt-1">{c.email}</div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400">No contacts recorded yet.</p>
+                <p className="text-xs text-[#6b7663]">No contacts recorded yet.</p>
               )}
             </div>
           </div>
 
           {/* Right Column: Office & Billing Addresses */}
           <div className="space-y-6">
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="clay-card p-6 rounded-2xl border border-[#c5d0be]/50">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-semibold text-slate-900">Addresses</h3>
+                <h3 className="text-base font-bold font-baloo text-[#26301f]">Addresses</h3>
                 <button
                   onClick={() => setActiveTab('addresses')}
-                  className="text-xs font-medium text-indigo-600 hover:underline"
+                  className="text-xs font-semibold text-[#14776b] hover:underline"
                 >
                   Manage
                 </button>
               </div>
               {client.addresses?.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   {client.addresses.map((addr) => (
-                    <div key={addr.id} className="p-3 border border-slate-100 rounded-lg bg-slate-50">
+                    <div key={addr.id} className="clay-card-interactive bg-[#e2e8dc] p-3.5 border border-[#c5d0be]/40 rounded-xl">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-semibold capitalize text-indigo-700">
+                        <span className="text-xs font-semibold capitalize text-[#14776b]">
                           {addr.type} Address
                         </span>
                       </div>
-                      <p className="text-xs text-slate-600">
+                      <p className="text-xs text-[#26301f]/85">
                         {addr.line1}
                         {addr.line2 && <>, {addr.line2}</>}
                         <br />
@@ -407,7 +402,7 @@ export const ClientDetailPage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400">No addresses registered.</p>
+                <p className="text-xs text-[#6b7663]">No addresses registered.</p>
               )}
             </div>
           </div>
@@ -418,11 +413,11 @@ export const ClientDetailPage: React.FC = () => {
       {activeTab === 'contacts' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-slate-900">Client Contacts & Stakeholders</h3>
+            <h3 className="text-lg font-bold font-baloo text-[#26301f]">Client Contacts & Stakeholders</h3>
             <Can permission="clients.edit">
               <button
                 onClick={() => setIsContactModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold shadow-sm transition-all duration-180"
               >
                 <Plus className="w-3.5 h-3.5" /> Add Contact
               </button>
@@ -434,29 +429,29 @@ export const ClientDetailPage: React.FC = () => {
               {client.contacts.map((contact) => (
                 <div
                   key={contact.id}
-                  className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative group"
+                  className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50 relative group transition-all duration-180"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">
+                      <div className="w-10 h-10 rounded-full bg-[#14776b]/20 text-[#14776b] font-bold flex items-center justify-center text-sm">
                         {contact.name.charAt(0)}
                       </div>
                       <div>
-                        <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                        <h4 className="text-sm font-semibold text-[#26301f] flex items-center gap-2">
                           {contact.name}
                           {contact.is_primary && (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100/70 text-emerald-800 border border-emerald-300">
                               Primary
                             </span>
                           )}
                         </h4>
-                        <p className="text-xs text-slate-500">{contact.designation || 'Member'}</p>
+                        <p className="text-xs text-[#6b7663]">{contact.designation || 'Member'}</p>
                       </div>
                     </div>
                     <Can permission="clients.edit">
                       <button
                         onClick={() => deleteContactMutation.mutate(contact.id)}
-                        className="text-slate-400 hover:text-rose-600 transition p-1"
+                        className="text-[#6b7663] hover:text-[#c4643f] hover:bg-[#c4643f]/10 transition-colors p-1 rounded-lg"
                         title="Delete contact"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -464,17 +459,17 @@ export const ClientDetailPage: React.FC = () => {
                     </Can>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-600">
+                  <div className="mt-4 pt-3 border-t border-[#c5d0be]/40 space-y-1.5 text-xs text-[#6b7663]">
                     <div className="flex items-center gap-2">
-                      <Mail className="w-3.5 h-3.5 text-slate-400" />
-                      <a href={`mailto:${contact.email}`} className="hover:underline text-indigo-600">
+                      <Mail className="w-3.5 h-3.5 text-[#6b7663]/70" />
+                      <a href={`mailto:${contact.email}`} className="hover:underline text-[#14776b] font-medium">
                         {contact.email}
                       </a>
                     </div>
                     {contact.phone && (
                       <div className="flex items-center gap-2">
-                        <Phone className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{contact.phone}</span>
+                        <Phone className="w-3.5 h-3.5 text-[#6b7663]/70" />
+                        <span className="text-[#26301f]">{contact.phone}</span>
                       </div>
                     )}
                   </div>
@@ -498,11 +493,11 @@ export const ClientDetailPage: React.FC = () => {
       {activeTab === 'addresses' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-slate-900">Registered Addresses</h3>
+            <h3 className="text-lg font-bold font-baloo text-[#26301f]">Registered Addresses</h3>
             <Can permission="clients.edit">
               <button
                 onClick={() => setIsAddressModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold shadow-sm transition-all duration-180"
               >
                 <Plus className="w-3.5 h-3.5" /> Add Address
               </button>
@@ -514,22 +509,22 @@ export const ClientDetailPage: React.FC = () => {
               {client.addresses.map((addr) => (
                 <div
                   key={addr.id}
-                  className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start justify-between"
+                  className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50 flex items-start justify-between transition-all duration-180"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg mt-0.5">
+                  <div className="flex items-start gap-3.5">
+                    <div className="p-2.5 bg-[#14776b]/15 text-[#14776b] rounded-xl clay-card mt-0.5">
                       <MapPin className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider bg-slate-100 text-slate-700">
+                      <span className="px-2.5 py-0.5 rounded-lg text-xs font-semibold uppercase tracking-wider clay-inset text-[#26301f] border border-[#c5d0be]/40">
                         {addr.type} Address
                       </span>
-                      <p className="text-sm font-medium text-slate-800 mt-2">
+                      <p className="text-sm font-semibold text-[#26301f] mt-2.5">
                         {addr.line1}
                         {addr.line2 && <br />}
                         {addr.line2}
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">
+                      <p className="text-xs text-[#6b7663] mt-1">
                         {addr.city}, {addr.state} - {addr.pincode}
                         <br />
                         {addr.country}
@@ -539,7 +534,7 @@ export const ClientDetailPage: React.FC = () => {
                   <Can permission="clients.edit">
                     <button
                       onClick={() => deleteAddressMutation.mutate(addr.id)}
-                      className="text-slate-400 hover:text-rose-600 transition p-1"
+                      className="text-[#6b7663] hover:text-[#c4643f] hover:bg-[#c4643f]/10 transition-colors p-1 rounded-lg"
                       title="Delete address"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -565,11 +560,11 @@ export const ClientDetailPage: React.FC = () => {
       {activeTab === 'projects' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-slate-900">Client Projects</h3>
+            <h3 className="text-lg font-bold font-baloo text-[#26301f]">Client Projects</h3>
             <Can permission="projects.create">
               <Link
                 to="/projects"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold shadow-sm transition-all duration-180"
               >
                 <Plus className="w-3.5 h-3.5" /> New Project
               </Link>
@@ -577,39 +572,39 @@ export const ClientDetailPage: React.FC = () => {
           </div>
 
           {loadingProjects ? (
-            <Loader text="Loading client projects..." />
+            <SkeletonTable rows={4} cols={4} />
           ) : projectsData && projectsData.data && projectsData.data.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {projectsData.data.map((proj: any) => (
                 <Link
                   key={proj.id}
                   to={`/projects/${proj.id}`}
-                  className="bg-white p-5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition block group"
+                  className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50 block group transition-all duration-180"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-lg clay-inset text-[#14776b] border border-[#14776b]/20">
                       {proj.project_code}
                     </span>
-                    <span className="text-xs font-medium capitalize px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                    <span className="text-xs font-semibold capitalize px-2.5 py-0.5 rounded-full clay-inset text-[#26301f] border border-[#c5d0be]/40">
                       {proj.status.replace('_', ' ')}
                     </span>
                   </div>
 
-                  <h4 className="text-base font-semibold text-slate-900 group-hover:text-indigo-600 transition mt-2">
+                  <h4 className="text-base font-bold text-[#26301f] group-hover:text-[#14776b] transition-colors mt-2.5">
                     {proj.name}
                   </h4>
 
-                  <div className="mt-3 text-xs text-slate-500 flex items-center justify-between">
+                  <div className="mt-3 text-xs text-[#6b7663] flex items-center justify-between pt-2 border-t border-[#c5d0be]/40">
                     <div>
                       PM:{' '}
-                      <span className="font-medium text-slate-700">
+                      <span className="font-semibold text-[#26301f]">
                         {proj.project_manager_name || 'Unassigned'}
                       </span>
                     </div>
                     <div>
                       Budget:{' '}
-                      <span className="font-semibold text-slate-800">
-                        ₹{Number(proj.budget).toLocaleString()}
+                      <span className="font-bold font-mono text-[#26301f]">
+                        {formatCurrency(proj.budget)}
                       </span>
                     </div>
                   </div>
@@ -627,19 +622,19 @@ export const ClientDetailPage: React.FC = () => {
 
       {/* 5. INVOICES TAB */}
       {activeTab === 'invoices' && (
-        <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
-          <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3">
+        <div className="clay-card p-8 rounded-2xl border border-[#c5d0be]/50 text-center">
+          <div className="w-12 h-12 bg-[#cf9b34]/15 text-[#916515] rounded-2xl flex items-center justify-center mx-auto mb-3">
             <CreditCard className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-bold text-slate-800">Invoices & Financial Ledger</h3>
-          <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
+          <h3 className="text-lg font-bold font-baloo text-[#26301f]">Invoices & Financial Ledger</h3>
+          <p className="text-sm text-[#6b7663] max-w-md mx-auto mt-1">
             Client billing statements, milestone disbursements, and tax credit tracking are
             managed through the dedicated Invoices module.
           </p>
           <div className="mt-4">
             <Link
               to="/invoices"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-md border border-indigo-200 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white text-xs font-semibold rounded-xl transition-all duration-180 shadow-sm"
             >
               Open Invoices
             </Link>
@@ -649,12 +644,12 @@ export const ClientDetailPage: React.FC = () => {
 
       {/* 6. DOCUMENTS TAB */}
       {activeTab === 'documents' && (
-        <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
-          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+        <div className="clay-card p-8 rounded-2xl border border-[#c5d0be]/50 text-center">
+          <div className="w-12 h-12 bg-[#22304a]/15 text-[#22304a] rounded-2xl flex items-center justify-center mx-auto mb-3">
             <FileText className="w-6 h-6" />
           </div>
-          <h3 className="text-lg font-bold text-slate-800">Client Document Repository</h3>
-          <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
+          <h3 className="text-lg font-bold font-baloo text-[#26301f]">Client Document Repository</h3>
+          <p className="text-sm text-[#6b7663] max-w-md mx-auto mt-1">
             Master Service Agreements (MSAs), SOW documents, KYC certificates, and NDAs are
             archived securely in the company document repository.
           </p>
@@ -665,11 +660,11 @@ export const ClientDetailPage: React.FC = () => {
       {activeTab === 'communications' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-slate-900">Communication History</h3>
+            <h3 className="text-lg font-bold font-baloo text-[#26301f]">Communication History</h3>
             <Can permission="clients.edit">
               <button
                 onClick={() => setIsCommModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold shadow-sm transition-all duration-180"
               >
                 <Plus className="w-3.5 h-3.5" /> Log Interaction
               </button>
@@ -677,7 +672,7 @@ export const ClientDetailPage: React.FC = () => {
           </div>
 
           {client.communications?.length > 0 ? (
-            <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
+            <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-[#c5d0be]">
               {client.communications.map((comm) => {
                 const iconMap: Record<string, any> = {
                   call: Phone,
@@ -689,14 +684,14 @@ export const ClientDetailPage: React.FC = () => {
 
                 return (
                   <div key={comm.id} className="relative group">
-                    <div className="absolute -left-6 top-1 w-5 h-5 rounded-full bg-white border-2 border-indigo-600 flex items-center justify-center text-indigo-600">
+                    <div className="absolute -left-6 top-1 w-5 h-5 rounded-full bg-[#e2e8dc] border-2 border-[#14776b] flex items-center justify-center text-[#14776b]">
                       <IconComponent className="w-2.5 h-2.5" />
                     </div>
 
-                    <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                      <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+                    <div className="clay-card-interactive bg-[#e2e8dc] p-4 rounded-2xl border border-[#c5d0be]/50 transition-all duration-180">
+                      <div className="flex items-center justify-between text-xs text-[#6b7663] mb-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-[10px]">
+                          <span className="font-semibold uppercase tracking-wider text-[#14776b] bg-[#14776b]/15 px-2 py-0.5 rounded-lg text-[10px]">
                             {comm.type}
                           </span>
                           <span>{comm.date}</span>
@@ -705,7 +700,7 @@ export const ClientDetailPage: React.FC = () => {
                         <Can permission="clients.edit">
                           <button
                             onClick={() => deleteCommMutation.mutate(comm.id)}
-                            className="text-slate-400 hover:text-rose-600 transition p-1"
+                            className="text-[#6b7663] hover:text-[#c4643f] hover:bg-[#c4643f]/10 transition-colors p-1 rounded-lg"
                             title="Remove log"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -713,7 +708,7 @@ export const ClientDetailPage: React.FC = () => {
                         </Can>
                       </div>
 
-                      <p className="text-sm text-slate-700 leading-relaxed mt-1">{comm.summary}</p>
+                      <p className="text-sm text-[#26301f]/90 leading-relaxed mt-1">{comm.summary}</p>
                     </div>
                   </div>
                 );
@@ -757,7 +752,7 @@ export const ClientDetailPage: React.FC = () => {
               required
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
           <FormField label="Designation / Role">
@@ -765,7 +760,7 @@ export const ClientDetailPage: React.FC = () => {
               type="text"
               value={contactDesignation}
               onChange={(e) => setContactDesignation(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
           <FormField label="Email Address" required>
@@ -774,7 +769,7 @@ export const ClientDetailPage: React.FC = () => {
               required
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
           <FormField label="Phone Number">
@@ -782,30 +777,30 @@ export const ClientDetailPage: React.FC = () => {
               type="text"
               value={contactPhone}
               onChange={(e) => setContactPhone(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
-          <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs font-semibold text-[#26301f] cursor-pointer">
             <input
               type="checkbox"
               checked={contactIsPrimary}
               onChange={(e) => setContactIsPrimary(e.target.checked)}
-              className="rounded text-indigo-600 focus:ring-indigo-500"
+              className="rounded accent-[#14776b]"
             />
             Mark as Primary Contact for this Client
           </label>
-          <div className="flex justify-end gap-2 pt-4 border-t">
+          <div className="flex justify-end gap-2.5 pt-4 border-t border-[#c5d0be]/40">
             <button
               type="button"
               onClick={() => setIsContactModalOpen(false)}
-              className="px-3 py-1.5 border rounded text-xs"
+              className="px-4 py-2 border border-[#c5d0be] text-[#26301f] hover:bg-[#dbe2d5]/60 rounded-xl text-xs font-semibold transition-all duration-180"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={addContactMutation.isPending}
-              className="px-4 py-1.5 bg-indigo-600 text-white rounded text-xs font-semibold disabled:opacity-50"
+              className="px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all duration-180 shadow-sm"
             >
               {addContactMutation.isPending ? 'Saving...' : 'Add Contact'}
             </button>
@@ -838,7 +833,7 @@ export const ClientDetailPage: React.FC = () => {
             <select
               value={addrType}
               onChange={(e: any) => setAddrType(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             >
               <option value="office">Office Address</option>
               <option value="billing">Billing Address</option>
@@ -850,7 +845,7 @@ export const ClientDetailPage: React.FC = () => {
               required
               value={addrLine1}
               onChange={(e) => setAddrLine1(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
           <FormField label="Line 2 (Building / Suite)">
@@ -858,7 +853,7 @@ export const ClientDetailPage: React.FC = () => {
               type="text"
               value={addrLine2}
               onChange={(e) => setAddrLine2(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
           <div className="grid grid-cols-2 gap-3">
@@ -868,7 +863,7 @@ export const ClientDetailPage: React.FC = () => {
                 required
                 value={addrCity}
                 onChange={(e) => setAddrCity(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
               />
             </FormField>
             <FormField label="State" required>
@@ -877,7 +872,7 @@ export const ClientDetailPage: React.FC = () => {
                 required
                 value={addrState}
                 onChange={(e) => setAddrState(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
               />
             </FormField>
           </div>
@@ -888,7 +883,7 @@ export const ClientDetailPage: React.FC = () => {
                 required
                 value={addrPincode}
                 onChange={(e) => setAddrPincode(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
               />
             </FormField>
             <FormField label="Country" required>
@@ -897,22 +892,22 @@ export const ClientDetailPage: React.FC = () => {
                 required
                 value={addrCountry}
                 onChange={(e) => setAddrCountry(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
               />
             </FormField>
           </div>
-          <div className="flex justify-end gap-2 pt-4 border-t">
+          <div className="flex justify-end gap-2.5 pt-4 border-t border-[#c5d0be]/40">
             <button
               type="button"
               onClick={() => setIsAddressModalOpen(false)}
-              className="px-3 py-1.5 border rounded text-xs"
+              className="px-4 py-2 border border-[#c5d0be] text-[#26301f] hover:bg-[#dbe2d5]/60 rounded-xl text-xs font-semibold transition-all duration-180"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={addAddressMutation.isPending}
-              className="px-4 py-1.5 bg-indigo-600 text-white rounded text-xs font-semibold disabled:opacity-50"
+              className="px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all duration-180 shadow-sm"
             >
               {addAddressMutation.isPending ? 'Saving...' : 'Add Address'}
             </button>
@@ -942,7 +937,7 @@ export const ClientDetailPage: React.FC = () => {
               <select
                 value={commType}
                 onChange={(e: any) => setCommType(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
               >
                 <option value="call">Phone Call</option>
                 <option value="email">Email</option>
@@ -956,7 +951,7 @@ export const ClientDetailPage: React.FC = () => {
                 required
                 value={commDate}
                 onChange={(e) => setCommDate(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
               />
             </FormField>
           </div>
@@ -968,22 +963,22 @@ export const ClientDetailPage: React.FC = () => {
               value={commSummary}
               onChange={(e) => setCommSummary(e.target.value)}
               placeholder="Detailed notes on discussion, decisions, and follow-ups..."
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] placeholder-[#6b7663] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
 
-          <div className="flex justify-end gap-2 pt-4 border-t">
+          <div className="flex justify-end gap-2.5 pt-4 border-t border-[#c5d0be]/40">
             <button
               type="button"
               onClick={() => setIsCommModalOpen(false)}
-              className="px-3 py-1.5 border rounded text-xs"
+              className="px-4 py-2 border border-[#c5d0be] text-[#26301f] hover:bg-[#dbe2d5]/60 rounded-xl text-xs font-semibold transition-all duration-180"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={addCommMutation.isPending}
-              className="px-4 py-1.5 bg-indigo-600 text-white rounded text-xs font-semibold disabled:opacity-50"
+              className="px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all duration-180 shadow-sm"
             >
               {addCommMutation.isPending ? 'Logging...' : 'Save Log'}
             </button>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'info';
@@ -26,13 +26,29 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const addToast = useCallback((message: string, type: ToastType = 'info') => {
-    const id = Math.random().toString(36).substring(2, 9);
-    setToasts((prev) => [...prev, { id, type, message }]);
+    if (!message) return;
+    const cleanMsg = message.trim();
 
-    setTimeout(() => {
-      removeToast(id);
+    setToasts((prev) => {
+      // Deduplicate: Don't stack identical toasts
+      const isDuplicate = prev.some((t) => t.message === cleanMsg && t.type === type);
+      if (isDuplicate) return prev;
+
+      const id = Math.random().toString(36).substring(2, 9);
+      // Cap at 3 active toasts
+      const capped = prev.length >= 3 ? prev.slice(1) : prev;
+      return [...capped, { id, type, message: cleanMsg }];
+    });
+  }, []);
+
+  // Auto-remove individual toasts after 4500ms
+  useEffect(() => {
+    if (toasts.length === 0) return;
+    const timer = setTimeout(() => {
+      setToasts((prev) => prev.slice(1));
     }, 4500);
-  }, [removeToast]);
+    return () => clearTimeout(timer);
+  }, [toasts]);
 
   const success = useCallback((message: string) => addToast(message, 'success'), [addToast]);
   const error = useCallback((message: string) => addToast(message, 'error'), [addToast]);

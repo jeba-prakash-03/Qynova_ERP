@@ -5,6 +5,7 @@ import { Loader } from '../../../shared/components/Loader';
 import { StatusBadge } from '../../../shared/components/StatusBadge';
 import { Clock, Calendar, FileText, CheckCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { formatCurrency } from '../../../shared/utils/format.util';
 
 export const EmployeeTodayAttendanceWidget: React.FC = () => {
   const { data, isLoading } = useQuery({
@@ -167,7 +168,7 @@ export const EmployeeRecentItemsWidget: React.FC = () => {
                 >
                   <span className="font-semibold text-[#26301f]">{p.month}</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#26301f] tabular-nums font-display">₹{p.netSalary.toLocaleString()}</span>
+                    <span className="font-bold text-[#26301f] tabular-nums font-display">{formatCurrency(p.netSalary)}</span>
                     <StatusBadge status={p.status} />
                   </div>
                 </div>

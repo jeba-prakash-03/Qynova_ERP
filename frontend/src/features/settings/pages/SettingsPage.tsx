@@ -45,18 +45,22 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-          <Sliders className="w-6 h-6 text-indigo-600" />
-          System Settings & Policies
-        </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Configure organization branding, work schedules, leave quotas, statutory rules, and notification defaults.
-        </p>
+      <div className="flex items-center gap-3">
+        <div className="p-2.5 bg-[#14776b]/15 text-[#14776b] rounded-xl clay-card">
+          <Sliders className="w-6 h-6" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold font-baloo text-[#26301f] tracking-tight">
+            System Settings & Policies
+          </h1>
+          <p className="text-sm text-[#6b7663]">
+            Configure organization branding, work schedules, leave quotas, statutory rules, and notification defaults.
+          </p>
+        </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex border-b border-slate-200 gap-1 overflow-x-auto scrollbar-none">
+      <div className="flex border-b border-[#c5d0be]/40 gap-1.5 overflow-x-auto scrollbar-none">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -64,13 +68,13 @@ export const SettingsPage: React.FC = () => {
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-180 ${
                 isActive
-                  ? 'border-indigo-600 text-indigo-600 bg-indigo-50/40 rounded-t-lg'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                  ? 'border-[#14776b] text-[#14776b] bg-[#14776b]/10 rounded-t-xl'
+                  : 'border-transparent text-[#6b7663] hover:text-[#26301f] hover:border-[#c5d0be]'
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
+              <Icon className={`w-4 h-4 ${isActive ? 'text-[#14776b]' : 'text-[#6b7663]'}`} />
               {tab.label}
             </button>
           );

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosClient from '../../../shared/api/axiosClient';
-import { Loader } from '../../../shared/components/Loader';
+import { SkeletonCard, SkeletonTable } from '../../../shared/components/Loader';
 import { ErrorState } from '../../../shared/components/ErrorState';
 import { useToast } from '../../../shared/context/ToastContext';
-import { ArrowLeft, Save, ShieldCheck, Key, CheckSquare, Square, Check } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 
 export const RolePermissionsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,7 +61,12 @@ export const RolePermissionsPage: React.FC = () => {
   });
 
   if (loadingRole || loadingPerms) {
-    return <Loader size="lg" text="Loading permissions matrix..." />;
+    return (
+      <div className="space-y-6">
+        <SkeletonCard lines={2} />
+        <SkeletonTable rows={10} cols={8} />
+      </div>
+    );
   }
 
   if (isError || !role) {
@@ -145,22 +150,22 @@ export const RolePermissionsPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/roles"
-            className="p-2 text-slate-400 hover:text-slate-700 bg-white border border-slate-200 rounded-xl transition shadow-xs"
+            className="p-2.5 text-[#6b7663] hover:text-[#14776b] clay-card rounded-xl transition"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl font-bold font-baloo text-[#26301f] tracking-tight">
                 Permissions Matrix: {role.name}
               </h1>
               {role.is_system && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 uppercase">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-[#cf9b34]/20 text-[#916515] border border-[#cf9b34]/30 uppercase">
                   System Role
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#6b7663] mt-0.5">
               Ticking capabilities grants authorization to users assigned to this role.
             </p>
           </div>
@@ -170,21 +175,21 @@ export const RolePermissionsPage: React.FC = () => {
           <button
             type="button"
             onClick={selectAll}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition"
+            className="px-3.5 py-1.5 text-xs font-semibold text-[#26301f] clay-card hover:bg-[#dbe2d5] rounded-xl transition"
           >
             Select All
           </button>
           <button
             type="button"
             onClick={deselectAll}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition"
+            className="px-3.5 py-1.5 text-xs font-semibold text-[#26301f] clay-card hover:bg-[#dbe2d5] rounded-xl transition"
           >
             Clear All
           </button>
           <button
             onClick={handleSave}
             disabled={saveMutation.isPending}
-            className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-[#14776b] hover:bg-[#11655b] rounded-xl shadow-sm transition active:scale-[0.98] disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {saveMutation.isPending ? 'Saving...' : 'Save Matrix'}
@@ -193,34 +198,34 @@ export const RolePermissionsPage: React.FC = () => {
       </div>
 
       {/* Permissions Grid Table */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="clay-card rounded-2xl border border-[#c5d0be]/50 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-50/80 border-b border-slate-200 text-slate-500 uppercase font-bold tracking-wider">
+          <table className="w-full text-left text-xs border-collapse min-w-[800px]">
+            <thead className="bg-[#dbe2d5]/50 border-b border-[#c5d0be]/40 text-[#6b7663] uppercase font-bold tracking-wider text-[11px]">
               <tr>
-                <th className="px-5 py-4 min-w-[200px]">Module / Entity</th>
+                <th className="px-5 py-3.5 min-w-[200px]">Module / Entity</th>
                 {actions.map((act) => (
-                  <th key={act} className="px-3 py-4 text-center min-w-[90px] capitalize">
+                  <th key={act} className="px-3 py-3.5 text-center min-w-[90px] capitalize">
                     {act.replace('_', ' ')}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#c5d0be]/30">
               {modules.map((mod) => {
                 const modulePerms = allPermissions.filter((p) => p.module === mod);
                 const allRowSelected = modulePerms.every((p) => selectedPermissionIds.has(p.id));
 
                 return (
-                  <tr key={mod} className="hover:bg-slate-50/70 transition">
+                  <tr key={mod} className="hover:bg-[#dbe2d5]/30 transition-colors">
                     {/* Module Title & Row Toggle */}
-                    <td className="px-5 py-3 font-bold text-slate-800">
+                    <td className="px-5 py-3 font-bold text-[#26301f]">
                       <div className="flex items-center justify-between">
                         <span className="capitalize font-mono text-xs">{mod.replace('_', ' ')}</span>
                         <button
                           type="button"
                           onClick={() => toggleModuleRow(mod)}
-                          className="text-[10px] text-slate-400 hover:text-indigo-600 transition"
+                          className="text-[11px] text-[#6b7663] hover:text-[#14776b] font-medium transition-colors"
                           title="Toggle all in row"
                         >
                           {allRowSelected ? 'Deselect' : 'Select Row'}
@@ -233,8 +238,8 @@ export const RolePermissionsPage: React.FC = () => {
                       const perm = permMap.get(`${mod}:${act}`);
                       if (!perm) {
                         return (
-                          <td key={act} className="px-3 py-3 text-center bg-slate-50/20">
-                            <span className="text-slate-300 font-bold select-none">—</span>
+                          <td key={act} className="px-3 py-3 text-center bg-[#dbe2d5]/10">
+                            <span className="text-[#6b7663]/40 font-bold select-none">—</span>
                           </td>
                         );
                       }
@@ -244,14 +249,14 @@ export const RolePermissionsPage: React.FC = () => {
                       return (
                         <td key={act} className="px-3 py-3 text-center">
                           <label
-                            className="inline-flex items-center justify-center cursor-pointer p-1 rounded-lg hover:bg-indigo-50 transition"
+                            className="inline-flex items-center justify-center cursor-pointer p-1.5 rounded-lg hover:bg-[#14776b]/15 transition"
                             title={`${perm.name}: ${perm.description}`}
                           >
                             <input
                               type="checkbox"
                               checked={isChecked}
                               onChange={() => togglePermission(perm.id)}
-                              className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                              className="w-4 h-4 accent-[#14776b] rounded cursor-pointer"
                             />
                           </label>
                         </td>

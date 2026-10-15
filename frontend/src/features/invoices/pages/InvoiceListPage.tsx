@@ -6,6 +6,7 @@ import { Invoice, InvoiceStatus, INVOICE_STATUS_CONFIG } from '../types';
 import { InvoiceFormModal } from '../components/InvoiceFormModal';
 import { RecordPaymentModal } from '../components/RecordPaymentModal';
 import { Can } from '../../../shared/components/Can';
+import { SkeletonCard, SkeletonTable } from '../../../shared/components/Loader';
 import {
   FileText,
   Plus,
@@ -14,9 +15,8 @@ import {
   DollarSign,
   AlertCircle,
   Eye,
-  CheckCircle2,
-  Calendar,
 } from 'lucide-react';
+import { formatCurrency } from '../../../shared/utils/format.util';
 
 export const InvoiceListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -50,20 +50,24 @@ export const InvoiceListPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-            <FileText className="w-7 h-7 text-indigo-600" />
-            Client Invoicing & Billing
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Create tax invoices from project deliverables, record customer payments, and download PDFs.
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#14776b]/15 text-[#14776b] rounded-xl clay-card">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold font-baloo text-[#26301f] tracking-tight">
+              Client Invoicing & Billing
+            </h1>
+            <p className="text-sm text-[#6b7663]">
+              Create tax invoices from project deliverables, record customer payments, and download PDFs.
+            </p>
+          </div>
         </div>
 
         <Can permission="invoices.create">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] active:scale-[0.98] text-white rounded-xl text-xs font-semibold transition-all duration-180 shadow-sm"
           >
             <Plus className="w-4 h-4" /> Create Invoice
           </button>
@@ -72,52 +76,52 @@ export const InvoiceListPage: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <div className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
             Total Billed
           </span>
-          <div className="text-2xl font-black text-slate-900 mt-1">
-            ₹{totalBilled.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          <div className="text-2xl font-bold font-mono text-[#26301f] mt-1.5">
+            {formatCurrency(totalBilled, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <div className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
             Total Collected
           </span>
-          <div className="text-2xl font-black text-emerald-600 mt-1">
-            ₹{totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          <div className="text-2xl font-bold font-mono text-[#14776b] mt-1.5">
+            {formatCurrency(totalCollected, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <div className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
             Pending Receivables
           </span>
-          <div className="text-2xl font-black text-rose-600 mt-1">
-            ₹{totalReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          <div className="text-2xl font-bold font-mono text-[#c4643f] mt-1.5">
+            {formatCurrency(totalReceivables, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-wrap items-center justify-between gap-4">
+      <div className="clay-card p-4 rounded-2xl border border-[#c5d0be]/50 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3 flex-1">
           <div className="relative min-w-[240px]">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#6b7663] absolute left-3 top-2.5" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search invoice #, client, project..."
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] placeholder-[#6b7663] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"
+            className="text-xs px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           >
             <option value="">All Statuses</option>
             <option value="draft">Draft</option>
@@ -129,42 +133,40 @@ export const InvoiceListPage: React.FC = () => {
           </select>
         </div>
 
-        <span className="text-xs font-medium text-slate-500">
+        <span className="text-xs font-medium text-[#6b7663]">
           Showing <strong>{invoices.length}</strong> invoices
         </span>
       </div>
 
       {/* Main Invoices Table */}
       {isLoading ? (
-        <div className="h-64 flex items-center justify-center bg-white rounded-2xl border border-slate-200">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
-        </div>
+        <SkeletonTable rows={6} cols={7} />
       ) : isError ? (
-        <div className="p-8 text-center bg-white rounded-2xl border border-rose-200 text-rose-600">
-          <AlertCircle className="w-8 h-8 mx-auto mb-2" />
-          <p className="font-semibold text-sm">Failed to load invoices</p>
+        <div className="clay-card p-8 text-center rounded-2xl border border-[#c4643f]/30 bg-[#c4643f]/10 text-[#9e3a1b]">
+          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-[#c4643f]" />
+          <p className="font-bold font-baloo text-sm">Failed to load invoices</p>
         </div>
       ) : invoices.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-2xl border border-slate-200">
-          <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-800">No invoices generated yet</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+        <div className="clay-card p-12 text-center rounded-2xl border border-[#c5d0be]/50">
+          <FileText className="w-10 h-10 text-[#6b7663]/60 mx-auto mb-3" />
+          <h3 className="text-base font-bold font-baloo text-[#26301f]">No invoices generated yet</h3>
+          <p className="text-xs text-[#6b7663] max-w-sm mx-auto mt-1">
             Create an invoice from deliverables or directly bill clients with customizable line items.
           </p>
           <Can permission="invoices.create">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition"
+              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold transition shadow-sm"
             >
               <Plus className="w-4 h-4" /> Create First Invoice
             </button>
           </Can>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div className="clay-card rounded-2xl border border-[#c5d0be]/50 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+            <table className="w-full text-left text-xs min-w-[768px]">
+              <thead className="bg-[#dbe2d5]/40 border-b border-[#c5d0be]/40 text-[#6b7663] font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="px-5 py-3.5">Invoice #</th>
                   <th className="px-5 py-3.5">Client & Project</th>
@@ -175,41 +177,41 @@ export const InvoiceListPage: React.FC = () => {
                   <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#c5d0be]/30">
                 {invoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-slate-50/80 transition">
-                    <td className="px-5 py-3.5 font-mono font-bold text-indigo-600">
+                  <tr key={inv.id} className="hover:bg-[#dbe2d5]/30 transition-colors">
+                    <td className="px-5 py-3.5 font-mono font-bold text-[#14776b]">
                       {inv.invoice_number}
                     </td>
                     <td className="px-5 py-3.5">
-                      <div className="font-semibold text-slate-800">{inv.client_name || inv.client_company}</div>
+                      <div className="font-semibold text-[#26301f]">{inv.client_name || inv.client_company}</div>
                       {inv.project_name && (
-                        <div className="text-[11px] text-slate-400 mt-0.5">
+                        <div className="text-[11px] text-[#6b7663] mt-0.5">
                           {inv.project_code} - {inv.project_name}
                         </div>
                       )}
                     </td>
-                    <td className="px-5 py-3.5 text-slate-500">
+                    <td className="px-5 py-3.5 text-[#6b7663]">
                       <div>Issued: {inv.issue_date}</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">Due: {inv.due_date}</div>
+                      <div className="text-[11px] text-[#6b7663]/70 mt-0.5">Due: {inv.due_date}</div>
                     </td>
-                    <td className="px-5 py-3.5 font-mono font-bold text-slate-900">
-                      ₹{Number(inv.total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    <td className="px-5 py-3.5 font-mono font-bold text-[#26301f]">
+                      {formatCurrency(inv.total, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="px-5 py-3.5 font-mono">
-                      <div className="text-emerald-600 font-semibold">
-                        ₹{Number(inv.amount_paid).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      <div className="text-[#14776b] font-semibold">
+                        {formatCurrency(inv.amount_paid, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
-                      <div className="text-[11px] text-rose-600 mt-0.5">
-                        Due: ₹{Number(inv.balance_due).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      <div className="text-[11px] text-[#c4643f] mt-0.5 font-semibold">
+                        Due: {formatCurrency(inv.balance_due, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </td>
                     <td className="px-5 py-3.5">
                       <span
                         className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold capitalize border ${
-                          INVOICE_STATUS_CONFIG[inv.status]?.bg || 'bg-slate-100'
-                        } ${INVOICE_STATUS_CONFIG[inv.status]?.color || 'text-slate-700'} ${
-                          INVOICE_STATUS_CONFIG[inv.status]?.border || 'border-slate-200'
+                          INVOICE_STATUS_CONFIG[inv.status]?.bg || 'bg-[#dbe2d5]'
+                        } ${INVOICE_STATUS_CONFIG[inv.status]?.color || 'text-[#26301f]'} ${
+                          INVOICE_STATUS_CONFIG[inv.status]?.border || 'border-[#c5d0be]'
                         }`}
                       >
                         {INVOICE_STATUS_CONFIG[inv.status]?.label || inv.status}
@@ -219,7 +221,7 @@ export const InvoiceListPage: React.FC = () => {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => invoicesApi.downloadPdf(inv.id, inv.invoice_number)}
-                          className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition"
+                          className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#dbe2d5]/60 rounded-lg transition-colors"
                           title="Download PDF"
                         >
                           <Download className="w-4 h-4" />
@@ -229,7 +231,7 @@ export const InvoiceListPage: React.FC = () => {
                           <Can permission="payments.create">
                             <button
                               onClick={() => setPaymentInvoice(inv)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100/70 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-xs font-semibold transition-all duration-180"
                               title="Record payment"
                             >
                               <DollarSign className="w-3.5 h-3.5" /> Pay
@@ -239,7 +241,7 @@ export const InvoiceListPage: React.FC = () => {
 
                         <button
                           onClick={() => navigate(`/invoices/${inv.id}`)}
-                          className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
+                          className="p-1.5 text-[#6b7663] hover:text-[#26301f] hover:bg-[#dbe2d5]/60 rounded-lg transition-colors"
                           title="View invoice details"
                         >
                           <Eye className="w-4 h-4" />

@@ -668,8 +668,24 @@ export const LeaveApprovalsPage: React.FC = () => {
         isOpen={Boolean(approveTarget)}
         onClose={() => setApproveTarget(null)}
         title="Review Leave Request (Per-Day Decision)"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setApproveTarget(null)}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="review-leave-form"
+              variant="primary"
+              isLoading={approveMutation.isPending}
+              disabled={Object.values(selectedDates).some((v) => !v) && !approvalNote.trim()}
+            >
+              Confirm Decision
+            </Button>
+          </>
+        }
       >
-        <form onSubmit={handleApproveSubmit} className="space-y-4">
+        <form id="review-leave-form" onSubmit={handleApproveSubmit} className="space-y-4">
           <p className="text-sm text-[#35422d]">
             Reviewing request for <strong className="text-[#26301f] font-display">{approveTarget?.employee_name}</strong> for{' '}
             <strong className="text-[#26301f]">{approveTarget?.days} day(s)</strong> of {approveTarget?.leave_type_name} (
@@ -778,20 +794,6 @@ export const LeaveApprovalsPage: React.FC = () => {
               required={Object.values(selectedDates).some((v) => !v)}
             />
           </FormField>
-
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[rgba(76,91,70,0.14)]">
-            <Button variant="secondary" onClick={() => setApproveTarget(null)}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={approveMutation.isPending}
-              disabled={Object.values(selectedDates).some((v) => !v) && !approvalNote.trim()}
-            >
-              Confirm Decision
-            </Button>
-          </div>
         </form>
       </Modal>
 
@@ -800,8 +802,24 @@ export const LeaveApprovalsPage: React.FC = () => {
         isOpen={Boolean(rejectTarget)}
         onClose={() => setRejectTarget(null)}
         title={`Reject Leave Request: ${rejectTarget?.employee_name}`}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setRejectTarget(null)}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="reject-leave-form"
+              variant="danger"
+              isLoading={rejectMutation.isPending}
+              disabled={!rejectNote.trim()}
+            >
+              Reject Request
+            </Button>
+          </>
+        }
       >
-        <form onSubmit={handleRejectSubmit} className="space-y-4">
+        <form id="reject-leave-form" onSubmit={handleRejectSubmit} className="space-y-4">
           <FormField label="Mandatory Reason for Rejection" required>
             <textarea
               rows={3}
@@ -813,20 +831,6 @@ export const LeaveApprovalsPage: React.FC = () => {
               minLength={5}
             />
           </FormField>
-
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[rgba(76,91,70,0.14)]">
-            <Button variant="secondary" onClick={() => setRejectTarget(null)}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="danger"
-              isLoading={rejectMutation.isPending}
-              disabled={!rejectNote.trim()}
-            >
-              Reject Request
-            </Button>
-          </div>
         </form>
       </Modal>
     </div>

@@ -3,7 +3,9 @@
 @tailwind utilities;
 
 :root {
-  /* Reference Design System Tokens: Claymorphism Analytics Dashboard — Soft Dusty Sage Clay UI */
+  /* ==============================================================================
+     Qynova ERP Claymorphism Design System Tokens (Dusty Sage Theme)
+     ============================================================================== */
   --clay-ground: #c5d0be;
   --clay-surface: #e2e8dc;
   --clay-surface-secondary: #dbe2d5;
@@ -17,37 +19,52 @@
 
   --clay-positive: #3f8f4a;
   --clay-border: rgba(76, 91, 70, 0.14);
+  --clay-border-subtle: rgba(76, 91, 70, 0.08);
 
-  --clay-shadow-dark:
-    12px 14px 30px rgba(88, 104, 84, 0.30);
+  --radius-card: 26px;
+  --radius-control: 16px;
+  --radius-pill: 999px;
 
-  --clay-shadow-light:
-    -8px -10px 22px rgba(255, 255, 255, 0.85);
-
-  --clay-shadow-raised:
+  --shadow-raised:
     8px 10px 24px rgba(88, 104, 84, 0.28),
     -6px -7px 18px rgba(255, 255, 255, 0.78);
 
-  --clay-shadow-inset:
+  --shadow-raised-sm:
+    4px 6px 14px rgba(88, 104, 84, 0.20),
+    -3px -4px 10px rgba(255, 255, 255, 0.75);
+
+  --shadow-raised-hover:
+    10px 14px 28px rgba(88, 104, 84, 0.32),
+    -8px -9px 22px rgba(255, 255, 255, 0.85);
+
+  --shadow-inset:
     inset 4px 5px 10px rgba(104, 118, 100, 0.30),
     inset -3px -4px 9px rgba(255, 255, 255, 0.70);
 
-  --clay-radius-card: 26px;
-  --clay-radius-control: 16px;
-  --clay-radius-pill: 999px;
+  --shadow-inset-sm:
+    inset 2px 3px 6px rgba(104, 118, 100, 0.22),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.65);
 
-  /* Backward Compatibility Tokens */
-  --color-primary: #14776b;
+  --transition-ui: 180ms ease;
+
+  /* Aliases for compatibility */
+  --clay-shadow-raised: var(--shadow-raised);
+  --clay-shadow-inset: var(--shadow-inset);
+  --clay-radius-card: var(--radius-card);
+  --clay-radius-control: var(--radius-control);
+  --clay-radius-pill: var(--radius-pill);
+
+  --color-primary: var(--clay-teal);
   --color-primary-hover: #106258;
   --color-primary-soft: #d8e6e2;
-  --color-page: #c5d0be;
-  --color-surface: #e2e8dc;
-  --color-border: rgba(76, 91, 70, 0.14);
-  --color-text: #26301f;
+  --color-page: var(--clay-ground);
+  --color-surface: var(--clay-surface);
+  --color-border: var(--clay-border);
+  --color-text: var(--clay-ink);
   --color-body: #35422d;
-  --color-muted: #6b7663;
+  --color-muted: var(--clay-muted);
 
-  /* Semantic Status Tokens */
+  /* Status Tokens */
   --status-present: #3f8f4a;
   --status-present-bg: #d8ebd9;
   --status-absent: #c4643f;
@@ -65,10 +82,19 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     font-family: 'Figtree', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     background-color: var(--clay-ground);
     color: var(--clay-ink);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -77,13 +103,20 @@
     letter-spacing: -0.01em;
   }
 
-  /* Professional tabular numbers for financial, date, and metrics figures */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+
+  /* Focused accessibility outline */
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--clay-surface), 0 0 0 4px var(--clay-teal);
+  }
 }
 
-/* Custom Clay Scrollbar */
+/* ==============================================================================
+   Custom Clay Scrollbar Styling
+   ============================================================================== */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
@@ -104,30 +137,74 @@
   background: #8e9e85;
 }
 
-/* Claymorphism physical utilities */
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==============================================================================
+   Claymorphism Physical Surface & Button Utilities
+   ============================================================================== */
 .clay-card {
   background-color: var(--clay-surface);
-  border-radius: var(--clay-radius-card);
+  border-radius: var(--radius-card);
   border: 1px solid var(--clay-border);
-  box-shadow: var(--clay-shadow-raised);
+  box-shadow: var(--shadow-raised);
 }
 
 .clay-card-flat {
   background-color: var(--clay-surface-secondary);
-  border-radius: var(--clay-radius-card);
+  border-radius: var(--radius-card);
   border: 1px solid var(--clay-border);
+}
+
+.clay-card-interactive {
+  background-color: var(--clay-surface);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--clay-border);
+  box-shadow: var(--shadow-raised);
+  transition: transform var(--transition-ui), box-shadow var(--transition-ui), background-color var(--transition-ui);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .clay-card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-raised-hover);
+  }
 }
 
 .clay-inset {
   background-color: var(--clay-surface-secondary);
   border: 1px solid var(--clay-border);
-  box-shadow: var(--clay-shadow-inset);
-  border-radius: var(--clay-radius-control);
+  box-shadow: var(--shadow-inset);
+  border-radius: var(--radius-control);
 }
 
+.clay-inset-sm {
+  background-color: var(--clay-surface-secondary);
+  border: 1px solid var(--clay-border);
+  box-shadow: var(--shadow-inset-sm);
+  border-radius: 12px;
+}
+
+/* Clay Button Styles */
 .clay-btn {
-  border-radius: var(--clay-radius-pill);
-  transition: all 180ms ease-in-out;
+  border-radius: var(--radius-pill);
+  transition: all var(--transition-ui);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .clay-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.clay-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .clay-btn-teal {
@@ -136,11 +213,11 @@
   box-shadow: 4px 6px 16px rgba(20, 119, 107, 0.32), -3px -3px 9px rgba(255, 255, 255, 0.65);
 }
 
-.clay-btn-teal:hover {
+.clay-btn-teal:hover:not(:disabled) {
   background-color: #106258;
 }
 
-.clay-btn-teal:active {
+.clay-btn-teal:active:not(:disabled) {
   box-shadow: inset 3px 4px 8px rgba(10, 50, 45, 0.45);
 }
 
@@ -151,11 +228,11 @@
   box-shadow: 4px 5px 14px rgba(88, 104, 84, 0.22), -3px -3px 9px rgba(255, 255, 255, 0.85);
 }
 
-.clay-btn-surface:hover {
+.clay-btn-surface:hover:not(:disabled) {
   background-color: var(--clay-surface-secondary);
 }
 
-.clay-btn-surface:active {
+.clay-btn-surface:active:not(:disabled) {
   box-shadow: inset 2px 3px 6px rgba(88, 104, 84, 0.28);
 }
 
@@ -165,11 +242,11 @@
   box-shadow: 4px 6px 16px rgba(196, 100, 63, 0.32), -3px -3px 9px rgba(255, 255, 255, 0.65);
 }
 
-.clay-btn-rust:hover {
+.clay-btn-rust:hover:not(:disabled) {
   background-color: #af5533;
 }
 
-.clay-btn-rust:active {
+.clay-btn-rust:active:not(:disabled) {
   box-shadow: inset 3px 4px 8px rgba(120, 40, 20, 0.45);
 }
 
@@ -177,7 +254,7 @@
   font-family: 'Baloo 2', 'Figtree', sans-serif;
 }
 
-/* Consistent browser autofill background */
+/* Browser autofill styling */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
@@ -187,7 +264,24 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Subtle fade-in animation */
+/* ==============================================================================
+   Subtle Transitions & Skeleton Shimmer
+   ============================================================================== */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: pageEnter 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @keyframes authFadeIn {
   from {
     opacity: 0;
@@ -203,10 +297,75 @@ input:-webkit-autofill:active {
   animation: authFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .animate-auth-fade {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+/* Skeleton Loading Animation */
+@keyframes clayShimmer {
+  0% {
+    background-position: -200% 0;
   }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.clay-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(219, 226, 213, 0.8) 25%,
+    rgba(226, 232, 220, 0.95) 50%,
+    rgba(219, 226, 213, 0.8) 75%
+  );
+  background-size: 200% 100%;
+  animation: clayShimmer 1.8s infinite ease-in-out;
+  border-radius: 12px;
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-page-enter,
+  .animate-auth-fade,
+  .clay-card-interactive,
+  .clay-btn {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .clay-skeleton {
+    animation: none !important;
+    background: rgba(219, 226, 213, 0.8);
+  }
+}
+
+/* ==============================================================================
+   CRM Pipeline Responsive Board & Columns
+   ============================================================================== */
+.crm-pipeline-board {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .crm-pipeline-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .crm-pipeline-board {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+.crm-pipeline-column {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }

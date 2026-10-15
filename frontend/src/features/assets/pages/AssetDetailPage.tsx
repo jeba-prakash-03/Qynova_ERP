@@ -23,6 +23,7 @@ import {
   AlertCircle,
   Plus,
 } from 'lucide-react';
+import { formatCurrency } from '../../../shared/utils/format.util';
 
 export const AssetDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -198,7 +199,7 @@ export const AssetDetailPage: React.FC = () => {
             <div>
               <span className="text-[#64748B] block mb-0.5">Purchase Cost</span>
               <span className="font-bold text-[#0F172A]">
-                {asset.purchase_cost != null ? `₹${asset.purchase_cost.toLocaleString()}` : '—'}
+                {formatCurrency(asset.purchase_cost)}
               </span>
             </div>
             <div>
@@ -332,7 +333,7 @@ export const AssetDetailPage: React.FC = () => {
                     </td>
                     <td className="px-4 py-3 max-w-xs">{m.issue_description}</td>
                     <td className="px-4 py-3 text-[#64748B]">{m.vendor_name || 'In-House'}</td>
-                    <td className="px-4 py-3 font-semibold text-[#0F172A]">₹{Number(m.cost).toLocaleString()}</td>
+                    <td className="px-4 py-3 font-semibold text-[#0F172A]">{formatCurrency(m.cost)}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={m.status === 'completed' ? 'approved' : 'warning'} />
                     </td>

@@ -7,19 +7,12 @@ import {
   Target,
   Plus,
   Search,
-  Filter,
   LayoutGrid,
   List,
-  Calendar,
-  Building,
   User,
-  ArrowRight,
   CheckCircle2,
   AlertCircle,
-  MoreVertical,
   Edit,
-  Trash2,
-  ExternalLink,
 } from 'lucide-react';
 import { crmApi } from '../api';
 import {
@@ -33,7 +26,7 @@ import { LeadDrawer } from '../components/LeadDrawer';
 import { ConvertLeadModal } from '../components/ConvertLeadModal';
 import { LostReasonModal } from '../components/LostReasonModal';
 import { Can } from '../../../shared/components/Can';
-import { Loader } from '../../../shared/components/Loader';
+import { SkeletonCard, SkeletonTable } from '../../../shared/components/Loader';
 import { useToast } from '../../../shared/context/ToastContext';
 import axiosClient from '../../../shared/api/axiosClient';
 
@@ -56,6 +49,7 @@ export const CrmPipelinePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [salespersonFilter, setSalespersonFilter] = useState<string>('all');
   const [selectedStageFilter, setSelectedStageFilter] = useState<string>('all');
+  const [kanbanStageFilter, setKanbanStageFilter] = useState<string>('all');
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -170,28 +164,69 @@ export const CrmPipelinePage: React.FC = () => {
     );
   };
 
+  const [draggedLead, setDraggedLead] = useState<Lead | null>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState<LeadStage | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, lead: Lead) => {
+    setDraggedLead(lead);
+    e.dataTransfer.setData('text/plain', String(lead.id));
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragEnd = () => {
+    setDraggedLead(null);
+    setIsDraggingOver(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, stage: LeadStage) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (isDraggingOver !== stage) {
+      setIsDraggingOver(stage);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setIsDraggingOver(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, stage: LeadStage) => {
+    e.preventDefault();
+    setIsDraggingOver(null);
+    if (draggedLead && draggedLead.stage !== stage) {
+      handleStageChange(draggedLead, stage);
+    }
+    setDraggedLead(null);
+  };
+
+  const displayedStages =
+    kanbanStageFilter === 'all'
+      ? STAGES
+      : STAGES.filter((s) => s === kanbanStageFilter);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full min-w-0">
       {/* Top Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold font-baloo tracking-tight text-[#26301f]">
             CRM & Sales Pipeline
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-[#6b7663]">
             Track leads, stage conversions, weighted revenue forecasts, and client onboarding.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* View mode toggle */}
-          <div className="flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+          <div className="flex items-center clay-inset p-1 rounded-xl">
             <button
               onClick={() => setViewMode('kanban')}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-180 ${
                 viewMode === 'kanban'
-                  ? 'bg-indigo-50 text-indigo-700 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#e2e8dc] text-[#14776b] shadow-xs'
+                  : 'text-[#6b7663] hover:text-[#26301f]'
               }`}
             >
               <LayoutGrid className="h-3.5 w-3.5" />
@@ -199,10 +234,10 @@ export const CrmPipelinePage: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-180 ${
                 viewMode === 'table'
-                  ? 'bg-indigo-50 text-indigo-700 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#e2e8dc] text-[#14776b] shadow-xs'
+                  : 'text-[#6b7663] hover:text-[#26301f]'
               }`}
             >
               <List className="h-3.5 w-3.5" />
@@ -216,7 +251,7 @@ export const CrmPipelinePage: React.FC = () => {
                 setEditingLead(null);
                 setIsCreateModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#14776b] hover:bg-[#11655b] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-180 active:scale-[0.98]"
             >
               <Plus className="h-4 w-4" />
               New Lead
@@ -228,78 +263,78 @@ export const CrmPipelinePage: React.FC = () => {
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Active Leads */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="clay-card-interactive bg-[#e2e8dc] rounded-2xl border border-[#c5d0be]/50 p-5">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
               Total Leads
             </p>
-            <span className="rounded-lg bg-indigo-50 p-2 text-indigo-600">
+            <span className="rounded-xl bg-[#14776b]/15 p-2 text-[#14776b]">
               <Users className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-slate-900">
+            <span className="text-2xl font-bold font-mono text-[#26301f]">
               {pipelineOverview?.total_leads_count ?? 0}
             </span>
-            <span className="text-xs text-slate-500">records in pipeline</span>
+            <span className="text-xs text-[#6b7663]">records in pipeline</span>
           </div>
         </div>
 
         {/* Total Pipeline Value */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="clay-card-interactive bg-[#e2e8dc] rounded-2xl border border-[#c5d0be]/50 p-5">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
               Active Pipeline Value
             </p>
-            <span className="rounded-lg bg-blue-50 p-2 text-blue-600">
+            <span className="rounded-xl bg-[#22304a]/15 p-2 text-[#22304a]">
               <DollarSign className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-slate-900">
+            <span className="text-2xl font-bold font-mono text-[#26301f]">
               {formatCurrency(pipelineOverview?.total_pipeline_value)}
             </span>
-            <span className="text-xs text-slate-500">unweighted potential</span>
+            <span className="text-xs text-[#6b7663]">unweighted potential</span>
           </div>
         </div>
 
         {/* Weighted Revenue Forecast */}
-        <div className="rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 p-5 shadow-sm">
+        <div className="clay-card-interactive bg-gradient-to-br from-[#14776b]/10 to-[#22304a]/10 rounded-2xl border border-[#14776b]/30 p-5">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-indigo-700">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#14776b]">
               Weighted Forecast
             </p>
-            <span className="rounded-lg bg-indigo-100 p-2 text-indigo-700">
+            <span className="rounded-xl bg-[#14776b]/20 p-2 text-[#14776b]">
               <TrendingUp className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-indigo-950">
+            <span className="text-2xl font-bold font-mono text-[#14776b]">
               {formatCurrency(pipelineOverview?.weighted_forecast)}
             </span>
-            <span className="text-xs font-medium text-indigo-600">
+            <span className="text-xs font-semibold text-[#14776b]">
               ∑(Value × Prob)
             </span>
           </div>
         </div>
 
         {/* Won Deals Value */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="clay-card-interactive bg-[#e2e8dc] rounded-2xl border border-[#c5d0be]/50 p-5">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
               Won Revenue
             </p>
-            <span className="rounded-lg bg-emerald-50 p-2 text-emerald-600">
+            <span className="rounded-xl bg-emerald-100/70 p-2 text-emerald-800">
               <CheckCircle2 className="h-5 w-5" />
             </span>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-emerald-700">
+            <span className="text-2xl font-bold font-mono text-emerald-800">
               {formatCurrency(
                 pipelineOverview?.stage_summaries.find((s) => s.stage === 'won')?.total_value || 0
               )}
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-[#6b7663]">
               {pipelineOverview?.stage_summaries.find((s) => s.stage === 'won')?.count || 0} won deals
             </span>
           </div>
@@ -307,26 +342,26 @@ export const CrmPipelinePage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="clay-card p-4 rounded-2xl border border-[#c5d0be]/50 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#6b7663]" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by company, contact, or LD code..."
-            className="w-full rounded-lg border border-slate-300 pl-9 pr-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="w-full pl-9 pr-4 py-2 text-sm clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] placeholder-[#6b7663] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {/* Salesperson Filter */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-slate-500">Salesperson:</span>
+            <span className="text-xs font-semibold text-[#6b7663]">Salesperson:</span>
             <select
               value={salespersonFilter}
               onChange={(e) => setSalespersonFilter(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-700 focus:border-indigo-500 focus:outline-none"
+              className="px-3 py-1.5 text-xs clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             >
               <option value="all">All Sales Reps</option>
               {employees.map((emp: any) => (
@@ -340,11 +375,11 @@ export const CrmPipelinePage: React.FC = () => {
           {/* Stage Filter (for List mode) */}
           {viewMode === 'table' && (
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-500">Stage:</span>
+              <span className="text-xs font-semibold text-[#6b7663]">Stage:</span>
               <select
                 value={selectedStageFilter}
                 onChange={(e) => setSelectedStageFilter(e.target.value)}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-700 focus:border-indigo-500 focus:outline-none"
+                className="px-3 py-1.5 text-xs clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
               >
                 <option value="all">All Stages</option>
                 {STAGES.map((stg) => (
@@ -356,14 +391,15 @@ export const CrmPipelinePage: React.FC = () => {
             </div>
           )}
 
-          {(searchTerm || salespersonFilter !== 'all' || selectedStageFilter !== 'all') && (
+          {(searchTerm || salespersonFilter !== 'all' || selectedStageFilter !== 'all' || kanbanStageFilter !== 'all') && (
             <button
               onClick={() => {
                 setSearchTerm('');
                 setSalespersonFilter('all');
                 setSelectedStageFilter('all');
+                setKanbanStageFilter('all');
               }}
-              className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+              className="text-xs text-[#14776b] hover:text-[#11655b] font-semibold"
             >
               Clear filters
             </button>
@@ -373,182 +409,289 @@ export const CrmPipelinePage: React.FC = () => {
 
       {/* Loading state */}
       {isLeadsLoading && (
-        <div className="flex h-64 items-center justify-center rounded-xl border border-slate-200 bg-white">
-          <Loader />
-        </div>
+        viewMode === 'kanban' ? (
+          <div className="crm-pipeline-board grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-4.5 pb-6 pt-1 w-full min-w-0">
+            {STAGES.map((stg) => (
+              <div key={stg} className="crm-pipeline-column min-w-0">
+                <SkeletonCard lines={4} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <SkeletonTable rows={6} cols={7} />
+        )
       )}
 
       {/* Error state */}
       {leadsError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center text-rose-700">
-          <AlertCircle className="mx-auto h-8 w-8 text-rose-500" />
-          <h3 className="mt-2 font-semibold">Failed to load CRM pipeline</h3>
+        <div className="clay-card rounded-2xl border border-[#c4643f]/30 bg-[#c4643f]/10 p-6 text-center text-[#9e3a1b]">
+          <AlertCircle className="mx-auto h-8 w-8 text-[#c4643f]" />
+          <h3 className="mt-2 font-bold font-baloo">Failed to load CRM pipeline</h3>
           <p className="mt-1 text-xs">{(leadsError as any)?.message || 'Unknown network error'}</p>
         </div>
       )}
 
       {/* KANBAN PIPELINE VIEW */}
       {!isLeadsLoading && !leadsError && viewMode === 'kanban' && (
-        <div className="flex gap-4 overflow-x-auto pb-6 pt-1">
-          {STAGES.map((stageKey) => {
-            const stageConfig = LEAD_STAGES_CONFIG[stageKey];
-            const stageLeads = filteredLeads.filter((l) => l.stage === stageKey);
-            const stageSummary = pipelineOverview?.stage_summaries.find(
-              (s) => s.stage === stageKey
-            );
-            const totalStageVal =
-              stageSummary?.total_value ??
-              stageLeads.reduce((acc, l) => acc + Number(l.estimated_value || 0), 0);
-            const weightedVal =
-              stageSummary?.weighted_value ??
-              stageLeads.reduce(
-                (acc, l) =>
-                  acc + (Number(l.estimated_value || 0) * (l.probability_percent || 0)) / 100,
-                0
+        <div className="space-y-4 w-full min-w-0">
+          {/* Mobile / Tablet Stage Quick Switcher (allows instant single-stage focus on small screens) */}
+          <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar min-w-0">
+            <button
+              type="button"
+              onClick={() => setKanbanStageFilter('all')}
+              className={`rounded-xl px-3 py-1.5 text-xs font-semibold shrink-0 transition-all duration-180 ${
+                kanbanStageFilter === 'all'
+                  ? 'bg-[#14776b] text-white shadow-xs'
+                  : 'clay-card text-[#6b7663] hover:text-[#26301f]'
+              }`}
+            >
+              All Stages ({filteredLeads.length})
+            </button>
+            {STAGES.map((stageKey) => {
+              const stageConfig = LEAD_STAGES_CONFIG[stageKey];
+              const count = filteredLeads.filter((l) => l.stage === stageKey).length;
+              const isActive = kanbanStageFilter === stageKey;
+              return (
+                <button
+                  key={stageKey}
+                  type="button"
+                  onClick={() => setKanbanStageFilter(stageKey)}
+                  className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold shrink-0 transition-all duration-180 ${
+                    isActive
+                      ? 'bg-[#14776b] text-white shadow-xs'
+                      : 'clay-card text-[#6b7663] hover:text-[#26301f]'
+                  }`}
+                >
+                  <span>{stageConfig.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      isActive ? 'bg-white/20 text-white' : 'clay-inset text-[#26301f]'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
               );
+            })}
+          </div>
 
-            return (
-              <div
-                key={stageKey}
-                className="flex w-72 shrink-0 flex-col rounded-xl border border-slate-200 bg-slate-50/80 p-3 shadow-xs"
-              >
-                {/* Column Header */}
-                <div className="mb-3">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${stageConfig.bg} ${stageConfig.color} border ${stageConfig.border}`}
-                    >
-                      {stageConfig.label}
-                    </span>
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700">
-                      {stageLeads.length}
-                    </span>
+          {/* Responsive CSS Grid Pipeline Board (4 columns desktop, 2 tablet, 1 mobile) */}
+          <div className="crm-pipeline-board grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-4.5 pb-6 pt-1 w-full min-w-0">
+            {displayedStages.map((stageKey) => {
+              const stageConfig = LEAD_STAGES_CONFIG[stageKey];
+              const stageLeads = filteredLeads.filter((l) => l.stage === stageKey);
+              const stageSummary = pipelineOverview?.stage_summaries.find(
+                (s) => s.stage === stageKey
+              );
+              const totalStageVal =
+                stageSummary?.total_value ??
+                stageLeads.reduce((acc, l) => acc + Number(l.estimated_value || 0), 0);
+              const weightedVal =
+                stageSummary?.weighted_value ??
+                stageLeads.reduce(
+                  (acc, l) =>
+                    acc + (Number(l.estimated_value || 0) * (l.probability_percent || 0)) / 100,
+                  0
+                );
+
+              return (
+                <div
+                  key={stageKey}
+                  onDragOver={(e) => handleDragOver(e, stageKey)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, stageKey)}
+                  className={`crm-pipeline-column flex flex-col rounded-2xl border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5]/65 p-3 sm:p-3.5 shadow-[4px_6px_16px_rgba(88,104,84,0.14),-3px_-3px_10px_rgba(255,255,255,0.6)] transition-all duration-200 min-w-0 ${
+                    isDraggingOver === stageKey
+                      ? 'ring-2 ring-[#14776b] bg-[#d3dcce] shadow-[0_0_16px_rgba(20,119,107,0.25)]'
+                      : ''
+                  }`}
+                >
+                  {/* Column Header */}
+                  <div className="mb-3 min-w-0">
+                    <div className="flex items-start justify-between gap-2 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                        <span
+                          className={`inline-flex items-center rounded-xl px-2.5 py-1 text-xs font-bold leading-snug ${stageConfig.bg} ${stageConfig.color} border ${stageConfig.border} shadow-2xs whitespace-normal break-words`}
+                        >
+                          {stageConfig.label}
+                        </span>
+                      </div>
+                      <span
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full clay-inset text-xs font-bold text-[#26301f] shadow-inner"
+                        title={`${stageLeads.length} leads in stage`}
+                      >
+                        {stageLeads.length}
+                      </span>
+                    </div>
+
+                    <div className="mt-2 flex flex-wrap items-baseline justify-between gap-1 text-xs min-w-0">
+                      <div className="flex items-baseline gap-1.5 min-w-0">
+                        <span
+                          className="font-bold font-mono text-[#26301f] text-sm truncate"
+                          title={`Total Value: ${formatCurrency(totalStageVal)}`}
+                        >
+                          {formatCurrency(totalStageVal)}
+                        </span>
+                        {stageLeads.length > 0 && (
+                          <span className="text-[10px] text-[#6b7663] font-semibold uppercase tracking-wider">
+                            Total
+                          </span>
+                        )}
+                      </div>
+                      {stageKey !== 'won' && stageKey !== 'lost' && weightedVal > 0 && (
+                        <div
+                          className="font-mono text-[11px] text-[#14776b] font-medium"
+                          title={`Weighted Forecast: ${formatCurrency(weightedVal)}`}
+                        >
+                          Est: {formatCurrency(weightedVal)}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
-                    <span className="font-semibold text-slate-800">
-                      {formatCurrency(totalStageVal)}
-                    </span>
-                    {stageKey !== 'won' && stageKey !== 'lost' && (
-                      <span title="Weighted value">
-                        Est: {formatCurrency(weightedVal)}
-                      </span>
+                  {/* Cards Container */}
+                  <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto max-h-[460px] min-h-[160px] pr-1 min-w-0 no-scrollbar">
+                    {stageLeads.length === 0 ? (
+                      <div className="flex h-32 flex-col items-center justify-center rounded-xl border border-dashed border-[#c5d0be] bg-white/20 text-[#6b7663] p-3 text-center">
+                        <p className="text-xs font-semibold text-[#35422d]">No leads</p>
+                        <p className="text-[10px] text-[#6b7663] mt-0.5">Drag leads here or create new</p>
+                      </div>
+                    ) : (
+                      stageLeads.map((lead) => (
+                        <div
+                          key={lead.id}
+                          draggable={true}
+                          onDragStart={(e) => handleDragStart(e, lead)}
+                          onDragEnd={handleDragEnd}
+                          onClick={() => setActiveDrawerLeadId(lead.id)}
+                          className="group relative cursor-pointer rounded-xl border border-[rgba(76,91,70,0.14)] bg-[#e2e8dc] p-3 shadow-[3px_4px_10px_rgba(88,104,84,0.12),-2px_-2px_6px_rgba(255,255,255,0.7)] hover:shadow-[5px_7px_14px_rgba(88,104,84,0.18),-3px_-3px_8px_rgba(255,255,255,0.85)] hover:border-[#14776b]/40 clay-card-interactive transition-all duration-180 min-w-0 overflow-hidden active:scale-[0.99]"
+                        >
+                          {/* Card Header: Code & Probability */}
+                          <div className="flex items-center justify-between gap-1.5 mb-2 min-w-0">
+                            <span
+                              className="text-xs font-mono font-bold text-[#14776b] tracking-tight truncate"
+                              title={lead.lead_code}
+                            >
+                              {lead.lead_code}
+                            </span>
+                            <span
+                              className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-none ${
+                                lead.probability_percent >= 70
+                                  ? 'bg-emerald-100/70 text-emerald-800'
+                                  : lead.probability_percent >= 40
+                                  ? 'bg-[#cf9b34]/15 text-[#916515]'
+                                  : 'clay-inset text-[#6b7663]'
+                              }`}
+                              title={`${lead.probability_percent}% probability`}
+                            >
+                              {lead.probability_percent}% prob
+                            </span>
+                          </div>
+
+                          {/* Company & Contact */}
+                          <h4
+                            title={lead.company_name}
+                            className="text-sm font-bold text-[#26301f] leading-snug group-hover:text-[#14776b] transition-colors break-words line-clamp-2"
+                          >
+                            {lead.company_name}
+                          </h4>
+                          <div
+                            className="mt-1 flex items-center gap-1.5 text-xs text-[#6b7663] min-w-0"
+                            title={lead.contact_name}
+                          >
+                            <User className="h-3.5 w-3.5 shrink-0 text-[#6b7663]/70" />
+                            <span className="truncate">{lead.contact_name}</span>
+                          </div>
+
+                          {/* Value & Forecast */}
+                          <div className="mt-2.5 flex flex-col gap-1 border-t border-[#c5d0be]/40 pt-2 min-w-0">
+                            <div className="flex items-baseline justify-between gap-2">
+                              <span className="text-[10px] text-[#6b7663] uppercase font-semibold tracking-wider">
+                                Deal Value
+                              </span>
+                              <span
+                                className="text-sm font-bold font-mono text-[#26301f] truncate"
+                                title={formatCurrency(lead.estimated_value)}
+                              >
+                                {formatCurrency(lead.estimated_value)}
+                              </span>
+                            </div>
+                            {lead.expected_closing_date && (
+                              <div className="flex items-baseline justify-between gap-2">
+                                <span className="text-[10px] text-[#6b7663] uppercase font-semibold tracking-wider">
+                                  Target Date
+                                </span>
+                                <span
+                                  className="text-xs font-medium text-[#26301f] truncate font-mono"
+                                  title={lead.expected_closing_date}
+                                >
+                                  {lead.expected_closing_date}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Salesperson Footer */}
+                          {lead.salesperson_name && (
+                            <div className="mt-1.5 flex items-center justify-between text-[11px] text-[#6b7663] min-w-0 pt-1 border-t border-[#c5d0be]/20">
+                              <span className="truncate" title={`Sales Rep: ${lead.salesperson_name}`}>
+                                Rep: <span className="font-medium text-[#26301f]">{lead.salesperson_name}</span>
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Conversion Status Badge */}
+                          {lead.converted_client_id && (
+                            <div
+                              className="mt-2 flex items-center gap-1.5 rounded-lg bg-emerald-100/70 px-2 py-1 text-[11px] font-semibold text-emerald-800 min-w-0 truncate"
+                              title={`Converted Client: ${lead.converted_client_code}`}
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                              <span className="truncate">Converted ({lead.converted_client_code})</span>
+                            </div>
+                          )}
+
+                          {/* Won state conversion button */}
+                          {lead.stage === 'won' && !lead.converted_client_id && (
+                            <Can permission="crm.edit">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setConvertingLead(lead);
+                                }}
+                                title="Convert to Client & Project"
+                                className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#14776b] hover:bg-[#11655b] px-2.5 py-1.5 text-xs font-semibold text-white shadow-xs transition-all duration-180 active:scale-[0.98]"
+                              >
+                                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate">Convert to Project</span>
+                              </button>
+                            </Can>
+                          )}
+                        </div>
+                      ))
                     )}
                   </div>
                 </div>
-
-                {/* Cards Container */}
-                <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto max-h-[calc(100vh-340px)] pr-0.5">
-                  {stageLeads.length === 0 ? (
-                    <div className="flex h-28 flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 bg-white/50 text-slate-400">
-                      <p className="text-xs">No leads in stage</p>
-                    </div>
-                  ) : (
-                    stageLeads.map((lead) => (
-                      <div
-                        key={lead.id}
-                        onClick={() => setActiveDrawerLeadId(lead.id)}
-                        className="group relative cursor-pointer rounded-lg border border-slate-200 bg-white p-3.5 shadow-2xs transition-all hover:border-indigo-300 hover:shadow-md"
-                      >
-                        {/* Card Header: Code & Probability */}
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[11px] font-bold text-slate-500 tracking-wider">
-                            {lead.lead_code}
-                          </span>
-                          <span
-                            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                              lead.probability_percent >= 70
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : lead.probability_percent >= 40
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-slate-100 text-slate-700'
-                            }`}
-                          >
-                            {lead.probability_percent}% prob
-                          </span>
-                        </div>
-
-                        {/* Company & Contact */}
-                        <h4 className="text-xs font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition">
-                          {lead.company_name}
-                        </h4>
-                        <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-600">
-                          <User className="h-3 w-3 shrink-0 text-slate-400" />
-                          <span className="truncate">{lead.contact_name}</span>
-                        </div>
-
-                        {/* Value & Forecast */}
-                        <div className="mt-2.5 flex items-center justify-between border-t border-slate-100 pt-2">
-                          <div>
-                            <p className="text-[10px] text-slate-400 uppercase font-medium">Value</p>
-                            <p className="text-xs font-bold text-slate-800">
-                              {formatCurrency(lead.estimated_value)}
-                            </p>
-                          </div>
-                          {lead.expected_closing_date && (
-                            <div className="text-right">
-                              <p className="text-[10px] text-slate-400 uppercase font-medium">Target</p>
-                              <p className="text-[11px] font-medium text-slate-600">
-                                {lead.expected_closing_date}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Salesperson Footer */}
-                        {lead.salesperson_name && (
-                          <div className="mt-2 flex items-center justify-between pt-1 text-[10px] text-slate-500">
-                            <span className="truncate">Rep: {lead.salesperson_name}</span>
-                          </div>
-                        )}
-
-                        {/* Conversion Status Badge */}
-                        {lead.converted_client_id && (
-                          <div className="mt-2 flex items-center gap-1 rounded bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            <span>Converted ({lead.converted_client_code})</span>
-                          </div>
-                        )}
-
-                        {/* Won state conversion button */}
-                        {lead.stage === 'won' && !lead.converted_client_id && (
-                          <Can permission="crm.edit">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setConvertingLead(lead);
-                              }}
-                              className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 transition"
-                            >
-                              <CheckCircle2 className="h-3.5 w-3.5" />
-                              Convert to Client & Project
-                            </button>
-                          </Can>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
 
       {/* TABLE / LIST VIEW */}
       {!isLeadsLoading && !leadsError && viewMode === 'table' && (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="clay-card rounded-2xl border border-[#c5d0be]/50 overflow-hidden">
           {filteredLeads.length === 0 ? (
-            <div className="py-16 text-center text-slate-500">
-              <Target className="mx-auto h-10 w-10 text-slate-300" />
-              <p className="mt-2 text-sm font-medium">No leads match your search criteria</p>
-              <p className="text-xs text-slate-400">Try adjusting your filters or create a new lead.</p>
+            <div className="py-16 text-center text-[#6b7663]">
+              <Target className="mx-auto h-10 w-10 text-[#6b7663]/50" />
+              <p className="mt-2 text-sm font-semibold text-[#26301f]">No leads match your search criteria</p>
+              <p className="text-xs text-[#6b7663]">Try adjusting your filters or create a new lead.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-600">
-                <thead className="bg-slate-50 text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+              <table className="w-full text-left text-xs min-w-[768px]">
+                <thead className="bg-[#dbe2d5]/40 text-[11px] font-semibold uppercase tracking-wider text-[#6b7663] border-b border-[#c5d0be]/40">
                   <tr>
                     <th className="px-4 py-3">Code</th>
                     <th className="px-4 py-3">Company & Contact</th>
@@ -562,7 +705,7 @@ export const CrmPipelinePage: React.FC = () => {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#c5d0be]/30">
                   {filteredLeads.map((lead) => {
                     const stageConfig = LEAD_STAGES_CONFIG[lead.stage];
                     const weighted =
@@ -572,50 +715,50 @@ export const CrmPipelinePage: React.FC = () => {
                       <tr
                         key={lead.id}
                         onClick={() => setActiveDrawerLeadId(lead.id)}
-                        className="cursor-pointer hover:bg-slate-50/80 transition"
+                        className="cursor-pointer hover:bg-[#dbe2d5]/30 transition-colors"
                       >
-                        <td className="px-4 py-3 font-semibold text-slate-700">
+                        <td className="px-4 py-3 font-mono font-bold text-[#14776b]">
                           {lead.lead_code}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="font-semibold text-slate-900">{lead.company_name}</div>
-                          <div className="text-[11px] text-slate-500">{lead.contact_name}</div>
+                          <div className="font-semibold text-[#26301f]">{lead.company_name}</div>
+                          <div className="text-[11px] text-[#6b7663]">{lead.contact_name}</div>
                         </td>
                         <td className="px-4 py-3">
                           <span
-                            className={`inline-flex rounded px-2 py-0.5 text-[10px] font-semibold ${stageConfig.bg} ${stageConfig.color} border ${stageConfig.border}`}
+                            className={`inline-flex rounded-lg px-2 py-0.5 text-[10px] font-semibold ${stageConfig.bg} ${stageConfig.color} border ${stageConfig.border}`}
                           >
                             {stageConfig.label}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right font-semibold text-slate-800">
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-[#26301f]">
                           {formatCurrency(lead.estimated_value)}
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-4 py-3 text-right font-mono">
                           <span
                             className={`font-semibold ${
                               lead.probability_percent >= 70
-                                ? 'text-emerald-700'
+                                ? 'text-emerald-800'
                                 : lead.probability_percent >= 40
-                                ? 'text-amber-700'
-                                : 'text-slate-600'
+                                ? 'text-[#916515]'
+                                : 'text-[#6b7663]'
                             }`}
                           >
                             {lead.probability_percent}%
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right font-semibold text-indigo-700">
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-[#14776b]">
                           {formatCurrency(weighted)}
                         </td>
-                        <td className="px-4 py-3 text-slate-500">
+                        <td className="px-4 py-3 text-[#6b7663]">
                           {lead.expected_closing_date || '—'}
                         </td>
-                        <td className="px-4 py-3 text-slate-600">
+                        <td className="px-4 py-3 text-[#26301f]">
                           {lead.salesperson_name || 'Unassigned'}
                         </td>
                         <td className="px-4 py-3 text-center">
                           {lead.converted_client_id ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800">
                               <CheckCircle2 className="h-3 w-3" />
                               {lead.converted_client_code}
                             </span>
@@ -626,12 +769,12 @@ export const CrmPipelinePage: React.FC = () => {
                                 e.stopPropagation();
                                 setConvertingLead(lead);
                               }}
-                              className="rounded bg-emerald-600 px-2 py-1 text-[10px] font-semibold text-white shadow-xs hover:bg-emerald-700"
+                              className="rounded-lg bg-[#14776b] hover:bg-[#11655b] px-2 py-1 text-[10px] font-semibold text-white shadow-xs transition"
                             >
                               Convert
                             </button>
                           ) : (
-                            <span className="text-[10px] text-slate-400">—</span>
+                            <span className="text-[10px] text-[#6b7663]/60">—</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -642,7 +785,7 @@ export const CrmPipelinePage: React.FC = () => {
                                 setEditingLead(lead);
                                 setIsCreateModalOpen(true);
                               }}
-                              className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                              className="rounded-lg p-1 text-[#6b7663] hover:bg-[#dbe2d5]/60 hover:text-[#14776b] transition-colors"
                               title="Edit lead"
                             >
                               <Edit className="h-3.5 w-3.5" />

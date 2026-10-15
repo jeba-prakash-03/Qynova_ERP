@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, getRoleRedirectPath } from '../context/AuthContext';
 import { MENU_CONFIG } from '../navigation/menuConfig';
 import { NotificationBell } from '../../features/notifications/NotificationBell';
 import { PushNotificationBanner } from './PushNotificationBanner';
+import { AppPageErrorBoundary } from './AppPageErrorBoundary';
 import { useBranding } from '../hooks/useBranding';
 import {
   Menu,
@@ -21,7 +22,44 @@ export const AppShell: React.FC = () => {
   const { appName, logoUrl, isConfigured } = useBranding();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Scroll to top on every route change
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [location.pathname]);
+
+  // Close user dropdown on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [userMenuOpen]);
+
+  // Close sidebar on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSidebarOpen(false);
+        setUserMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   if (!user) return null;
 
@@ -42,28 +80,14 @@ export const AppShell: React.FC = () => {
         return item;
       })
       .filter((item) => {
-        // 1. Employee requirement check
-        if (item.requireEmployee && !hasEmployee) {
-          return false;
-        }
-
-        // 2. Admin dashboard check
-        if (item.adminOnly && !isAdmin && !isHR) {
-          return false;
-        }
-
-        // 3. Manager dashboard check
-        if (item.managerOnly && !isManager && !isAdmin) {
-          return false;
-        }
-
-        // 4. Permission check
+        if (item.requireEmployee && !hasEmployee) return false;
+        if (item.adminOnly && !isAdmin && !isHR) return false;
+        if (item.managerOnly && !isManager && !isAdmin) return false;
         if (item.permission) {
           if (isAdmin) return true;
           const reqPerms = item.permission.split(',');
           return reqPerms.some((p) => user.permissions?.includes(p.trim()));
         }
-
         return true;
       });
 
@@ -79,13 +103,14 @@ export const AppShell: React.FC = () => {
     : user.email.split('@')[0];
 
   return (
-    <div className="min-h-screen bg-[#c5d0be] flex flex-col antialiased text-[#26301f]">
+    <div className="h-screen h-[100dvh] w-screen flex flex-col overflow-hidden bg-[#c5d0be] text-[#26301f]">
       {/* Top Navigation Header */}
-      <header className="sticky top-0 z-40 bg-[#e2e8dc]/95 backdrop-blur-md border-b border-[rgba(76,91,70,0.14)] shadow-[0_4px_16px_rgba(88,104,84,0.12)] px-4 lg:px-6 h-16 flex items-center justify-between">
+      <header className="h-16 shrink-0 z-40 bg-[#e2e8dc]/95 backdrop-blur-md border-b border-[rgba(76,91,70,0.14)] shadow-[0_4px_16px_rgba(88,104,84,0.10)] px-4 lg:px-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2 rounded-full text-[#35422d] hover:text-[#26301f] bg-[#e2e8dc] hover:bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] shadow-[2px_3px_6px_rgba(88,104,84,0.15)] transition"
+            aria-label="Toggle Navigation"
+            className="lg:hidden p-2 rounded-full text-[#35422d] hover:text-[#26301f] bg-[#e2e8dc] hover:bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] shadow-[2px_3px_6px_rgba(88,104,84,0.15)] transition active:scale-95"
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -119,10 +144,10 @@ export const AppShell: React.FC = () => {
           <NotificationBell />
 
           {/* User Profile Pill */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full bg-[#e2e8dc] hover:bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] shadow-[3px_4px_10px_rgba(88,104,84,0.18),-2px_-2px_6px_rgba(255,255,255,0.85)] active:shadow-[inset_2px_2px_4px_rgba(88,104,84,0.25)] transition"
+              className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full bg-[#e2e8dc] hover:bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] shadow-[3px_4px_10px_rgba(88,104,84,0.18),-2px_-2px_6px_rgba(255,255,255,0.85)] active:shadow-[inset_2px_2px_4px_rgba(88,104,84,0.25)] transition duration-150"
             >
               <div className="w-8 h-8 rounded-full bg-[#14776b] flex items-center justify-center text-white text-xs font-bold shadow-xs">
                 {user.employee?.photo_url ? (
@@ -149,8 +174,7 @@ export const AppShell: React.FC = () => {
             {/* User Dropdown */}
             {userMenuOpen && (
               <div
-                className="absolute right-0 mt-2 w-60 bg-[#e2e8dc] rounded-[24px] shadow-[12px_16px_36px_rgba(50,65,45,0.30),-8px_-8px_20px_rgba(255,255,255,0.85)] border border-[rgba(76,91,70,0.18)] py-2 z-50 animate-in fade-in slide-in-from-top-1"
-                onMouseLeave={() => setUserMenuOpen(false)}
+                className="absolute right-0 mt-2 w-60 bg-[#e2e8dc] rounded-[24px] shadow-[12px_16px_36px_rgba(50,65,45,0.30),-8px_-8px_20px_rgba(255,255,255,0.85)] border border-[rgba(76,91,70,0.18)] py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
               >
                 <div className="px-4 py-2 border-b border-[rgba(76,91,70,0.10)]">
                   <p className="font-display text-xs font-bold text-[#26301f]">{displayName}</p>
@@ -220,23 +244,34 @@ export const AppShell: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Container with Sidebar */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar Overlay on mobile */}
+      {/* Main Container with Sidebar & Primary Vertical Scroll Container */}
+      <div className="flex-1 flex min-h-0 overflow-hidden relative">
+        {/* Mobile Backdrop */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-[#26301f]/45 backdrop-blur-xs z-30 lg:hidden"
+            className="fixed inset-0 bg-[#26301f]/45 backdrop-blur-xs z-30 lg:hidden transition-opacity"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
         {/* Sidebar Navigation */}
         <aside
-          className={`fixed lg:static inset-y-0 left-0 z-30 w-64 bg-[#dbe2d5] border-r border-[rgba(76,91,70,0.14)] shadow-[6px_0_20px_rgba(88,104,84,0.12)] flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-            sidebarOpen ? 'translate-x-0 top-16' : '-translate-x-full'
+          className={`fixed lg:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-[#dbe2d5] border-r border-[rgba(76,91,70,0.14)] shadow-[6px_0_20px_rgba(88,104,84,0.12)] flex flex-col h-full transition-transform duration-200 ease-out lg:translate-x-0 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="flex-1 overflow-y-auto px-3.5 py-5 space-y-6">
+          {/* Mobile Sidebar Close Header */}
+          <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-[rgba(76,91,70,0.12)] bg-[#dbe2d5]">
+            <span className="font-display font-bold text-sm text-[#26301f]">{appName}</span>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-1.5 rounded-full hover:bg-[#c5d0be] text-[#35422d]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-5">
             {visibleMenuGroups.map((group, gIdx) => (
               <div key={gIdx} className="space-y-1">
                 <h4 className="px-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7663]">
@@ -251,10 +286,10 @@ export const AppShell: React.FC = () => {
                         to={item.path}
                         onClick={() => setSidebarOpen(false)}
                         className={({ isActive }) =>
-                          `flex items-center gap-3 px-3.5 py-2.5 rounded-full text-xs font-bold transition-all duration-150 ${
+                          `flex items-center gap-3 px-3.5 py-2.5 rounded-full text-xs font-bold transition-all duration-150 select-none ${
                             isActive
                               ? 'bg-[#14776b] text-white shadow-[inset_3px_4px_8px_rgba(10,50,45,0.45),inset_-2px_-3px_6px_rgba(255,255,255,0.22)]'
-                              : 'text-[#35422d] hover:bg-[#e2e8dc] hover:text-[#26301f]'
+                              : 'text-[#35422d] hover:bg-[#e2e8dc] hover:text-[#26301f] active:scale-[0.98]'
                           }`
                         }
                       >
@@ -269,18 +304,24 @@ export const AppShell: React.FC = () => {
           </div>
 
           {/* Footer Environment Tag */}
-          <div className="p-3.5 border-t border-[rgba(76,91,70,0.12)] bg-[#dbe2d5]/60 flex items-center justify-between text-[11px] text-[#6b7663]">
-            <span className="font-semibold text-[#26301f] truncate max-w-[180px]">{appName}</span>
-            <span className="font-mono">v1.0.0</span>
+          <div className="p-3.5 border-t border-[rgba(76,91,70,0.12)] bg-[#dbe2d5]/60 flex items-center justify-between text-[11px] text-[#6b7663] shrink-0">
+            <span className="font-semibold text-[#26301f] truncate max-w-[170px]">{appName}</span>
+            <span className="font-mono text-[10px]">v1.0.0</span>
           </div>
         </aside>
 
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-[#c5d0be]">
+        {/* Primary Vertical Scroll Container */}
+        <main
+          ref={mainRef}
+          className="flex-1 overflow-y-auto min-w-0 bg-[#c5d0be] focus:outline-none"
+          tabIndex={-1}
+        >
           <PushNotificationBanner />
-          <div className="p-4 sm:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto">
-              <Outlet />
+          <div className="p-4 sm:p-6 lg:p-8 animate-page-enter min-w-0">
+            <div className="w-full max-w-7xl 2xl:max-w-[1600px] mx-auto min-w-0">
+              <AppPageErrorBoundary resetKey={location.pathname}>
+                <Outlet />
+              </AppPageErrorBoundary>
             </div>
           </div>
         </main>

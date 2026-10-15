@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import axiosClient from '../../../shared/api/axiosClient';
 import { Modal } from '../../../shared/components/Modal';
 import { FormField } from '../../../shared/components/FormField';
-import { Project, ProjectPriority, ProjectStatus } from '../types';
+import { Project } from '../types';
 import { X } from 'lucide-react';
 
 const projectFormSchema = z.object({
@@ -81,7 +81,6 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
     register,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors },
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectFormSchema),
@@ -165,7 +164,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
           <FormField label="Client Account" required error={errors.client_id?.message}>
             <select
               {...register('client_id', { valueAsNumber: true })}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             >
               <option value="">Select Client...</option>
               {clientsData?.map((c: any) => (
@@ -181,7 +180,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
               {...register('project_manager_id', {
                 setValueAs: (v) => (v === '' ? null : Number(v)),
               })}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             >
               <option value="">Select Project Manager...</option>
               {employeesData?.map((emp: any) => (
@@ -198,7 +197,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
             {...register('name')}
             type="text"
             placeholder="e.g. FinTech Core Banking Gateway"
-            className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] placeholder-[#6b7663] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           />
         </FormField>
 
@@ -207,7 +206,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
             {...register('description')}
             rows={2}
             placeholder="High-level project objectives, deliverables, and scope statement..."
-            className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] placeholder-[#6b7663] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           />
         </FormField>
 
@@ -216,7 +215,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
             <input
               {...register('start_date')}
               type="date"
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
 
@@ -224,7 +223,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
             <input
               {...register('end_date')}
               type="date"
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
 
@@ -234,7 +233,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
               type="number"
               step="1000"
               placeholder="e.g. 500000"
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] font-mono focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </FormField>
         </div>
@@ -243,7 +242,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
           <FormField label="Priority" required error={errors.priority?.message}>
             <select
               {...register('priority')}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             >
               <option value="low">Low Priority</option>
               <option value="medium">Medium Priority</option>
@@ -255,7 +254,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
           <FormField label="Initial Status" required error={errors.status?.message}>
             <select
               {...register('status')}
-              className="w-full px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              className="w-full px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             >
               <option value="lead">Lead</option>
               <option value="proposal">Proposal</option>
@@ -276,7 +275,7 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
 
         {/* Technologies Tag Input */}
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1.5">
             Technology Stack & Frameworks
           </label>
           <div className="flex gap-2">
@@ -291,12 +290,12 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
                 }
               }}
               placeholder="e.g. React, Docker, Python (Press Enter to add)"
-              className="flex-1 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex-1 px-3 py-2 clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-sm text-[#26301f] placeholder-[#6b7663] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
             <button
               type="button"
               onClick={addTechTag}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md border border-slate-300 transition"
+              className="px-4 py-2 clay-inset hover:bg-[#c5d0be]/50 text-[#26301f] text-xs font-semibold rounded-xl border border-[#c5d0be]/40 transition-all duration-180"
             >
               Add Tag
             </button>
@@ -305,13 +304,13 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
             {technologies.map((tech) => (
               <span
                 key={tech}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-md border border-indigo-200"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 clay-inset text-[#14776b] text-xs font-semibold rounded-lg border border-[#14776b]/20"
               >
                 {tech}
                 <button
                   type="button"
                   onClick={() => removeTechTag(tech)}
-                  className="hover:text-indigo-900"
+                  className="hover:text-[#c4643f] transition-colors"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -320,18 +319,18 @@ export const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+        <div className="flex justify-end gap-3 pt-4 border-t border-[#c5d0be]/40">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+            className="px-4 py-2 border border-[#c5d0be] text-[#26301f] hover:bg-[#dbe2d5]/60 rounded-xl text-sm font-semibold transition-all duration-180"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition shadow-sm disabled:opacity-50"
+            className="px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-sm font-semibold transition-all duration-180 shadow-sm disabled:opacity-50"
           >
             {isLoading ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Project'}
           </button>

@@ -58,7 +58,7 @@ export function DataTable<T>({
   keyExtractor,
 }: DataTableProps<T>) {
   return (
-    <div className="bg-[#e2e8dc] rounded-[26px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.28),-6px_-7px_18px_rgba(255,255,255,0.78)] overflow-hidden flex flex-col">
+    <div className="bg-[#e2e8dc] rounded-[26px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.28),-6px_-7px_18px_rgba(255,255,255,0.78)] overflow-hidden flex flex-col w-full min-w-0">
       {/* Table Toolbar */}
       {(onSearchChange || filters || actions) && (
         <div className="p-4 border-b border-[rgba(76,91,70,0.12)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#dbe2d5]/60">
@@ -84,16 +84,23 @@ export function DataTable<T>({
       {/* Table Container */}
       <div className="overflow-x-auto min-h-[280px] relative">
         {isLoading ? (
-          <div className="py-20">
-            <Loader text="Loading records..." />
+          <div className="p-4 space-y-3">
+            <div className="h-8 w-full clay-skeleton" />
+            {Array.from({ length: 5 }).map((_, rIdx) => (
+              <div key={rIdx} className="flex gap-3">
+                {columns.map((_, cIdx) => (
+                  <div key={cIdx} className="h-9 flex-1 clay-skeleton" />
+                ))}
+              </div>
+            ))}
           </div>
         ) : data.length === 0 ? (
           <div className="py-12">
             <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
           </div>
         ) : (
-          <table className="w-full text-left text-sm text-[#26301f] border-collapse">
-            <thead className="bg-[#dbe2d5]/85 border-b border-[rgba(76,91,70,0.14)] text-xs uppercase font-bold text-[#6b7663] tracking-wider shadow-[inset_0_-1px_3px_rgba(104,118,100,0.08)]">
+          <table className="w-full min-w-[640px] text-left text-sm text-[#26301f] border-collapse">
+            <thead className="sticky top-0 z-10 bg-[#dbe2d5]/95 backdrop-blur-xs border-b border-[rgba(76,91,70,0.14)] text-xs uppercase font-bold text-[#6b7663] tracking-wider shadow-[inset_0_-1px_3px_rgba(104,118,100,0.08)]">
               <tr>
                 {columns.map((col, index) => {
                   const isSorted = sortField && col.accessorKey === sortField;
@@ -102,7 +109,7 @@ export function DataTable<T>({
                       key={index}
                       scope="col"
                       className={`px-5 py-3.5 ${col.className || ''} ${
-                        col.sortable && onSort ? 'cursor-pointer select-none hover:bg-[#dbe2d5]' : ''
+                        col.sortable && onSort ? 'cursor-pointer select-none hover:bg-[#dbe2d5] transition-colors' : ''
                       }`}
                       onClick={() => {
                         if (col.sortable && onSort && col.accessorKey) {
@@ -135,7 +142,7 @@ export function DataTable<T>({
               {data.map((row) => (
                 <tr
                   key={keyExtractor(row)}
-                  className="hover:bg-[#dbe2d5]/45 transition duration-150"
+                  className="hover:bg-[#dbe2d5]/60 transition-colors duration-150"
                 >
                   {columns.map((col, cIndex) => (
                     <td key={cIndex} className={`px-5 py-3.5 ${col.className || ''}`}>

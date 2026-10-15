@@ -8,6 +8,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage';
 import { AuthContext } from '../../../shared/context/AuthContext';
 import { UserAuth } from '../types';
+import { authApi } from '../api';
 
 // Mock authApi
 vi.mock('../api', () => ({
@@ -450,7 +451,8 @@ describe('Qynova ERP - Enterprise Login Experience Suite', () => {
   });
 
   describe('6. Forgot Password Experience', () => {
-    it('shows generic confirmation message on submit without revealing user existence', async () => {
+    it('shows confirmation message on submit for registered account', async () => {
+      vi.mocked(authApi.forgotPassword).mockResolvedValueOnce(undefined as any);
       const user = userEvent.setup();
       render(
         <MemoryRouter initialEntries={['/forgot-password']}>
@@ -466,10 +468,36 @@ describe('Qynova ERP - Enterprise Login Experience Suite', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(
-            /if an account exists for that email, we've sent a reset link\./i
-          )
-        );
+          screen.getByText(/password reset instructions have been sent to your email\./i)
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('shows error message when unregistered account is submitted', async () => {
+      vi.mocked(authApi.forgotPassword).mockRejectedValueOnce({
+        response: {
+          data: {
+            message: 'No registered account found with this email address',
+          },
+        },
+      });
+      const user = userEvent.setup();
+      render(
+        <MemoryRouter initialEntries={['/forgot-password']}>
+          <Routes>
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      const emailInput = screen.getByLabelText(/work email/i);
+      await user.type(emailInput, 'unknown_unregistered@company.com');
+      await user.click(screen.getByRole('button', { name: /send reset link/i }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/no registered account found with this email address/i)
+        ).toBeInTheDocument();
       });
     });
   });

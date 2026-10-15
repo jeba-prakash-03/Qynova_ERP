@@ -266,5 +266,43 @@ describe('Attendance Module Lifecycle & Permissions', () => {
         expect(item.reporting_manager_id).toBe(managerEmployeeId);
       }
     });
+
+    it('should export daily attendance sheet as Excel (.xlsx) and CSV', async () => {
+      const today = '2026-10-10';
+
+      // 1. XLSX export
+      const xlsxRes = await request(app)
+        .get(`/api/v1/attendance/export?type=daily&date=${today}&format=xlsx`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(xlsxRes.status).toBe(200);
+      expect(xlsxRes.headers['content-type']).toContain('spreadsheetml.sheet');
+      expect(xlsxRes.headers['content-disposition']).toContain(`attendance_daily_${today}.xlsx`);
+
+      // 2. CSV export
+      const csvRes = await request(app)
+        .get(`/api/v1/attendance/export?type=daily&date=${today}&format=csv`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(csvRes.status).toBe(200);
+      expect(csvRes.headers['content-type']).toContain('text/csv');
+      expect(csvRes.headers['content-disposition']).toContain(`attendance_daily_${today}.csv`);
+    });
+
+    it('should export monthly attendance sheet as Excel (.xlsx)', async () => {
+      const month = '2026-10';
+      const res = await request(app)
+        .get(`/api/v1/attendance/export?type=monthly&month=${month}&format=xlsx`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.headers['content-type']).toContain('spreadsheetml.sheet');
+      expect(res.headers['content-disposition']).toContain(`attendance_monthly_${month}.xlsx`);
+    });
+
+    it('should reject unauthenticated request to /export', async () => {
+      const res = await request(app).get('/api/v1/attendance/export?type=daily&format=xlsx');
+      expect(res.status).toBe(401);
+    });
   });
 });

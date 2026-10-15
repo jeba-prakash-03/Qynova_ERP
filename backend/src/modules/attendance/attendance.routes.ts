@@ -72,7 +72,17 @@ router.get(
   attendanceController.getMonthlySheet
 );
 
-router.get('/export', attendanceController.exportSheet);
+router.get(
+  '/export',
+  (req, res, next) => {
+    const perms = req.user?.permissions || [];
+    if (perms.includes('attendance.view') || perms.includes('attendance.view_team')) {
+      return next();
+    }
+    return requirePermission('attendance.view')(req, res, next);
+  },
+  attendanceController.exportSheet
+);
 
 // ==========================================
 // 3. Admin / HR Manual Edit & Insertion

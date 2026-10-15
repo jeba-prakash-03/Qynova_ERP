@@ -18,6 +18,10 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  ShieldCheck,
+  Crosshair,
+  MapPin,
+  AlertCircle,
 } from 'lucide-react';
 
 interface AttendanceBreak {
@@ -41,12 +45,22 @@ interface TodayAttendance {
     is_late: boolean;
     is_early_checkout: boolean;
     remarks: string | null;
+    check_in_latitude?: number | null;
+    check_in_longitude?: number | null;
+    check_in_accuracy?: number | null;
+    check_in_distance_meters?: number | null;
+    office_location_id?: number | null;
     breaks?: AttendanceBreak[];
   } | null;
   activeBreak: AttendanceBreak | null;
   serverTime: string;
   serverDate: string;
   shift: { start: string; end: string };
+  is_wfh_approved?: boolean;
+  geofencing_enabled?: boolean;
+  office_name?: string | null;
+  allowed_radius_meters?: number;
+  min_accuracy_meters?: number;
 }
 
 export const MyAttendancePage: React.FC = () => {
@@ -54,6 +68,9 @@ export const MyAttendancePage: React.FC = () => {
   const { success, error } = useToast();
 
   const [workType, setWorkType] = useState<'office' | 'wfh'>('office');
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     const d = new Date();
     return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -67,7 +84,7 @@ export const MyAttendancePage: React.FC = () => {
   } | null>(null);
 
   // Real-time ticking clock for running timer
-  const [liveSeconds, setLiveSeconds] = useState(0);
+  const [, setLiveSeconds] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => {
       setLiveSeconds((s) => s + 1);
@@ -85,6 +102,13 @@ export const MyAttendancePage: React.FC = () => {
     refetchInterval: 10000,
   });
 
+  // Automatically pre-select WFH if employee has an approved WFH request for today
+  useEffect(() => {
+    if (todayData?.is_wfh_approved && !todayData.attendance?.check_in) {
+      setWorkType('wfh');
+    }
+  }, [todayData?.is_wfh_approved, todayData?.attendance?.check_in]);
+
   // Fetch monthly attendance calendar data
   const { data: monthlyData, isLoading: isLoadingMonthly } = useQuery({
     queryKey: ['attendance', 'me', selectedMonth],
@@ -96,18 +120,26 @@ export const MyAttendancePage: React.FC = () => {
 
   // Check-In Mutation
   const checkInMutation = useMutation({
-    mutationFn: async () => {
-      const res = await axiosClient.post('/attendance/check-in', {
-        work_type: workType,
-      });
+    mutationFn: async (payload: {
+      work_type: 'office' | 'wfh';
+      latitude?: number;
+      longitude?: number;
+      accuracy?: number;
+    }) => {
+      const res = await axiosClient.post('/attendance/check-in', payload);
       return res.data;
     },
     onSuccess: () => {
+      setIsLocating(false);
+      setLocationError(null);
       success('Checked in successfully!');
       queryClient.invalidateQueries({ queryKey: ['attendance'] });
     },
     onError: (err: any) => {
-      error(err.response?.data?.message || 'Check-in failed');
+      setIsLocating(false);
+      const msg = err.response?.data?.message || 'Check-in failed';
+      setLocationError(msg);
+      error(msg);
     },
   });
 
@@ -226,6 +258,76 @@ export const MyAttendancePage: React.FC = () => {
       : 'Checked In'
     : 'Not Checked In';
 
+  // Handle Check-In Click with Geolocation Capture
+  const handleCheckInClick = () => {
+    setLocationError(null);
+
+    // 1. Work From Home path
+    if (workType === 'wfh') {
+      if (!todayData?.is_wfh_approved) {
+        const msg =
+          'Work from home check-in requires an approved WFH request for today. Please apply for WFH in Leaves or switch to Office.';
+        setLocationError(msg);
+        error(msg);
+        return;
+      }
+
+      checkInMutation.mutate({ work_type: 'wfh' });
+      return;
+    }
+
+    // 2. Office Check-in path
+    if (todayData?.geofencing_enabled) {
+      if (!navigator.geolocation) {
+        const msg =
+          'Browser geolocation is not supported on this device/browser. Please use a modern browser to check in.';
+        setLocationError(msg);
+        error(msg);
+        return;
+      }
+
+      setIsLocating(true);
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setIsLocating(false);
+          const lat = Number(position.coords.latitude.toFixed(7));
+          const lon = Number(position.coords.longitude.toFixed(7));
+          const acc = Math.round(position.coords.accuracy);
+
+          checkInMutation.mutate({
+            work_type: 'office',
+            latitude: lat,
+            longitude: lon,
+            accuracy: acc,
+          });
+        },
+        (geoErr) => {
+          setIsLocating(false);
+          let msg = 'Unable to determine your location. Please retry.';
+          if (geoErr.code === 1) {
+            msg = 'Location permission is required for office check-in. Please allow location access in your browser settings and retry.';
+          } else if (geoErr.code === 2) {
+            msg = 'Unable to determine your location. Please check your device location or GPS and retry.';
+          } else if (geoErr.code === 3) {
+            msg = 'Location request timed out. Please move to an area with a clearer GPS signal and retry.';
+          }
+          setLocationError(msg);
+          error(msg);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
+      );
+      return;
+    }
+
+    // Geofencing is disabled: normal punch
+    checkInMutation.mutate({ work_type: 'office' });
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
       {/* Page Header */}
@@ -262,8 +364,22 @@ export const MyAttendancePage: React.FC = () => {
             </div>
 
             {isCheckedIn && (
-              <div className="text-xs text-[#6b7663] pt-1">
-                Checked in at: <strong className="text-[#26301f] font-display tabular-nums">{formatTimeStr(attendance?.check_in)}</strong>
+              <div className="text-xs text-[#6b7663] pt-1 space-y-1">
+                <div>
+                  Checked in at: <strong className="text-[#26301f] font-display tabular-nums">{formatTimeStr(attendance?.check_in)}</strong>
+                </div>
+                {attendance?.check_in_distance_meters !== null && attendance?.check_in_distance_meters !== undefined && (
+                  <div className="flex items-center gap-1 text-[11px] text-[#14776b] font-medium">
+                    <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                    <span>Verified inside office boundary (distance: {Math.round(attendance.check_in_distance_meters)}m)</span>
+                  </div>
+                )}
+                {attendance?.work_type === 'wfh' && (
+                  <div className="flex items-center gap-1 text-[11px] text-[#14776b] font-medium">
+                    <Home className="w-3.5 h-3.5 shrink-0" />
+                    <span>Approved Work From Home Punch</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -283,7 +399,7 @@ export const MyAttendancePage: React.FC = () => {
             ) : null}
           </div>
 
-          {/* Right: Controls & ONE Main Punch Button */}
+          {/* Right: Controls & Main Punch Action */}
           <div className="w-full lg:w-auto flex flex-col items-center gap-3">
             {!isCheckedIn ? (
               <div className="w-full max-w-xs space-y-3">
@@ -291,7 +407,10 @@ export const MyAttendancePage: React.FC = () => {
                 <div className="flex bg-[#dbe2d5] p-1 rounded-full text-xs font-semibold border border-[rgba(76,91,70,0.14)] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)]">
                   <button
                     type="button"
-                    onClick={() => setWorkType('office')}
+                    onClick={() => {
+                      setWorkType('office');
+                      setLocationError(null);
+                    }}
                     className={`flex-1 py-1.5 rounded-full flex items-center justify-center gap-1.5 transition-all font-display ${
                       workType === 'office'
                         ? 'bg-[#14776b] text-white shadow-sm font-bold'
@@ -303,7 +422,10 @@ export const MyAttendancePage: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setWorkType('wfh')}
+                    onClick={() => {
+                      setWorkType('wfh');
+                      setLocationError(null);
+                    }}
                     className={`flex-1 py-1.5 rounded-full flex items-center justify-center gap-1.5 transition-all font-display ${
                       workType === 'wfh'
                         ? 'bg-[#14776b] text-white shadow-sm font-bold'
@@ -315,17 +437,68 @@ export const MyAttendancePage: React.FC = () => {
                   </button>
                 </div>
 
+                {/* Status Notice Indicator */}
+                {workType === 'office' && todayData?.geofencing_enabled && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#14776b]/10 border border-[#14776b]/20 text-[11px] text-[#0e5950] font-medium text-center justify-center">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#14776b] shrink-0" />
+                    <span>Office Geofence Active (Within {todayData.allowed_radius_meters || 100}m)</span>
+                  </div>
+                )}
+
+                {workType === 'wfh' && todayData?.is_wfh_approved && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#14776b]/15 border border-[#14776b]/30 text-[11px] text-[#14776b] font-bold text-center justify-center">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#14776b] shrink-0" />
+                    <span>Approved WFH for Today</span>
+                  </div>
+                )}
+
+                {workType === 'wfh' && !todayData?.is_wfh_approved && (
+                  <div className="p-2.5 rounded-xl bg-[#cf9b34]/15 border border-[#cf9b34]/30 text-[11px] text-[#855b11] font-medium flex items-start gap-1.5">
+                    <AlertTriangle className="w-4 h-4 text-[#cf9b34] shrink-0 mt-0.5" />
+                    <span>WFH check-in requires an approved WFH request in Leaves. Please switch to Office or apply for WFH.</span>
+                  </div>
+                )}
+
+                {/* Inline Location Error Feedback */}
+                {locationError && (
+                  <div className="p-3 rounded-xl bg-[#f6dfd8] border border-[#e8beae] text-[11px] text-[#8a3114] space-y-1">
+                    <div className="font-bold flex items-center gap-1">
+                      <AlertCircle className="w-3.5 h-3.5 text-[#c4643f] shrink-0" />
+                      Verification Failed
+                    </div>
+                    <p className="leading-snug">{locationError}</p>
+                  </div>
+                )}
+
                 {/* CHECK IN BUTTON */}
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full font-bold"
-                  isLoading={checkInMutation.isPending}
-                  leftIcon={<LogIn className="w-5 h-5" />}
-                  onClick={() => checkInMutation.mutate()}
+                  className="w-full font-bold shadow-sm"
+                  isLoading={isLocating || checkInMutation.isPending}
+                  leftIcon={
+                    isLocating ? (
+                      <Crosshair className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <LogIn className="w-5 h-5" />
+                    )
+                  }
+                  onClick={handleCheckInClick}
                 >
-                  CHECK IN
+                  {isLocating
+                    ? 'Acquiring GPS...'
+                    : checkInMutation.isPending
+                    ? 'Verifying Location...'
+                    : workType === 'wfh'
+                    ? 'Punch Check In (WFH)'
+                    : 'Punch Check In'}
                 </Button>
+
+                {workType === 'office' && todayData?.geofencing_enabled && (
+                  <p className="text-[10px] text-[#6b7663] text-center">
+                    Device location is checked once to verify presence at the office. Continuous tracking is never performed.
+                  </p>
+                )}
               </div>
             ) : !isCheckedOut ? (
               <div className="w-full max-w-xs space-y-3">
@@ -333,7 +506,7 @@ export const MyAttendancePage: React.FC = () => {
                 <Button
                   variant="danger"
                   size="lg"
-                  className="w-full font-bold"
+                  className="w-full font-bold shadow-sm"
                   isLoading={checkOutMutation.isPending}
                   leftIcon={<LogOut className="w-5 h-5" />}
                   onClick={() => checkOutMutation.mutate()}

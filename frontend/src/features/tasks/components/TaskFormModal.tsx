@@ -4,8 +4,9 @@ import { tasksApi } from '../api';
 import { projectsApi } from '../../projects/api';
 import { Task, CreateTaskPayload, UpdateTaskPayload, TaskPriority, TaskStatus } from '../types';
 import { useToast } from '../../../shared/context/ToastContext';
+import { Modal } from '../../../shared/components/Modal';
 import axiosClient from '../../../shared/api/axiosClient';
-import { X, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -58,15 +59,15 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
 
   // Fetch active employees for reviewer list
   const { data: employees = [] } = useQuery({
-    queryKey: ['employees', 'active-form-select'],
+    queryKey: ['employees', 'task-reviewers'],
     queryFn: async () => {
       const res = await axiosClient.get('/employees?limit=200&status=active');
-      const list: any[] = res.data?.data || [];
-      return list.filter((e) => e.status === 'active' && e.lifecycle_stage !== 'relieved');
+      return res.data?.data || [];
     },
     enabled: isOpen,
   });
 
+  // Populate fields if editing
   useEffect(() => {
     if (taskToEdit) {
       setProjectId(taskToEdit.project_id);
@@ -78,9 +79,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       setPriority(taskToEdit.priority);
       setStatus(taskToEdit.status);
       setDueDate(taskToEdit.due_date ? taskToEdit.due_date.split('T')[0] : '');
-      setEstimatedHours(taskToEdit.estimated_hours || 0);
+      setEstimatedHours(Number(taskToEdit.estimated_hours || 0));
     } else {
-      setProjectId(defaultProjectId || (projectsData?.data?.[0]?.id ?? 0));
+      setProjectId(defaultProjectId || 0);
       setModuleId(undefined);
       setTitle('');
       setDescription('');
@@ -91,41 +92,45 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       setDueDate('');
       setEstimatedHours(0);
     }
-  }, [taskToEdit, defaultProjectId, projectsData, isOpen]);
+  }, [taskToEdit, defaultProjectId, isOpen]);
 
   const mutation = useMutation({
     mutationFn: async () => {
+      if (!title.trim()) throw new Error('Task title is required');
+      if (!activeProjectId) throw new Error('Project is required');
+
       if (taskToEdit) {
         const payload: UpdateTaskPayload = {
+          title: title.trim(),
+          description: description.trim() || undefined,
           module_id: moduleId || null,
-          title,
-          description,
           assignee_id: assigneeId || null,
           reviewer_id: reviewerId || null,
           priority,
           due_date: dueDate || undefined,
-          estimated_hours: Number(estimatedHours) || 0,
+          estimated_hours: estimatedHours > 0 ? Number(estimatedHours) : undefined,
         };
         return tasksApi.update(taskToEdit.id, payload);
       } else {
         const payload: CreateTaskPayload = {
-          project_id: projectId,
-          module_id: moduleId || null,
-          title,
-          description,
-          assignee_id: assigneeId || null,
-          reviewer_id: reviewerId || null,
+          project_id: activeProjectId,
+          module_id: moduleId,
+          title: title.trim(),
+          description: description.trim() || undefined,
+          assignee_id: assigneeId,
+          reviewer_id: reviewerId,
           priority,
           status,
           due_date: dueDate || undefined,
-          estimated_hours: Number(estimatedHours) || 0,
+          estimated_hours: estimatedHours > 0 ? Number(estimatedHours) : undefined,
         };
         return tasksApi.create(payload);
       }
     },
-    onSuccess: (saved) => {
-      success(`Task ${taskToEdit ? 'updated' : 'created'} successfully: ${saved.task_code}`);
+    onSuccess: (task) => {
+      success(taskToEdit ? `Task ${task.task_code} updated` : `Task ${task.task_code} created`);
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['project'] });
       onClose();
     },
     onError: (err: any) => {
@@ -140,213 +145,210 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl overflow-hidden border border-slate-200">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-          <h3 className="text-base font-bold text-slate-800">
-            {taskToEdit ? `Edit Task (${taskToEdit.task_code})` : 'Create New Task'}
-          </h3>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={taskToEdit ? `Edit Task (${taskToEdit.task_code})` : 'Create New Task'}
+      subtitle={taskToEdit ? `Update sprint task details and assignments` : 'Assign task deliverables to project team members'}
+      maxWidth="xl"
+      footer={
+        <>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200"
+            className="px-4 py-2 border border-[#c5d0be] rounded-xl text-xs font-semibold text-[#26301f] bg-[#e2e8dc] hover:bg-[#dbe2d5] transition active:scale-95"
           >
-            <X className="w-5 h-5" />
+            Cancel
           </button>
+          <button
+            type="submit"
+            form="task-form"
+            disabled={mutation.isPending}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition shadow-xs active:scale-95"
+          >
+            <Save className="w-3.5 h-3.5" />
+            {mutation.isPending ? 'Saving...' : taskToEdit ? 'Save Changes' : 'Create Task'}
+          </button>
+        </>
+      }
+    >
+      <form
+        id="task-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutation.mutate();
+        }}
+        className="space-y-4"
+      >
+        {/* Project selection */}
+        {!taskToEdit && !defaultProjectId && (
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Project *
+            </label>
+            <select
+              value={projectId}
+              onChange={(e) => {
+                setProjectId(Number(e.target.value));
+                setAssigneeId(undefined);
+              }}
+              required
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
+            >
+              <option value="">Select Project</option>
+              {projectsData?.data?.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.project_code} - {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Title */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+            Task Title *
+          </label>
+          <input
+            type="text"
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Implement banking payment webhook validator"
+            className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30 placeholder-[#6b7663]/60"
+          />
         </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            mutation.mutate();
-          }}
-          className="p-6 space-y-4"
-        >
-          {/* Project selection */}
-          {!taskToEdit && !defaultProjectId && (
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Project *
-              </label>
-              <select
-                value={projectId}
-                onChange={(e) => {
-                  setProjectId(Number(e.target.value));
-                  setAssigneeId(undefined);
-                }}
-                required
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="">Select Project</option>
-                {projectsData?.data?.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.project_code} - {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Title */}
+        {/* Module & Priority */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              Task Title *
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Project Module
+            </label>
+            <select
+              value={moduleId || ''}
+              onChange={(e) => setModuleId(e.target.value ? Number(e.target.value) : undefined)}
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
+            >
+              <option value="">None / General</option>
+              {modules.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Priority
+            </label>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as TaskPriority)}
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30 capitalize"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Assignee & Reviewer */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Assignee (Project Member)
+            </label>
+            <select
+              value={assigneeId || ''}
+              onChange={(e) =>
+                setAssigneeId(e.target.value ? Number(e.target.value) : undefined)
+              }
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
+            >
+              <option value="">Unassigned</option>
+              {currentProject?.members && currentProject.members.length > 0 ? (
+                currentProject.members.map((m) => (
+                  <option key={m.id} value={m.employee_id}>
+                    {m.employee_name} ({m.role})
+                  </option>
+                ))
+              ) : (
+                <option disabled>No members in project</option>
+              )}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Reviewer
+            </label>
+            <select
+              value={reviewerId || ''}
+              onChange={(e) =>
+                setReviewerId(e.target.value ? Number(e.target.value) : undefined)
+              }
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
+            >
+              <option value="">None / Self</option>
+              {employees.map((emp: any) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.first_name} {emp.last_name} ({emp.employee_code})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Due date & Estimated hours */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Due Date
             </label>
             <input
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Implement banking payment webhook validator"
-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </div>
 
-          {/* Module & Priority */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Project Module
-              </label>
-              <select
-                value={moduleId || ''}
-                onChange={(e) => setModuleId(e.target.value ? Number(e.target.value) : undefined)}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="">None / General</option>
-                {modules.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Priority
-              </label>
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white capitalize"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Assignee & Reviewer */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Assignee (Project Member)
-              </label>
-              <select
-                value={assigneeId || ''}
-                onChange={(e) =>
-                  setAssigneeId(e.target.value ? Number(e.target.value) : undefined)
-                }
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="">Unassigned</option>
-                {currentProject?.members && currentProject.members.length > 0 ? (
-                  currentProject.members.map((m) => (
-                    <option key={m.id} value={m.employee_id}>
-                      {m.employee_name} ({m.role})
-                    </option>
-                  ))
-                ) : (
-                  <option disabled>No members in project</option>
-                )}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Reviewer
-              </label>
-              <select
-                value={reviewerId || ''}
-                onChange={(e) =>
-                  setReviewerId(e.target.value ? Number(e.target.value) : undefined)
-                }
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="">None / Self</option>
-                {employees.map((emp: any) => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.first_name} {emp.last_name} ({emp.employee_code})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Due date & Estimated hours */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Due Date
-              </label>
-              <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Estimated Hours
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.5"
-                value={estimatedHours}
-                onChange={(e) => setEstimatedHours(Number(e.target.value))}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-          </div>
-
-          {/* Description */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              Description
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Estimated Hours
             </label>
-            <textarea
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Detailed acceptance criteria or implementation notes..."
-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={estimatedHours}
+              onChange={(e) => setEstimatedHours(Number(e.target.value))}
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </div>
+        </div>
 
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={mutation.isPending}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50 transition shadow-sm"
-            >
-              <Save className="w-3.5 h-3.5" />
-              {mutation.isPending ? 'Saving...' : taskToEdit ? 'Save Changes' : 'Create Task'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Description */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+            Description
+          </label>
+          <textarea
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Detailed acceptance criteria or implementation notes..."
+            className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30 placeholder-[#6b7663]/60"
+          />
+        </div>
+      </form>
+    </Modal>
   );
 };
+
+export default TaskFormModal;

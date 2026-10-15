@@ -144,13 +144,14 @@ describe('Task 5: Email Outbox, Notifications & Forgot Password Suite', () => {
   });
 
   describe('3. Forgot Password & Single-Use Reset Token Flow', () => {
-    it('should silently handle unknown email without error or leaking', async () => {
+    it('should reject unknown email with 404 error', async () => {
       const res = await request(app)
         .post('/api/v1/auth/forgot-password')
         .send({ email: 'nonexistent_user_9999@test.com' });
 
-      expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
+      expect(res.status).toBe(404);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toMatch(/no registered account found/i);
     });
 
     it('should generate reset token and email for valid user email', async () => {

@@ -35,6 +35,15 @@ export interface CompanySettingsData {
   signature_url?: string | null;
 }
 
+export interface OfficeLocationData {
+  id?: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  radius_meters: number;
+  is_active?: boolean;
+}
+
 export interface WorkSettingsData {
   shift_start: string;
   shift_end: string;
@@ -42,6 +51,13 @@ export interface WorkSettingsData {
   late_grace_minutes: number;
   min_hours_full_day: number;
   min_hours_half_day: number;
+  geofencing_enabled?: boolean;
+  office_name?: string | null;
+  office_latitude?: number | null;
+  office_longitude?: number | null;
+  office_radius_meters?: number;
+  min_location_accuracy_meters?: number;
+  office_locations?: OfficeLocationData[];
 }
 
 export interface LeavePolicyData {

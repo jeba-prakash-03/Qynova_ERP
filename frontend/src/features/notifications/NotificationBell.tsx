@@ -104,7 +104,7 @@ export const NotificationBell: React.FC = () => {
 
       {/* Notification Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#e2e8dc] rounded-[24px] shadow-[12px_16px_36px_rgba(50,65,45,0.30),-8px_-8px_20px_rgba(255,255,255,0.85)] border border-[rgba(76,91,70,0.18)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="absolute -right-2 sm:right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm sm:w-96 bg-[#e2e8dc] rounded-[24px] shadow-[12px_16px_36px_rgba(50,65,45,0.30),-8px_-8px_20px_rgba(255,255,255,0.85)] border border-[rgba(76,91,70,0.18)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-180">
           <div className="p-3.5 border-b border-[rgba(76,91,70,0.12)] flex items-center justify-between bg-[#dbe2d5]/60">
             <div className="flex items-center gap-2">
               <span className="font-display text-sm font-bold text-[#26301f]">Notifications</span>

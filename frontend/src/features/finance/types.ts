@@ -16,9 +16,12 @@ export interface FinanceOverview {
 export interface LaborCostItem {
   employee_id: number;
   employee_name: string;
+  employee_code?: string;
   hourly_rate: number;
-  hours: number;
-  cost: number;
+  approved_hours?: number;
+  hours?: number;
+  labor_cost?: number;
+  cost?: number;
 }
 
 export interface ProjectProfitability {
@@ -30,8 +33,10 @@ export interface ProjectProfitability {
   labor_cost: number;
   project_expenses: number;
   total_cost: number;
-  net_profit: number;
+  profit?: number;
+  net_profit?: number;
   profit_margin_percent: number;
   budget_used_percent: number;
   labor_breakdown: LaborCostItem[];
+  expense_breakdown?: Array<{ category: string; total_amount: number }>;
 }

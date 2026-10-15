@@ -17,6 +17,7 @@ import { financeApi } from '../api';
 import { Loader } from '../../../shared/components/Loader';
 import { ErrorState } from '../../../shared/components/ErrorState';
 import { EmptyState } from '../../../shared/components/EmptyState';
+import { formatCurrency } from '../../../shared/utils/format.util';
 
 export const FinanceOverviewPage: React.FC = () => {
   const {
@@ -29,15 +30,6 @@ export const FinanceOverviewPage: React.FC = () => {
     queryKey: ['finance-overview'],
     queryFn: financeApi.getOverview,
   });
-
-  const formatCurrency = (amt: number | undefined) => {
-    const num = Number(amt) || 0;
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 2,
-    }).format(num);
-  };
 
   if (isLoading) {
     return (
@@ -69,14 +61,14 @@ export const FinanceOverviewPage: React.FC = () => {
       : '0.0';
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 w-full min-w-0">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold font-baloo tracking-tight text-[#26301f]">
             Finance & Cash Flow Overview
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-[#6b7663]">
             Organization-wide income, expenses, pending receivables, and monthly financial performance.
           </p>
         </div>
@@ -84,64 +76,64 @@ export const FinanceOverviewPage: React.FC = () => {
         <div className="flex items-center space-x-3">
           <Link
             to="/invoices"
-            className="inline-flex items-center space-x-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+            className="inline-flex items-center space-x-1.5 rounded-xl border border-[#c5d0be]/60 bg-[#e2e8dc] hover:bg-[#dbe2d5] px-3.5 py-2 text-sm font-semibold text-[#26301f] shadow-xs transition"
           >
-            <FileText className="h-4 w-4 text-slate-500" />
+            <FileText className="h-4 w-4 text-[#14776b]" />
             <span>Manage Invoices</span>
           </Link>
           <Link
             to="/expenses"
-            className="inline-flex items-center space-x-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+            className="inline-flex items-center space-x-1.5 rounded-xl border border-[#c5d0be]/60 bg-[#e2e8dc] hover:bg-[#dbe2d5] px-3.5 py-2 text-sm font-semibold text-[#26301f] shadow-xs transition"
           >
-            <CreditCard className="h-4 w-4 text-slate-500" />
+            <CreditCard className="h-4 w-4 text-[#c4643f]" />
             <span>Manage Expenses</span>
           </Link>
         </div>
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Revenue */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-500">Total Revenue</span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">Total Revenue</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#14776b]/15 text-[#14776b] shadow-inner">
               <TrendingUp className="h-5 w-5" />
             </div>
           </div>
           <div className="mt-3">
-            <p className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+            <p className="text-2xl font-bold tracking-tight text-[#14776b] font-mono">
               {formatCurrency(overview.total_revenue)}
             </p>
-            <p className="mt-1 text-xs text-slate-500">Realized client payments to date</p>
+            <p className="mt-1 text-xs text-[#6b7663]">Realized client payments to date</p>
           </div>
         </div>
 
         {/* Total Expenses */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-500">Total Expenses</span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">Total Expenses</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#c4643f]/15 text-[#9e3a1b] shadow-inner">
               <Receipt className="h-5 w-5" />
             </div>
           </div>
           <div className="mt-3">
-            <p className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+            <p className="text-2xl font-bold tracking-tight text-[#9e3a1b] font-mono">
               {formatCurrency(overview.total_expenses)}
             </p>
-            <p className="mt-1 text-xs text-slate-500">Approved operational and project claims</p>
+            <p className="mt-1 text-xs text-[#6b7663]">Approved operational claims</p>
           </div>
         </div>
 
         {/* Net Profit */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-500">Net Profit</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">Net Profit</span>
             <div
-              className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+              className={`flex h-9 w-9 items-center justify-center rounded-xl shadow-inner ${
                 isNetProfitPositive
-                  ? 'bg-emerald-50 text-emerald-600'
-                  : 'bg-rose-50 text-rose-600'
+                  ? 'bg-[#14776b]/15 text-[#14776b]'
+                  : 'bg-[#c4643f]/15 text-[#9e3a1b]'
               }`}
             >
               {isNetProfitPositive ? (
@@ -154,52 +146,52 @@ export const FinanceOverviewPage: React.FC = () => {
           <div className="mt-3">
             <p
               className={`text-2xl font-bold tracking-tight font-mono ${
-                isNetProfitPositive ? 'text-emerald-700' : 'text-rose-700'
+                isNetProfitPositive ? 'text-[#14776b]' : 'text-[#9e3a1b]'
               }`}
             >
               {formatCurrency(overview.net_profit)}
             </p>
-            <p className="mt-1 text-xs text-slate-500 font-medium">
+            <p className="mt-1 text-xs text-[#6b7663] font-medium">
               Margin: {overallMargin}% of total revenue
             </p>
           </div>
         </div>
 
         {/* Pending Invoices */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="clay-card-interactive bg-[#e2e8dc] p-5 rounded-2xl border border-[#c5d0be]/50">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-500">Pending Receivables</span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">Pending Receivables</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#22304a]/10 text-[#22304a] shadow-inner">
               <Clock className="h-5 w-5" />
             </div>
           </div>
           <div className="mt-3">
-            <p className="text-2xl font-bold tracking-tight text-sky-700 font-mono">
+            <p className="text-2xl font-bold tracking-tight text-[#22304a] font-mono">
               {formatCurrency(overview.pending_invoices_amount)}
             </p>
-            <p className="mt-1 text-xs text-slate-500">Unpaid balance on issued invoices</p>
+            <p className="mt-1 text-xs text-[#6b7663]">Unpaid balance on issued invoices</p>
           </div>
         </div>
       </div>
 
       {/* Monthly Breakdown Section */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 bg-slate-50 px-6 py-4">
+      <div className="clay-card rounded-2xl border border-[#c5d0be]/50 bg-[#e2e8dc] overflow-hidden shadow-xs">
+        <div className="border-b border-[#c5d0be]/40 bg-[#dbe2d5]/60 px-6 py-4">
           <div className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5 text-slate-500" />
-            <h2 className="text-base font-semibold text-slate-900">
+            <Calendar className="h-5 w-5 text-[#14776b]" />
+            <h2 className="text-base font-bold font-baloo text-[#26301f]">
               Monthly Income vs Expenses Trend
             </h2>
           </div>
-          <p className="mt-0.5 text-xs text-slate-500">
+          <p className="mt-0.5 text-xs text-[#6b7663]">
             Cash-flow receipts vs approved claims aggregated per calendar month
           </p>
         </div>
 
         {overview.monthly_trend && overview.monthly_trend.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="border-b border-slate-200 bg-slate-100/75 text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <div className="overflow-x-auto min-w-0">
+            <table className="w-full text-left text-sm text-[#26301f] min-w-[600px]">
+              <thead className="border-b border-[#c5d0be]/40 bg-[#dbe2d5]/40 text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
                 <tr>
                   <th className="py-3.5 pl-6 pr-4">Month</th>
                   <th className="px-4 py-3.5 text-right">Income (Received)</th>
@@ -208,7 +200,7 @@ export const FinanceOverviewPage: React.FC = () => {
                   <th className="py-3.5 pl-4 pr-6 text-right">Profit Margin</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-[#c5d0be]/30">
                 {overview.monthly_trend.map((item) => {
                   const itemMargin =
                     item.income > 0
@@ -217,29 +209,29 @@ export const FinanceOverviewPage: React.FC = () => {
                   const isPositive = item.net_profit >= 0;
 
                   return (
-                    <tr key={item.month} className="hover:bg-slate-50/50">
-                      <td className="py-4 pl-6 pr-4 font-mono font-medium text-slate-900">
+                    <tr key={item.month} className="hover:bg-[#dbe2d5]/30 transition-colors">
+                      <td className="py-4 pl-6 pr-4 font-mono font-medium text-[#26301f]">
                         {item.month}
                       </td>
-                      <td className="px-4 py-4 text-right font-mono font-medium text-emerald-700">
+                      <td className="px-4 py-4 text-right font-mono font-medium text-[#14776b]">
                         {formatCurrency(item.income)}
                       </td>
-                      <td className="px-4 py-4 text-right font-mono font-medium text-amber-700">
+                      <td className="px-4 py-4 text-right font-mono font-medium text-[#9e3a1b]">
                         {formatCurrency(item.expenses)}
                       </td>
                       <td
                         className={`px-4 py-4 text-right font-mono font-bold ${
-                          isPositive ? 'text-emerald-700' : 'text-rose-700'
+                          isPositive ? 'text-[#14776b]' : 'text-[#9e3a1b]'
                         }`}
                       >
                         {formatCurrency(item.net_profit)}
                       </td>
                       <td className="py-4 pl-4 pr-6 text-right font-mono">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
                             isPositive
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-rose-50 text-rose-700 border border-rose-200'
+                              ? 'bg-emerald-100/70 text-emerald-800 border-emerald-200'
+                              : 'bg-[#c4643f]/15 text-[#9e3a1b] border-[#c4643f]/30'
                           }`}
                         >
                           {itemMargin}%

@@ -181,7 +181,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Business KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               {/* Active Projects */}
               <div className="bg-[#e2e8dc] rounded-[22px] p-4 border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)] flex flex-col justify-between">
                 <div>

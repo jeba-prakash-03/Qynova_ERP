@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tasksApi } from '../api';
 import {
@@ -114,11 +115,34 @@ export const TaskDrawer: React.FC<TaskDrawerProps> = ({ taskId, onClose, onEdit 
     },
   });
 
+  // Lock body scroll and handle Escape key
+  useEffect(() => {
+    if (!taskId) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [taskId, onClose]);
+
   if (!taskId) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/50 backdrop-blur-sm flex justify-end">
-      <div className="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 overflow-hidden bg-[#26301f]/50 backdrop-blur-xs flex justify-end"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
           <div className="flex items-center gap-3">
@@ -506,6 +530,7 @@ export const TaskDrawer: React.FC<TaskDrawerProps> = ({ taskId, onClose, onEdit 
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

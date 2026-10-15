@@ -17,6 +17,12 @@ export interface WorkSettings {
   late_grace_minutes: number;// 10
   min_hours_full_day: number;// 8.00
   min_hours_half_day: number;// 4.00
+  geofencing_enabled?: boolean;
+  office_name?: string | null;
+  office_latitude?: number | null;
+  office_longitude?: number | null;
+  office_radius_meters?: number;
+  min_location_accuracy_meters?: number;
   created_at: string;
   updated_at: string;
 }
@@ -40,6 +46,12 @@ export interface UpdateWorkSettingsDto {
   late_grace_minutes?: number;
   min_hours_full_day?: number;
   min_hours_half_day?: number;
+  geofencing_enabled?: boolean;
+  office_name?: string | null;
+  office_latitude?: number | null;
+  office_longitude?: number | null;
+  office_radius_meters?: number;
+  min_location_accuracy_meters?: number;
 }
 
 export interface WorkingDaysResult {

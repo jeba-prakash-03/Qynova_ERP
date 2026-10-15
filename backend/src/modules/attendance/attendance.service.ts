@@ -19,8 +19,39 @@ import {
 } from '../../shared/utils/date.util';
 import { BadRequestError, NotFoundError } from '../../shared/errors/app-error';
 import { auditService } from '../../shared/services/audit.service';
+import {
+  calculateHaversineDistance,
+  isValidCoordinate,
+  validateLocationAccuracy,
+} from '../../shared/utils/geo.util';
 
 export class AttendanceService {
+  /**
+   * Checks whether an employee has an approved Work From Home (WFH) request for the given date.
+   */
+  async isWfhApproved(employeeId: number, date: string): Promise<boolean> {
+    // 1. Check existing attendance row
+    const existing = await db('attendance')
+      .where({ employee_id: employeeId, date })
+      .first();
+    if (existing && (existing.status === 'wfh' || existing.work_type === 'wfh')) {
+      return true;
+    }
+
+    // 2. Check approved leave requests for WFH covering this date
+    const approvedLeave = await db('leave_requests as lr')
+      .join('leave_types as lt', 'lr.leave_type_id', 'lt.id')
+      .join('leave_request_days as lrd', 'lrd.leave_request_id', 'lr.id')
+      .where('lr.employee_id', employeeId)
+      .where('lt.code', 'WFH')
+      .where('lrd.date', date)
+      .where('lrd.status', 'approved')
+      .whereIn('lr.status', ['approved', 'partially_approved'])
+      .first();
+
+    return Boolean(approvedLeave);
+  }
+
   /**
    * Employee Check-In
    */
@@ -46,13 +77,146 @@ export class AttendanceService {
     const now = new Date();
     const workSettings = await holidaysService.getWorkSettings();
 
+    // 1. WFH Authorization check
+    const isWfh = dto.work_type === 'wfh';
+    if (isWfh) {
+      const wfhAuthorized = await this.isWfhApproved(employeeId, today);
+      if (!wfhAuthorized) {
+        throw new BadRequestError(
+          'Work from home check-in requires an approved WFH request for today. Please submit a WFH request in Leaves or check in at the office.'
+        );
+      }
+    }
+
+    // 2. Office Geofencing Verification (for office check-in)
+    let locationMeta: {
+      check_in_latitude?: number | null;
+      check_in_longitude?: number | null;
+      check_in_accuracy?: number | null;
+      check_in_distance_meters?: number | null;
+      office_location_id?: number | null;
+    } = {};
+
+    if (!isWfh && workSettings.geofencing_enabled) {
+      // Gather all candidate offices (primary office + active multiple office locations)
+      interface OfficeCandidate {
+        id: number | null;
+        name: string;
+        latitude: number;
+        longitude: number;
+        radius_meters: number;
+      }
+      const candidates: OfficeCandidate[] = [];
+
+      if (
+        workSettings.office_latitude !== null &&
+        workSettings.office_latitude !== undefined &&
+        workSettings.office_longitude !== null &&
+        workSettings.office_longitude !== undefined
+      ) {
+        candidates.push({
+          id: null,
+          name: workSettings.office_name || 'Primary Office',
+          latitude: Number(workSettings.office_latitude),
+          longitude: Number(workSettings.office_longitude),
+          radius_meters: Number(workSettings.office_radius_meters) || 100,
+        });
+      }
+
+      const activeOffices = await db('office_locations')
+        .where({ is_active: true })
+        .select('*');
+
+      for (const o of activeOffices) {
+        candidates.push({
+          id: Number(o.id),
+          name: o.name,
+          latitude: Number(o.latitude),
+          longitude: Number(o.longitude),
+          radius_meters: Number(o.radius_meters) || 100,
+        });
+      }
+
+      // Fail closed if geofencing is enabled but no office is configured
+      if (candidates.length === 0) {
+        throw new BadRequestError(
+          'Office location has not been configured. Please contact your administrator.'
+        );
+      }
+
+      // Validate submitted coordinates presence
+      if (
+        dto.latitude === undefined ||
+        dto.latitude === null ||
+        dto.longitude === undefined ||
+        dto.longitude === null ||
+        dto.accuracy === undefined ||
+        dto.accuracy === null
+      ) {
+        throw new BadRequestError(
+          'Location coordinates and accuracy are required for office check-in.'
+        );
+      }
+
+      // Validate finite numbers & degree bounds
+      if (!isValidCoordinate(dto.latitude, dto.longitude)) {
+        throw new BadRequestError('Invalid latitude or longitude coordinates provided.');
+      }
+
+      // Validate reported GPS accuracy against configured threshold
+      const maxAccuracy = workSettings.min_location_accuracy_meters || 50;
+      const accuracyCheck = validateLocationAccuracy(dto.accuracy, maxAccuracy);
+      if (!accuracyCheck.valid) {
+        throw new BadRequestError(accuracyCheck.reason!);
+      }
+
+      // Calculate distance to each configured office and find the closest
+      let closestCandidate: OfficeCandidate | null = null;
+      let minDistance = Infinity;
+
+      for (const cand of candidates) {
+        const dist = calculateHaversineDistance(
+          dto.latitude,
+          dto.longitude,
+          cand.latitude,
+          cand.longitude
+        );
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestCandidate = cand;
+        }
+      }
+
+      if (!closestCandidate || minDistance > closestCandidate.radius_meters) {
+        const allowed = closestCandidate ? closestCandidate.radius_meters : (workSettings.office_radius_meters || 100);
+        throw new BadRequestError(
+          `You are outside the permitted office check-in area (distance: ${Math.round(minDistance)}m, allowed: ${allowed}m).`
+        );
+      }
+
+      locationMeta = {
+        check_in_latitude: dto.latitude,
+        check_in_longitude: dto.longitude,
+        check_in_accuracy: dto.accuracy,
+        check_in_distance_meters: minDistance,
+        office_location_id: closestCandidate.id,
+      };
+    } else if (!isWfh && isValidCoordinate(dto.latitude, dto.longitude)) {
+      // Optional recording when geofencing is disabled
+      locationMeta = {
+        check_in_latitude: dto.latitude,
+        check_in_longitude: dto.longitude,
+        check_in_accuracy: typeof dto.accuracy === 'number' && Number.isFinite(dto.accuracy) ? dto.accuracy : null,
+      };
+    }
+
     // Check if late (check_in minutes > shift_start + grace)
     const checkInMinutes = getKolkataMinutesOfDay(now);
     const shiftStartMinutes = timeStringToMinutes(workSettings.shift_start);
     const lateThreshold = shiftStartMinutes + workSettings.late_grace_minutes;
     const isLate = checkInMinutes > lateThreshold;
 
-    const status: AttendanceStatus = dto.work_type === 'wfh' ? 'wfh' : 'present';
+    const status: AttendanceStatus = isWfh ? 'wfh' : 'present';
 
     if (existing) {
       // Update existing record if created as placeholder
@@ -62,6 +226,7 @@ export class AttendanceService {
         work_type: dto.work_type || 'office',
         is_late: isLate,
         remarks: dto.remarks || existing.remarks,
+        ...locationMeta,
       });
       return updated!;
     }
@@ -74,6 +239,7 @@ export class AttendanceService {
       work_type: dto.work_type || 'office',
       is_late: isLate,
       remarks: dto.remarks,
+      ...locationMeta,
     });
   }
 
@@ -225,11 +391,17 @@ export class AttendanceService {
     serverTime: string;
     serverDate: string;
     shift: { start: string; end: string };
+    is_wfh_approved: boolean;
+    geofencing_enabled: boolean;
+    office_name: string | null;
+    allowed_radius_meters: number;
+    min_accuracy_meters: number;
   }> {
     const today = getKolkataDateString();
     const attendance = await attendanceRepository.findByEmployeeAndDate(employeeId, today);
     const activeBreak = attendance ? await attendanceRepository.findOpenBreak(attendance.id) : null;
     const settings = await holidaysService.getWorkSettings();
+    const isWfhApproved = await this.isWfhApproved(employeeId, today);
 
     return {
       attendance,
@@ -240,6 +412,11 @@ export class AttendanceService {
         start: settings.shift_start,
         end: settings.shift_end,
       },
+      is_wfh_approved: isWfhApproved,
+      geofencing_enabled: Boolean(settings.geofencing_enabled),
+      office_name: settings.office_name ?? null,
+      allowed_radius_meters: Number(settings.office_radius_meters) || 100,
+      min_accuracy_meters: Number(settings.min_location_accuracy_meters) || 50,
     };
   }
 

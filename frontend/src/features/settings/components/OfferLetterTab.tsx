@@ -5,7 +5,6 @@ import axiosClient from '../../../shared/api/axiosClient';
 import { useToast } from '../../../shared/context/ToastContext';
 import { FormField } from '../../../shared/components/FormField';
 import { Button } from '../../../shared/components/Button';
-import { Modal } from '../../../shared/components/Modal';
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import {
   FileText,
@@ -18,12 +17,10 @@ import {
   Bold,
   Italic,
   List,
-  Heading1,
   Heading2,
   Table as TableIcon,
   ChevronDown,
   Sparkles,
-  AlertCircle,
   FileCode,
 } from 'lucide-react';
 
@@ -74,13 +71,12 @@ export const OfferLetterTab: React.FC = () => {
     is_default: false,
   });
   const [isDirty, setIsDirty] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [showVariableDropdown, setShowVariableDropdown] = useState(false);
   const [activeViewMode, setActiveViewMode] = useState<'editor' | 'preview'>('editor');
 
   // Fetch all templates
-  const { data: templatesData, isLoading } = useQuery({
+  const { data: templatesData } = useQuery({
     queryKey: ['offer-letter-templates'],
     queryFn: async () => {
       const res = await axiosClient.get('/offer-letters/templates');
@@ -297,32 +293,32 @@ export const OfferLetterTab: React.FC = () => {
       '{{signatory_designation}}': 'Head of People Operations',
       '{{salary_breakup_table}}': `<table style="width: 100%; border-collapse: collapse; margin: 12px 0;">
   <thead>
-    <tr style="background-color: #f1f5f9;">
-      <th style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: left;">Salary Component</th>
-      <th style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">Monthly (INR)</th>
-      <th style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">Annual (INR)</th>
+    <tr style="background-color: #dbe2d5; color: #26301f;">
+      <th style="border: 1px solid #b2bfa9; padding: 8px 12px; text-align: left;">Salary Component</th>
+      <th style="border: 1px solid #b2bfa9; padding: 8px 12px; text-align: right;">Monthly (INR)</th>
+      <th style="border: 1px solid #b2bfa9; padding: 8px 12px; text-align: right;">Annual (INR)</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px;">Basic Salary (50%)</td>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">₹50,000.00</td>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">₹6,00,000.00</td>
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px;">Basic Salary (50%)</td>
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px; text-align: right; font-family: monospace;">₹50,000.00</td>
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px; text-align: right; font-family: monospace;">₹6,00,000.00</td>
+    </tr>
+    <tr style="background-color: #f7f9f6;">
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px;">House Rent Allowance (HRA)</td>
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px; text-align: right; font-family: monospace;">₹20,000.00</td>
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px; text-align: right; font-family: monospace;">₹2,40,000.00</td>
     </tr>
     <tr>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px;">House Rent Allowance (HRA)</td>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">₹20,000.00</td>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">₹2,40,000.00</td>
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px;">Special Allowance</td>
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px; text-align: right; font-family: monospace;">₹30,000.00</td>
+      <td style="border: 1px solid #c5d0be; padding: 8px 12px; text-align: right; font-family: monospace;">₹3,60,000.00</td>
     </tr>
-    <tr>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px;">Special Allowance</td>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">₹30,000.00</td>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">₹3,60,000.00</td>
-    </tr>
-    <tr style="font-weight: bold; background-color: #f8fafc;">
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px;">Total Cost to Company (CTC)</td>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">₹1,00,000.00</td>
-      <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: right;">₹12,00,000.00</td>
+    <tr style="font-weight: bold; background-color: #e2e8dc; color: #26301f;">
+      <td style="border: 1px solid #b2bfa9; padding: 8px 12px;">Total Cost to Company (CTC)</td>
+      <td style="border: 1px solid #b2bfa9; padding: 8px 12px; text-align: right; font-family: monospace;">₹1,00,000.00</td>
+      <td style="border: 1px solid #b2bfa9; padding: 8px 12px; text-align: right; font-family: monospace;">₹12,00,000.00</td>
     </tr>
   </tbody>
 </table>`,
@@ -338,22 +334,22 @@ export const OfferLetterTab: React.FC = () => {
   const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+    <div className="clay-card overflow-hidden">
       {/* Top Header */}
-      <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 border-b border-[#b2bfa9]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-indigo-600" />
+          <h2 className="text-base font-bold text-[var(--clay-ink)] flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[var(--clay-teal)]" />
             Offer Letter Templates & Variables
           </h2>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[var(--clay-muted)] mt-1">
             Customize standardized offer letters, legal appointment clauses, and dynamic token replacements.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {isDirty && (
-            <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">
+            <span className="text-xs font-semibold text-[var(--clay-brass)] bg-[var(--clay-brass)]/15 px-2.5 py-1 rounded-md border border-[var(--clay-brass)]/30">
               Unsaved Changes
             </span>
           )}
@@ -374,42 +370,42 @@ export const OfferLetterTab: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[580px]">
         {/* Left Column: Template List */}
-        <div className="lg:col-span-4 border-r border-slate-100 p-4 bg-slate-50/50 space-y-2">
+        <div className="lg:col-span-4 border-r border-[#b2bfa9]/30 p-4 bg-[var(--clay-surface-secondary)]/40 space-y-2">
           <div className="flex items-center justify-between px-2 pb-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-[var(--clay-muted)] uppercase tracking-wider">
               Templates ({templates.length})
             </span>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {templates.map((t) => (
               <div
                 key={t.id}
                 onClick={() => selectTemplate(t)}
-                className={`p-3.5 rounded-xl border text-left cursor-pointer transition flex items-start justify-between gap-3 ${
+                className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all duration-180 flex items-start justify-between gap-3 ${
                   selectedTemplateId === t.id
-                    ? 'bg-white border-indigo-500 shadow-xs ring-1 ring-indigo-500/10'
-                    : 'bg-white/80 border-slate-200/80 hover:bg-white hover:border-slate-300'
+                    ? 'clay-inset border-[var(--clay-teal)]/60 bg-[var(--clay-surface)] ring-1 ring-[var(--clay-teal)]/20'
+                    : 'bg-[var(--clay-surface)] border-[#b2bfa9]/40 hover:border-[var(--clay-teal)]/40'
                 }`}
               >
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-slate-800 truncate block">
+                    <span className="text-xs font-bold text-[var(--clay-ink)] truncate block">
                       {t.name}
                     </span>
                     {t.is_default && (
-                      <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      <span className="inline-flex items-center text-[10px] font-bold text-[var(--clay-teal)] bg-[var(--clay-teal)]/15 px-1.5 py-0.5 rounded border border-[var(--clay-teal)]/25">
                         Default
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-400 truncate">{t.subject}</p>
+                  <p className="text-[11px] text-[var(--clay-muted)] truncate">{t.subject}</p>
                 </div>
 
                 <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => duplicateMutation.mutate(t.id)}
-                    className="p-1 text-slate-400 hover:text-indigo-600 rounded transition"
+                    className="p-1.5 text-[var(--clay-muted)] hover:text-[var(--clay-teal)] rounded-lg transition"
                     title="Duplicate template"
                   >
                     <Copy className="w-3.5 h-3.5" />
@@ -417,7 +413,7 @@ export const OfferLetterTab: React.FC = () => {
                   {!t.is_default && (
                     <button
                       onClick={() => setDeleteId(t.id)}
-                      className="p-1 text-slate-400 hover:text-rose-600 rounded transition"
+                      className="p-1.5 text-[var(--clay-muted)] hover:text-[var(--clay-rust)] rounded-lg transition"
                       title="Delete template"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -430,17 +426,17 @@ export const OfferLetterTab: React.FC = () => {
         </div>
 
         {/* Right Column: Editor & Live Preview */}
-        <div className="lg:col-span-8 p-6 space-y-5">
+        <div className="lg:col-span-8 p-6 space-y-5 bg-[var(--clay-surface)]">
           {/* Editor Header & Actions */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#b2bfa9]/30">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setActiveViewMode('editor')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                   activeViewMode === 'editor'
-                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    ? 'bg-[var(--clay-teal)] text-white shadow-xs'
+                    : 'text-[var(--clay-ink)] hover:bg-[#b2bfa9]/20'
                 }`}
               >
                 <FileCode className="w-3.5 h-3.5 inline mr-1" />
@@ -451,8 +447,8 @@ export const OfferLetterTab: React.FC = () => {
                 onClick={() => setActiveViewMode('preview')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                   activeViewMode === 'preview'
-                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    ? 'bg-[var(--clay-teal)] text-white shadow-xs'
+                    : 'text-[var(--clay-ink)] hover:bg-[#b2bfa9]/20'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5 inline mr-1" />
@@ -485,7 +481,7 @@ export const OfferLetterTab: React.FC = () => {
                   setIsDirty(true);
                 }}
                 placeholder="e.g. Standard Professional Offer"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="clay-inset w-full px-3.5 py-2 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--clay-teal)]/30 text-[var(--clay-ink)] font-medium"
               />
             </FormField>
 
@@ -498,7 +494,7 @@ export const OfferLetterTab: React.FC = () => {
                   setIsDirty(true);
                 }}
                 placeholder="Offer of Employment: {{designation}} at {{company_name}}"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="clay-inset w-full px-3.5 py-2 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--clay-teal)]/30 text-[var(--clay-ink)] font-medium"
               />
             </FormField>
           </div>
@@ -506,12 +502,12 @@ export const OfferLetterTab: React.FC = () => {
           {activeViewMode === 'editor' ? (
             <div className="space-y-2">
               {/* Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="flex flex-wrap items-center justify-between gap-2 p-2 bg-[var(--clay-surface-secondary)] border border-[#b2bfa9]/40 rounded-xl">
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={() => insertTextAtCursor('<strong>', '</strong>')}
-                    className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-white rounded border border-transparent hover:border-slate-200 transition"
+                    className="p-1.5 text-[var(--clay-ink)] hover:text-[var(--clay-teal)] hover:bg-[var(--clay-surface)] rounded-lg transition"
                     title="Bold"
                   >
                     <Bold className="w-3.5 h-3.5" />
@@ -519,7 +515,7 @@ export const OfferLetterTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => insertTextAtCursor('<em>', '</em>')}
-                    className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-white rounded border border-transparent hover:border-slate-200 transition"
+                    className="p-1.5 text-[var(--clay-ink)] hover:text-[var(--clay-teal)] hover:bg-[var(--clay-surface)] rounded-lg transition"
                     title="Italic"
                   >
                     <Italic className="w-3.5 h-3.5" />
@@ -527,7 +523,7 @@ export const OfferLetterTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => insertTextAtCursor('<h3>', '</h3>')}
-                    className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-white rounded border border-transparent hover:border-slate-200 transition"
+                    className="p-1.5 text-[var(--clay-ink)] hover:text-[var(--clay-teal)] hover:bg-[var(--clay-surface)] rounded-lg transition"
                     title="Heading"
                   >
                     <Heading2 className="w-3.5 h-3.5" />
@@ -535,7 +531,7 @@ export const OfferLetterTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => insertTextAtCursor('<ul>\n  <li>', '</li>\n</ul>')}
-                    className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-white rounded border border-transparent hover:border-slate-200 transition"
+                    className="p-1.5 text-[var(--clay-ink)] hover:text-[var(--clay-teal)] hover:bg-[var(--clay-surface)] rounded-lg transition"
                     title="List"
                   >
                     <List className="w-3.5 h-3.5" />
@@ -543,7 +539,7 @@ export const OfferLetterTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => insertVariable('{{salary_breakup_table}}')}
-                    className="px-2 py-1 text-[11px] font-semibold text-slate-700 hover:text-indigo-600 hover:bg-white rounded border border-transparent hover:border-slate-200 transition flex items-center gap-1"
+                    className="px-2.5 py-1 text-[11px] font-semibold text-[var(--clay-ink)] hover:text-[var(--clay-teal)] hover:bg-[var(--clay-surface)] rounded-lg transition flex items-center gap-1"
                     title="Insert CTC Table"
                   >
                     <TableIcon className="w-3.5 h-3.5" />
@@ -556,7 +552,7 @@ export const OfferLetterTab: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowVariableDropdown(!showVariableDropdown)}
-                    className="px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition flex items-center gap-1.5"
+                    className="px-3 py-1 text-xs font-semibold text-[var(--clay-teal)] bg-[var(--clay-teal)]/15 border border-[var(--clay-teal)]/30 rounded-lg hover:bg-[var(--clay-teal)]/25 transition flex items-center gap-1.5"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     Insert Variable
@@ -564,16 +560,16 @@ export const OfferLetterTab: React.FC = () => {
                   </button>
 
                   {showVariableDropdown && (
-                    <div className="absolute right-0 mt-1 w-64 bg-white border border-slate-200 rounded-xl shadow-lg z-30 max-h-64 overflow-y-auto p-1.5 space-y-0.5">
+                    <div className="absolute right-0 mt-1 w-64 bg-[var(--clay-surface)] border border-[#b2bfa9] rounded-xl shadow-lg z-30 max-h-64 overflow-y-auto p-1.5 space-y-0.5">
                       {TEMPLATE_VARIABLES.map((v) => (
                         <button
                           key={v.value}
                           type="button"
                           onClick={() => insertVariable(v.value)}
-                          className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs hover:bg-indigo-50 hover:text-indigo-700 transition flex items-center justify-between"
+                          className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs hover:bg-[var(--clay-teal)]/10 hover:text-[var(--clay-teal)] text-[var(--clay-ink)] transition flex items-center justify-between"
                         >
-                          <span className="font-medium text-slate-800">{v.label}</span>
-                          <span className="font-mono text-[10px] text-slate-400">{v.value}</span>
+                          <span className="font-medium">{v.label}</span>
+                          <span className="font-mono text-[10px] text-[var(--clay-muted)]">{v.value}</span>
                         </button>
                       ))}
                     </div>
@@ -590,27 +586,27 @@ export const OfferLetterTab: React.FC = () => {
                   setIsDirty(true);
                 }}
                 rows={16}
-                className="w-full px-4 py-3 font-mono text-xs leading-relaxed bg-slate-900 text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 border border-slate-800"
+                className="w-full px-4 py-3 font-mono text-xs leading-relaxed bg-[#1d2719] text-[#e8f0e4] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--clay-teal)]/50 border border-[#33422d] selection:bg-[var(--clay-teal)]"
                 placeholder="Enter HTML template with {{double_brace}} variables..."
               />
             </div>
           ) : (
             /* Live Preview Container */
-            <div className="p-8 bg-slate-50 border border-slate-200 rounded-2xl min-h-[420px] space-y-4">
-              <div className="pb-4 border-b border-slate-200 flex items-center justify-between">
+            <div className="p-8 clay-inset rounded-2xl min-h-[420px] space-y-4 bg-[var(--clay-surface)]">
+              <div className="pb-4 border-b border-[#b2bfa9]/30 flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-[var(--clay-ink)]">
                     Subject: {formData.subject.replace('{{designation}}', 'Senior Full Stack Engineer').replace('{{company_name}}', 'Qynova Technologies')}
                   </h3>
-                  <p className="text-xs text-slate-500">Live preview simulated with sample employee parameters.</p>
+                  <p className="text-xs text-[var(--clay-muted)]">Live preview simulated with sample employee parameters.</p>
                 </div>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[var(--clay-teal)]/15 text-[var(--clay-teal)] border border-[var(--clay-teal)]/25">
                   Sample Preview
                 </span>
               </div>
 
               <div
-                className="prose prose-sm max-w-none text-slate-800 leading-relaxed space-y-3 font-sans"
+                className="prose prose-sm max-w-none text-[var(--clay-ink)] leading-relaxed space-y-3 font-sans"
                 dangerouslySetInnerHTML={{ __html: getSampleRenderedHtml() }}
               />
             </div>

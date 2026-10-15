@@ -494,8 +494,24 @@ export const MyLeavesPage: React.FC = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
         title="Apply for Leave / Time Off"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsApplyModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="apply-leave-form"
+              variant="primary"
+              isLoading={applyMutation.isPending}
+              disabled={isCalculating || Boolean(calcError)}
+            >
+              Submit Application
+            </Button>
+          </>
+        }
       >
-        <form onSubmit={handleApplySubmit} className="space-y-4">
+        <form id="apply-leave-form" onSubmit={handleApplySubmit} className="space-y-4">
           <FormField label="Leave Type" required>
             <select
               value={formData.leave_type_id}
@@ -671,20 +687,6 @@ export const MyLeavesPage: React.FC = () => {
               required
             />
           </FormField>
-
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[rgba(76,91,70,0.14)]">
-            <Button variant="secondary" onClick={() => setIsApplyModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={applyMutation.isPending}
-              disabled={isCalculating || Boolean(calcError)}
-            >
-              Submit Application
-            </Button>
-          </div>
         </form>
       </Modal>
 

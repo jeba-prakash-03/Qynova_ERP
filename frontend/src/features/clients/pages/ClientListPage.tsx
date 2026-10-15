@@ -102,7 +102,7 @@ export const ClientListPage: React.FC = () => {
     {
       header: 'Client Code',
       cell: (client: Client) => (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold clay-inset text-[#14776b] border border-[#14776b]/20">
           {client.client_code}
         </span>
       ),
@@ -115,18 +115,18 @@ export const ClientListPage: React.FC = () => {
         <div>
           <Link
             to={`/clients/${client.id}`}
-            className="text-sm font-semibold text-slate-800 hover:text-indigo-600 transition"
+            className="text-sm font-semibold text-[#26301f] hover:text-[#14776b] transition-colors"
           >
             {client.company_name}
           </Link>
           {client.website && (
-            <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-              <Globe className="w-3 h-3 text-slate-400" />
+            <div className="flex items-center gap-1.5 text-xs text-[#6b7663] mt-0.5">
+              <Globe className="w-3 h-3 text-[#6b7663]/70" />
               <a
                 href={client.website}
                 target="_blank"
                 rel="noreferrer"
-                className="hover:underline truncate max-w-[200px]"
+                className="hover:underline hover:text-[#14776b] truncate max-w-[200px]"
                 onClick={(e) => e.stopPropagation()}
               >
                 {client.website.replace(/^https?:\/\//, '')}
@@ -141,7 +141,7 @@ export const ClientListPage: React.FC = () => {
     {
       header: 'Industry',
       cell: (client: Client) => (
-        <span className="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded">
+        <span className="text-xs font-semibold clay-inset text-[#26301f]/80 px-2.5 py-0.5 rounded-lg border border-[#c5d0be]/40">
           {client.industry || 'Not specified'}
         </span>
       ),
@@ -154,22 +154,22 @@ export const ClientListPage: React.FC = () => {
         <div className="text-xs">
           {client.primary_contact_name ? (
             <>
-              <div className="font-medium text-slate-800">{client.primary_contact_name}</div>
+              <div className="font-semibold text-[#26301f]">{client.primary_contact_name}</div>
               {client.primary_contact_email && (
-                <div className="flex items-center gap-1 text-slate-500 mt-0.5">
-                  <Mail className="w-3 h-3 text-slate-400" />
+                <div className="flex items-center gap-1.5 text-[#6b7663] mt-0.5">
+                  <Mail className="w-3 h-3 text-[#6b7663]/70" />
                   <span>{client.primary_contact_email}</span>
                 </div>
               )}
               {client.primary_contact_phone && (
-                <div className="flex items-center gap-1 text-slate-500 mt-0.5">
-                  <Phone className="w-3 h-3 text-slate-400" />
+                <div className="flex items-center gap-1.5 text-[#6b7663] mt-0.5">
+                  <Phone className="w-3 h-3 text-[#6b7663]/70" />
                   <span>{client.primary_contact_phone}</span>
                 </div>
               )}
             </>
           ) : (
-            <span className="text-slate-400 italic">No primary contact</span>
+            <span className="text-[#6b7663]/60 italic">No primary contact</span>
           )}
         </div>
       ),
@@ -178,13 +178,13 @@ export const ClientListPage: React.FC = () => {
       header: 'Status',
       cell: (client: Client) => {
         const badgeColors: Record<string, string> = {
-          active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-          lead: 'bg-amber-50 text-amber-700 border-amber-200',
-          inactive: 'bg-slate-100 text-slate-600 border-slate-200',
+          active: 'bg-emerald-100/70 text-emerald-800 border-emerald-300',
+          lead: 'bg-[#cf9b34]/15 text-[#916515] border-[#cf9b34]/30',
+          inactive: 'bg-[#dbe2d5] text-[#6b7663] border-[#c5d0be]',
         };
         return (
           <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize ${
               badgeColors[client.status] || badgeColors.inactive
             }`}
           >
@@ -198,11 +198,11 @@ export const ClientListPage: React.FC = () => {
     {
       header: 'Actions',
       cell: (client: Client) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Link
             to={`/clients/${client.id}`}
             title="View Details"
-            className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded transition"
+            className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#dbe2d5]/60 rounded-lg transition-colors"
           >
             <Eye className="w-4 h-4" />
           </Link>
@@ -210,7 +210,7 @@ export const ClientListPage: React.FC = () => {
             <button
               onClick={() => handleOpenEdit(client)}
               title="Edit Client"
-              className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#dbe2d5]/60 rounded-lg transition-colors"
             >
               <Edit2 className="w-4 h-4" />
             </button>
@@ -219,7 +219,7 @@ export const ClientListPage: React.FC = () => {
             <button
               onClick={() => setDeleteTarget(client)}
               title="Delete Client"
-              className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-slate-100 rounded transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#c4643f] hover:bg-[#c4643f]/10 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -233,24 +233,22 @@ export const ClientListPage: React.FC = () => {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-              <Building2 className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Clients & Accounts</h1>
-              <p className="text-sm text-slate-500">
-                Manage enterprise customer accounts, stakeholders, communication logs, and contracts
-              </p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#14776b]/15 text-[#14776b] rounded-xl clay-card">
+            <Building2 className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold font-baloo text-[#26301f]">Clients & Accounts</h1>
+            <p className="text-sm text-[#6b7663]">
+              Manage enterprise customer accounts, stakeholders, communication logs, and contracts
+            </p>
           </div>
         </div>
 
         <Can permission="clients.create">
           <button
             onClick={handleOpenCreate}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] active:scale-[0.98] text-white rounded-xl text-sm font-semibold transition-all duration-180 shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Register Client
@@ -259,15 +257,15 @@ export const ClientListPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <div className="clay-card p-4 rounded-2xl border border-[#c5d0be]/50 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#6b7663] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by company, code, GSTIN, or industry..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-9 pr-4 py-2 text-sm clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] placeholder-[#6b7663] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           />
         </div>
 
@@ -275,7 +273,7 @@ export const ClientListPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="w-full px-3 py-2 text-sm clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
@@ -286,7 +284,7 @@ export const ClientListPage: React.FC = () => {
       </div>
 
       {/* Data Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="clay-card rounded-2xl border border-[#c5d0be]/50 overflow-hidden">
         <DataTable<Client>
           columns={columns}
           data={clients}

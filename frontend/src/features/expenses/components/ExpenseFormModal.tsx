@@ -3,7 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { expensesApi } from '../api';
 import { projectsApi } from '../../projects/api';
 import { useToast } from '../../../shared/context/ToastContext';
-import { X, Save, Receipt } from 'lucide-react';
+import { Modal } from '../../../shared/components/Modal';
+import { Save, Receipt } from 'lucide-react';
 
 interface ExpenseFormModalProps {
   isOpen: boolean;
@@ -69,150 +70,146 @@ export const ExpenseFormModal: React.FC<ExpenseFormModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-200">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-          <div className="flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-indigo-600" />
-            <h3 className="text-base font-bold text-slate-800">Claim / Submit Expense</h3>
-          </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Claim / Submit Expense"
+      subtitle="Submit operational or project expenditure for managerial reimbursement"
+      maxWidth="lg"
+      footer={
+        <>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200"
+            className="px-4 py-2 border border-[#c5d0be] rounded-xl text-xs font-semibold text-[#26301f] bg-[#e2e8dc] hover:bg-[#dbe2d5] transition active:scale-95"
           >
-            <X className="w-5 h-5" />
+            Cancel
           </button>
+          <button
+            type="submit"
+            form="expense-form"
+            disabled={createMutation.isPending || !categoryId || !amount}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition shadow-xs active:scale-95"
+          >
+            <Save className="w-3.5 h-3.5" />
+            {createMutation.isPending ? 'Submitting...' : 'Submit Claim'}
+          </button>
+        </>
+      }
+    >
+      <form
+        id="expense-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          createMutation.mutate();
+        }}
+        className="space-y-4"
+      >
+        {/* Category */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+            Expense Category *
+          </label>
+          <select
+            value={categoryId || ''}
+            onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : undefined)}
+            required
+            className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
+          >
+            <option value="">Select Category</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            createMutation.mutate();
-          }}
-          className="p-6 space-y-4"
-        >
-          {/* Category */}
+        {/* Project (optional) */}
+        {!defaultProjectId && (
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              Expense Category *
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Linked Project (Optional)
             </label>
             <select
-              value={categoryId || ''}
-              onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : undefined)}
-              required
-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+              value={projectId || ''}
+              onChange={(e) =>
+                setProjectId(e.target.value ? Number(e.target.value) : undefined)
+              }
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             >
-              <option value="">Select Category</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
+              <option value="">General Company Expense</option>
+              {projectsRes?.data?.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.project_code} - {p.name}
                 </option>
               ))}
             </select>
           </div>
+        )}
 
-          {/* Project (optional) */}
-          {!defaultProjectId && (
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Linked Project (Optional)
-              </label>
-              <select
-                value={projectId || ''}
-                onChange={(e) =>
-                  setProjectId(e.target.value ? Number(e.target.value) : undefined)
-                }
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="">General Company Expense</option>
-                {projectsRes?.data?.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.project_code} - {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Amount & Date */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Amount (₹ INR) *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="1"
-                required
-                value={amount}
-                onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : '')}
-                placeholder="e.g. 4500.00"
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Incurred Date *
-              </label>
-              <input
-                type="date"
-                required
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-          </div>
-
-          {/* Vendor */}
+        {/* Amount & Date */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              Vendor / Merchant
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Amount (₹ INR) *
             </label>
             <input
-              type="text"
-              value={vendor}
-              onChange={(e) => setVendor(e.target.value)}
-              placeholder="e.g. AWS, DLF Office, JetBrains, MakeMyTrip"
-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              type="number"
+              step="0.01"
+              min="1"
+              required
+              value={amount}
+              onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : '')}
+              placeholder="e.g. 4500.00"
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </div>
 
-          {/* Description */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              Description / Business Justification
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Incurred Date *
             </label>
-            <textarea
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Business justification and details of the expense..."
-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+            <input
+              type="date"
+              required
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
           </div>
+        </div>
 
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={createMutation.isPending || !categoryId || !amount}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50 transition shadow-sm"
-            >
-              <Save className="w-3.5 h-3.5" />
-              {createMutation.isPending ? 'Submitting...' : 'Submit Claim'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Vendor */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+            Vendor / Merchant
+          </label>
+          <input
+            type="text"
+            value={vendor}
+            onChange={(e) => setVendor(e.target.value)}
+            placeholder="e.g. AWS, DLF Office, JetBrains, MakeMyTrip"
+            className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30 placeholder-[#6b7663]/60"
+          />
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+            Description / Business Justification
+          </label>
+          <textarea
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Business justification and details of the expense..."
+            className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30 placeholder-[#6b7663]/60"
+          />
+        </div>
+      </form>
+    </Modal>
   );
 };
+
+export default ExpenseFormModal;

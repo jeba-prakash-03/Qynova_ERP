@@ -157,11 +157,35 @@ export class AttendanceController {
       reportingManagerId = req.user?.employeeId || undefined;
     }
 
+    const formatTimeStr = (val?: any): string => {
+      if (!val) return '-';
+      try {
+        if (val instanceof Date) {
+          return isNaN(val.getTime()) ? '-' : val.toLocaleTimeString('en-IN');
+        }
+        const str = String(val).trim();
+        if (!str) return '-';
+        const normalized = str.includes(' ') && !str.includes('T') ? str.replace(' ', 'T') : str;
+        const d = new Date(normalized);
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleTimeString('en-IN');
+        }
+        const match = str.match(/(\d{2}:\d{2}(?::\d{2})?)/);
+        return match ? match[1] : str;
+      } catch {
+        return '-';
+      }
+    };
+
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Qynova ERP';
+    workbook.created = new Date();
+
+    let filename: string;
 
     if (type === 'daily') {
       const sheetDate = date || new Date().toISOString().split('T')[0];
+      filename = `attendance_daily_${sheetDate}`;
       const sheetResult = await attendanceService.getDailySheet({
         date: sheetDate,
         reportingManagerId,
@@ -182,28 +206,35 @@ export class AttendanceController {
         { header: 'Early Checkout', key: 'is_early', width: 14 },
       ];
 
+      // Style Header Row
+      const headerRow = worksheet.getRow(1);
+      headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      headerRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF14776B' }, // Teal
+      };
+      headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+      headerRow.height = 24;
+
       for (const item of sheetResult.items) {
         worksheet.addRow({
           code: item.employee_code,
           name: `${item.first_name} ${item.last_name}`,
           dept: item.department_name,
           desig: item.designation_title,
-          status: item.status.toUpperCase(),
-          work_type: item.work_type.toUpperCase(),
-          check_in: item.check_in ? new Date(item.check_in).toLocaleTimeString('en-IN') : '-',
-          check_out: item.check_out ? new Date(item.check_out).toLocaleTimeString('en-IN') : '-',
-          hours: (item.working_minutes / 60).toFixed(1) + ' hrs',
+          status: (item.status || 'absent').toUpperCase(),
+          work_type: (item.work_type || 'office').toUpperCase(),
+          check_in: formatTimeStr(item.check_in),
+          check_out: formatTimeStr(item.check_out),
+          hours: ((item.working_minutes || 0) / 60).toFixed(1) + ' hrs',
           is_late: item.is_late ? 'YES' : 'NO',
           is_early: item.is_early_checkout ? 'YES' : 'NO',
         });
       }
-
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename="attendance_daily_${sheetDate}.${format}"`
-      );
     } else {
       const sheetMonth = month || new Date().toISOString().slice(0, 7);
+      filename = `attendance_monthly_${sheetMonth}`;
       const monthlyResult = await attendanceService.getMonthlySheet({
         month: sheetMonth,
         reportingManagerId,
@@ -229,44 +260,53 @@ export class AttendanceController {
 
       worksheet.columns = columns;
 
+      // Style Header Row
+      const headerRow = worksheet.getRow(1);
+      headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      headerRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF14776B' }, // Teal
+      };
+      headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+      headerRow.height = 24;
+
       for (const emp of monthlyResult.employees) {
         const rowData: Record<string, any> = {
           code: emp.employee_code,
           name: `${emp.first_name} ${emp.last_name}`,
           dept: emp.department_name,
-          tot_p: emp.totals.present,
-          tot_a: emp.totals.absent,
-          tot_hd: emp.totals.half_day,
-          tot_hrs: (emp.totals.total_working_minutes / 60).toFixed(1),
+          tot_p: emp.totals?.present || 0,
+          tot_a: emp.totals?.absent || 0,
+          tot_hd: emp.totals?.half_day || 0,
+          tot_hrs: (((emp.totals?.total_working_minutes || 0) / 60)).toFixed(1),
         };
 
         const pad = (n: number) => n.toString().padStart(2, '0');
         for (let d = 1; d <= monthlyResult.totalDays; d++) {
           const dateStr = `${sheetMonth}-${pad(d)}`;
-          const dayInfo = emp.days[dateStr];
+          const dayInfo = emp.days?.[dateStr];
           rowData[`d_${d}`] = dayInfo ? dayInfo.statusCode : '-';
         }
 
         worksheet.addRow(rowData);
       }
-
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename="attendance_monthly_${sheetMonth}.${format}"`
-      );
     }
 
     if (format === 'csv') {
-      res.setHeader('Content-Type', 'text/csv');
-      await workbook.csv.write(res);
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}.csv"`);
+      const csvBuffer = await workbook.csv.writeBuffer();
+      return res.send(Buffer.from(csvBuffer));
     } else {
       res.setHeader(
         'Content-Type',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       );
-      await workbook.xlsx.write(res);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
+      const buffer = await workbook.xlsx.writeBuffer();
+      return res.send(Buffer.from(buffer));
     }
-    return res.end();
   });
 }
 

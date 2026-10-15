@@ -200,8 +200,7 @@ export class AuthService {
   public async forgotPassword(email: string): Promise<void> {
     const user = await authRepository.findByEmail(email);
     if (!user) {
-      // Return cleanly to prevent email enumeration
-      return;
+      throw new NotFoundError('No registered account found with this email address');
     }
 
     const rawToken = crypto.randomBytes(32).toString('hex');

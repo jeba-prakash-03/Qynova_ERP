@@ -58,6 +58,44 @@ export const updateWorkSettingsSchema = z.object({
     .number({ required_error: 'Minimum half day hours is required' })
     .min(0.5, 'Half day hours must be at least 0.5')
     .max(12, 'Half day hours cannot exceed 12'),
+  geofencing_enabled: z.boolean().optional(),
+  office_name: z.string().max(255).nullable().optional(),
+  office_latitude: z
+    .number()
+    .min(-90, 'Latitude must be between -90 and 90')
+    .max(90, 'Latitude must be between -90 and 90')
+    .nullable()
+    .optional(),
+  office_longitude: z
+    .number()
+    .min(-180, 'Longitude must be between -180 and 180')
+    .max(180, 'Longitude must be between -180 and 180')
+    .nullable()
+    .optional(),
+  office_radius_meters: z
+    .number()
+    .int('Radius must be an integer')
+    .min(10, 'Radius must be at least 10 metres')
+    .max(50000, 'Radius cannot exceed 50,000 metres')
+    .optional(),
+  min_location_accuracy_meters: z
+    .number()
+    .int('Accuracy threshold must be an integer')
+    .min(5, 'Minimum accuracy must be at least 5 metres')
+    .max(1000, 'Minimum accuracy cannot exceed 1,000 metres')
+    .optional(),
+  office_locations: z
+    .array(
+      z.object({
+        id: z.number().int().positive().optional(),
+        name: z.string().min(1, 'Office name is required').max(255),
+        latitude: z.number().min(-90, 'Latitude must be between -90 and 90').max(90, 'Latitude must be between -90 and 90'),
+        longitude: z.number().min(-180, 'Longitude must be between -180 and 180').max(180, 'Longitude must be between -180 and 180'),
+        radius_meters: z.number().int().min(10, 'Radius must be at least 10 metres').max(50000),
+        is_active: z.boolean().optional(),
+      })
+    )
+    .optional(),
 });
 
 export const updateLeavePolicySchema = z.object({

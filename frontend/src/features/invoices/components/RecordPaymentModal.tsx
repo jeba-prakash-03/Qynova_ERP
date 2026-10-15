@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { invoicesApi } from '../api';
 import { Invoice, PaymentMethod } from '../types';
 import { useToast } from '../../../shared/context/ToastContext';
-import { X, DollarSign, Check } from 'lucide-react';
+import { Modal } from '../../../shared/components/Modal';
+import { DollarSign, Check } from 'lucide-react';
+import { formatCurrency } from '../../../shared/utils/format.util';
 
 interface RecordPaymentModalProps {
   isOpen: boolean;
@@ -21,7 +23,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
   const queryClient = useQueryClient();
   const { success, error: toastError } = useToast();
 
-  const balanceDue = invoice?.balance_due || 0;
+  const balanceDue = invoice?.balance_due ?? 0;
   const [amount, setAmount] = useState<number | ''>(balanceDue);
   const [paymentDate, setPaymentDate] = useState<string>(
     new Date().toISOString().split('T')[0]
@@ -31,9 +33,9 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
   const [notes, setNotes] = useState('');
 
   // Update default amount when modal opens with new invoice
-  React.useEffect(() => {
+  useEffect(() => {
     if (invoice) {
-      setAmount(invoice.balance_due);
+      setAmount(invoice.balance_due ?? 0);
     }
   }, [invoice]);
 
@@ -48,8 +50,8 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
         notes: notes.trim() || undefined,
       });
     },
-    onSuccess: (data) => {
-      success(`Payment of ₹${amount} recorded for ${invoice?.invoice_number}`);
+    onSuccess: () => {
+      success(`Payment of ${formatCurrency(amount)} recorded for ${invoice?.invoice_number}`);
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
       queryClient.invalidateQueries({ queryKey: ['invoice', invoice?.id] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
@@ -66,155 +68,149 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
   const isOverpayment = Number(amount) > balanceDue;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-emerald-600" />
-            <h3 className="text-base font-bold text-slate-800">
-              Record Payment ({invoice.invoice_number})
-            </h3>
-          </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Record Payment (${invoice.invoice_number})`}
+      subtitle={`Client: ${invoice.client_name || 'Account billing'}`}
+      maxWidth="md"
+      footer={
+        <>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200"
+            className="px-4 py-2 border border-[#c5d0be] rounded-xl text-xs font-semibold text-[#26301f] bg-[#e2e8dc] hover:bg-[#dbe2d5] transition active:scale-95"
           >
-            <X className="w-5 h-5" />
+            Cancel
           </button>
+          <button
+            type="submit"
+            form="record-payment-form"
+            disabled={mutation.isPending || !amount || isOverpayment}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition shadow-xs active:scale-95"
+          >
+            <Check className="w-3.5 h-3.5" />
+            {mutation.isPending ? 'Recording...' : 'Record Payment'}
+          </button>
+        </>
+      }
+    >
+      <form
+        id="record-payment-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutation.mutate();
+        }}
+        className="space-y-4"
+      >
+        {/* Balance info card */}
+        <div className="p-4 bg-[#dbe2d5]/60 rounded-2xl border border-[#c5d0be]/50 text-xs space-y-1.5 shadow-2xs">
+          <div className="flex justify-between text-[#6b7663]">
+            <span>Invoice Total:</span>
+            <span className="font-semibold text-[#26301f] font-mono">{formatCurrency(invoice.total)}</span>
+          </div>
+          <div className="flex justify-between text-[#6b7663]">
+            <span>Already Paid:</span>
+            <span className="font-semibold text-[#14776b] font-mono">
+              {formatCurrency(invoice.amount_paid)}
+            </span>
+          </div>
+          <div className="flex justify-between font-bold text-[#26301f] pt-1.5 border-t border-[#c5d0be]/40 font-mono">
+            <span>Balance Due:</span>
+            <span className="text-[#c4643f]">{formatCurrency(balanceDue)}</span>
+          </div>
         </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            mutation.mutate();
-          }}
-          className="p-6 space-y-4"
-        >
-          {/* Balance info card */}
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-            <div className="flex justify-between text-slate-500">
-              <span>Invoice Total:</span>
-              <span className="font-semibold text-slate-800">₹{invoice.total.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-slate-500">
-              <span>Already Paid:</span>
-              <span className="font-semibold text-emerald-600">
-                ₹{invoice.amount_paid.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between font-bold text-slate-900 pt-1 border-t border-slate-200">
-              <span>Balance Due:</span>
-              <span className="text-rose-600">₹{balanceDue.toLocaleString()}</span>
-            </div>
-          </div>
+        {/* Payment Amount */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+            Payment Amount (₹ INR) *
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            min="1"
+            max={balanceDue}
+            required
+            value={amount}
+            onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : '')}
+            className={`w-full text-xs px-3 py-2 border rounded-xl clay-inset focus:outline-none focus:ring-2 ${
+              isOverpayment
+                ? 'border-[#c4643f] ring-2 ring-[#c4643f]/30 bg-[#f8e5df] text-[#9e3a1b]'
+                : 'border-[#c5d0be]/60 bg-[#e2e8dc] text-[#26301f] focus:ring-[#14776b]/30'
+            }`}
+          />
+          {isOverpayment && (
+            <p className="text-[11px] text-[#c4643f] mt-1 font-semibold">
+              Overpayment blocked! Amount cannot exceed balance due of {formatCurrency(balanceDue)}.
+            </p>
+          )}
+        </div>
 
-          {/* Payment Amount */}
+        {/* Payment Date & Method */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              Payment Amount (₹ INR) *
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Payment Date *
             </label>
             <input
-              type="number"
-              step="0.01"
-              min="1"
-              max={balanceDue}
+              type="date"
               required
-              value={amount}
-              onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : '')}
-              className={`w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:outline-none ${
-                isOverpayment
-                  ? 'border-rose-300 ring-2 ring-rose-200 bg-rose-50'
-                  : 'border-slate-300 focus:ring-emerald-500'
-              }`}
+              value={paymentDate}
+              onChange={(e) => setPaymentDate(e.target.value)}
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
             />
-            {isOverpayment && (
-              <p className="text-[11px] text-rose-600 mt-1">
-                Overpayment blocked! Amount cannot exceed balance due of ₹{balanceDue}.
-              </p>
-            )}
           </div>
 
-          {/* Payment Date & Method */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Payment Date *
-              </label>
-              <input
-                type="date"
-                required
-                value={paymentDate}
-                onChange={(e) => setPaymentDate(e.target.value)}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-                Method
-              </label>
-              <select
-                value={method}
-                onChange={(e) => setMethod(e.target.value as PaymentMethod)}
-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white capitalize"
-              >
-                <option value="bank_transfer">Bank Transfer (NEFT/RTGS)</option>
-                <option value="upi">UPI</option>
-                <option value="credit_card">Credit Card</option>
-                <option value="cheque">Cheque</option>
-                <option value="cash">Cash</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Reference / UTR */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              Transaction Reference / UTR
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+              Method *
             </label>
-            <input
-              type="text"
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-              placeholder="e.g. HDFC-NEFT-9988221144"
-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">
-              Internal Notes
-            </label>
-            <textarea
-              rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Optional notes regarding the clearance..."
-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            <select
+              value={method}
+              onChange={(e) => setMethod(e.target.value as PaymentMethod)}
+              className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30 capitalize"
             >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={mutation.isPending || !amount || isOverpayment}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50 transition shadow-sm"
-            >
-              <Check className="w-3.5 h-3.5" />
-              {mutation.isPending ? 'Recording...' : 'Record Payment'}
-            </button>
+              <option value="bank_transfer">Bank Transfer (NEFT/RTGS)</option>
+              <option value="upi">UPI</option>
+              <option value="credit_card">Credit Card</option>
+              <option value="cheque">Cheque</option>
+              <option value="cash">Cash</option>
+              <option value="other">Other</option>
+            </select>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        {/* Reference / UTR */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+            Transaction Reference / UTR
+          </label>
+          <input
+            type="text"
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+            placeholder="e.g. HDFC-NEFT-9988221144"
+            className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30 placeholder-[#6b7663]/60"
+          />
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6b7663] mb-1">
+            Internal Notes
+          </label>
+          <textarea
+            rows={2}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Optional notes regarding the clearance..."
+            className="w-full text-xs px-3 py-2 border border-[#c5d0be]/60 clay-inset bg-[#e2e8dc] text-[#26301f] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#14776b]/30 placeholder-[#6b7663]/60"
+          />
+        </div>
+      </form>
+    </Modal>
   );
 };
+
+export default RecordPaymentModal;

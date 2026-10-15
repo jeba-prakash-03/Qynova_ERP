@@ -14,6 +14,7 @@ import { TaskDrawer } from '../components/TaskDrawer';
 import { TaskFormModal } from '../components/TaskFormModal';
 import { useToast } from '../../../shared/context/ToastContext';
 import { Can } from '../../../shared/components/Can';
+import { Button } from '../../../shared/components/Button';
 import {
   Plus,
   Kanban,
@@ -79,24 +80,24 @@ export const TasksPage: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-            <CheckSquare className="w-7 h-7 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-[#26301f] font-display tracking-tight flex items-center gap-2.5">
+            <CheckSquare className="w-7 h-7 text-[#14776b]" />
             Task Management & Sprints
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-[#6b7663] mt-1">
             Track development workflow, sprint tasks, and server-enforced code review lifecycles.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* View switcher */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <div className="flex items-center bg-[#dbe2d5] p-1 rounded-full border border-[rgba(76,91,70,0.14)] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)]">
             <button
               onClick={() => setViewMode('kanban')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all font-display ${
                 viewMode === 'kanban'
-                  ? 'bg-white text-indigo-600 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#14776b] text-white shadow-sm font-bold'
+                  : 'text-[#35422d] hover:text-[#26301f]'
               }`}
             >
               <Kanban className="w-3.5 h-3.5" />
@@ -104,10 +105,10 @@ export const TasksPage: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all font-display ${
                 viewMode === 'list'
-                  ? 'bg-white text-indigo-600 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#14776b] text-white shadow-sm font-bold'
+                  : 'text-[#35422d] hover:text-[#26301f]'
               }`}
             >
               <List className="w-3.5 h-3.5" />
@@ -116,22 +117,23 @@ export const TasksPage: React.FC = () => {
           </div>
 
           <Can permission="tasks.create">
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              leftIcon={<Plus className="w-4 h-4" />}
               onClick={() => {
                 setTaskToEdit(null);
                 setIsCreateModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
             >
-              <Plus className="w-4 h-4" />
               New Task
-            </button>
+            </Button>
           </Can>
         </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#e2e8dc] p-4 rounded-[22px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)] flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3 flex-1">
           {/* Project filter */}
           <div className="min-w-[200px]">
@@ -140,7 +142,7 @@ export const TasksPage: React.FC = () => {
               onChange={(e) =>
                 setSelectedProjectId(e.target.value ? Number(e.target.value) : undefined)
               }
-              className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"
+              className="w-full text-xs px-3.5 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             >
               <option value="">All Projects</option>
               {projectsData?.data?.map((p) => (
@@ -156,7 +158,7 @@ export const TasksPage: React.FC = () => {
             <select
               value={selectedPriority}
               onChange={(e) => setSelectedPriority(e.target.value)}
-              className="text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"
+              className="text-xs px-3.5 py-2 border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             >
               <option value="">All Priorities</option>
               <option value="low">Low</option>
@@ -168,49 +170,54 @@ export const TasksPage: React.FC = () => {
 
           {/* Search */}
           <div className="relative min-w-[220px]">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#6b7663] absolute left-3 top-2.5" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search code or title..."
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             />
           </div>
         </div>
 
-        <div className="text-xs text-slate-500 font-medium">
-          Showing <strong>{tasks.length}</strong> tasks
+        <div className="text-xs text-[#6b7663] font-medium tabular-nums">
+          Showing <strong className="text-[#26301f]">{tasks.length}</strong> tasks
         </div>
       </div>
 
       {/* Main Content Area */}
       {isLoading ? (
-        <div className="h-64 flex items-center justify-center bg-white rounded-2xl border border-slate-200">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-44 bg-[#dbe2d5] animate-pulse rounded-[24px] border border-[rgba(76,91,70,0.14)]" />
+          ))}
         </div>
       ) : isError ? (
-        <div className="p-8 text-center bg-white rounded-2xl border border-rose-200 text-rose-600">
-          <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+        <div className="p-8 text-center bg-[#f6dfd8] rounded-[24px] border border-[#e8beae] text-[#8a3114]">
+          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-[#c4643f]" />
           <p className="font-semibold text-sm">Failed to load tasks</p>
         </div>
       ) : tasks.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-2xl border border-slate-200">
-          <CheckSquare className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-800">No tasks found</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+        <div className="p-12 text-center bg-[#e2e8dc] rounded-[26px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)]">
+          <CheckSquare className="w-10 h-10 text-[#6b7663] mx-auto mb-3" />
+          <h3 className="text-base font-bold text-[#26301f] font-display">No tasks found</h3>
+          <p className="text-xs text-[#6b7663] max-w-sm mx-auto mt-1">
             Get started by creating tasks for your projects to track deliverables and sprint progress.
           </p>
           <Can permission="tasks.create">
-            <button
+            <Button
+              variant="primary"
+              size="sm"
+              leftIcon={<Plus className="w-4 h-4" />}
+              className="mt-4"
               onClick={() => {
                 setTaskToEdit(null);
                 setIsCreateModalOpen(true);
               }}
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition"
             >
-              <Plus className="w-4 h-4" /> Create First Task
-            </button>
+              Create First Task
+            </Button>
           </Can>
         </div>
       ) : viewMode === 'kanban' ? (
@@ -221,10 +228,10 @@ export const TasksPage: React.FC = () => {
         />
       ) : (
         /* Table List View */
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div className="bg-[#e2e8dc] rounded-[24px] border border-[rgba(76,91,70,0.18)] shadow-[8px_10px_24px_rgba(88,104,84,0.25),-6px_-7px_18px_rgba(255,255,255,0.75)] overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+            <table className="w-full text-left text-xs min-w-[700px]">
+              <thead className="bg-[#dbe2d5] border-b border-[rgba(76,91,70,0.14)] text-[#26301f] font-semibold uppercase tracking-wider text-[11px] font-display">
                 <tr>
                   <th className="px-5 py-3.5">Code</th>
                   <th className="px-5 py-3.5">Title</th>
@@ -236,29 +243,33 @@ export const TasksPage: React.FC = () => {
                   <th className="px-5 py-3.5">Due Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[rgba(76,91,70,0.10)] text-[#35422d]">
                 {tasks.map((task) => (
                   <tr
                     key={task.id}
                     onClick={() => setActiveTaskId(task.id)}
-                    className="hover:bg-slate-50/80 cursor-pointer transition"
+                    className="hover:bg-[#dbe2d5]/60 cursor-pointer transition-colors"
                   >
-                    <td className="px-5 py-3.5 font-mono font-bold text-indigo-600">
+                    <td className="px-5 py-3.5 font-mono font-bold text-[#14776b]">
                       {task.task_code}
                     </td>
-                    <td className="px-5 py-3.5 font-semibold text-slate-800 max-w-xs truncate">
+                    <td className="px-5 py-3.5 font-semibold text-[#26301f] max-w-xs truncate font-display">
                       {task.title}
                     </td>
-                    <td className="px-5 py-3.5 text-slate-500 font-medium">
+                    <td className="px-5 py-3.5 text-[#6b7663] font-medium">
                       {task.project_name || '—'}
                     </td>
-                    <td className="px-5 py-3.5 text-slate-600 font-medium">
+                    <td className="px-5 py-3.5 text-[#35422d] font-medium">
                       {task.assignee_name || 'Unassigned'}
                     </td>
                     <td className="px-5 py-3.5">
                       <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${
-                          TASK_PRIORITY_CONFIG[task.priority]?.badge
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                          task.priority === 'critical'
+                            ? 'bg-[#f6dfd8] text-[#8a3114] border-[#e8beae]'
+                            : task.priority === 'high'
+                            ? 'bg-[#f7efdd] text-[#855b11] border-[#e6d4a8]'
+                            : 'bg-[#dbe2d5] text-[#3c4535] border-[#c0cbba]'
                         }`}
                       >
                         {task.priority}
@@ -266,20 +277,20 @@ export const TasksPage: React.FC = () => {
                     </td>
                     <td className="px-5 py-3.5">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold capitalize border ${
-                          TASK_STATUS_CONFIG[task.status]?.bg || 'bg-slate-100'
-                        } ${TASK_STATUS_CONFIG[task.status]?.color || 'text-slate-700'} ${
-                          TASK_STATUS_CONFIG[task.status]?.border || 'border-slate-200'
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize border ${
+                          TASK_STATUS_CONFIG[task.status]?.bg || 'bg-[#dbe2d5]'
+                        } ${TASK_STATUS_CONFIG[task.status]?.color || 'text-[#26301f]'} ${
+                          TASK_STATUS_CONFIG[task.status]?.border || 'border-[rgba(76,91,70,0.18)]'
                         }`}
                       >
                         {TASK_STATUS_CONFIG[task.status]?.label || task.status}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-slate-600 font-medium">
+                    <td className="px-5 py-3.5 text-[#35422d] font-medium tabular-nums">
                       {Number(task.actual_hours || 0).toFixed(1)}h /{' '}
                       {Number(task.estimated_hours || 0).toFixed(1)}h
                     </td>
-                    <td className="px-5 py-3.5 text-slate-400">
+                    <td className="px-5 py-3.5 text-[#6b7663] tabular-nums">
                       {task.due_date ? task.due_date.split('T')[0] : '—'}
                     </td>
                   </tr>

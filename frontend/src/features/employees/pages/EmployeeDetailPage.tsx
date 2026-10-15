@@ -1161,6 +1161,27 @@ export const EmployeeDetailPage: React.FC = () => {
         isOpen={isOfferModalOpen}
         onClose={() => setIsOfferModalOpen(false)}
         title="Generate Offer Letter PDF"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsOfferModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              isLoading={offerLetterMutation.isPending}
+              leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+              onClick={() => {
+                offerLetterMutation.mutate({
+                  designation_name: offerDesignation,
+                  joining_date: offerJoiningDate,
+                  salary_ctc: offerSalaryCtc,
+                });
+              }}
+            >
+              Generate & Archive PDF
+            </Button>
+          </>
+        }
       >
         <div className="space-y-4 text-xs">
           <p className="text-[#6b7663]">
@@ -1203,26 +1224,6 @@ export const EmployeeDetailPage: React.FC = () => {
               placeholder="e.g. ₹ 8,50,000 per annum"
               className="w-full px-3.5 py-2.5 text-xs bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] border border-[rgba(76,91,70,0.2)] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             />
-          </div>
-
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[rgba(76,91,70,0.15)]">
-            <Button variant="secondary" onClick={() => setIsOfferModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              isLoading={offerLetterMutation.isPending}
-              leftIcon={<Sparkles className="w-3.5 h-3.5" />}
-              onClick={() => {
-                offerLetterMutation.mutate({
-                  designation_name: offerDesignation,
-                  joining_date: offerJoiningDate,
-                  salary_ctc: offerSalaryCtc,
-                });
-              }}
-            >
-              Generate & Archive PDF
-            </Button>
           </div>
         </div>
       </Modal>

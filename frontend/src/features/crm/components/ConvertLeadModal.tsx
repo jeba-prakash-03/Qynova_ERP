@@ -8,6 +8,7 @@ import { FormField } from '../../../shared/components/FormField';
 import { useToast } from '../../../shared/context/ToastContext';
 import axiosClient from '../../../shared/api/axiosClient';
 import { CheckCircle2, Building, FolderKanban, ArrowRight } from 'lucide-react';
+import { formatCurrency } from '../../../shared/utils/format.util';
 
 interface ConvertLeadModalProps {
   isOpen: boolean;
@@ -104,8 +105,8 @@ export const ConvertLeadModal: React.FC<ConvertLeadModalProps> = ({
           </div>
           <p className="mt-1 text-xs text-emerald-700 leading-relaxed">
             Converting will automatically generate active records in <strong>Clients Directory</strong> and{' '}
-            <strong>Projects Management</strong> with committed budget: ₹
-            {lead.estimated_value.toLocaleString()}.
+            <strong>Projects Management</strong> with committed budget:{' '}
+            {formatCurrency(lead.estimated_value)}.
           </p>
         </div>
 

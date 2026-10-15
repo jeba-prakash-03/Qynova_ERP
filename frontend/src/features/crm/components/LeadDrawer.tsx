@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
@@ -24,6 +25,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { crmApi } from '../api';
+import { formatCurrency } from '../../../shared/utils/format.util';
 import {
   Lead,
   LeadStage,
@@ -141,12 +143,35 @@ export const LeadDrawer: React.FC<LeadDrawerProps> = ({
     }
   };
 
+  // Lock body scroll and handle Escape key
+  useEffect(() => {
+    if (!lead) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [lead, onClose]);
+
   const stageConf = lead ? LEAD_STAGES_CONFIG[lead.stage] : null;
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/40 backdrop-blur-xs transition-opacity">
-      <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <div className="w-screen max-w-xl bg-white shadow-2xl flex flex-col">
+  return createPortal(
+    <>
+      <div
+        className="fixed inset-0 z-50 overflow-hidden bg-[#26301f]/50 backdrop-blur-xs flex justify-end"
+        onClick={onClose}
+      >
+        <div
+          className="w-full max-w-xl bg-white shadow-2xl flex flex-col h-full transform transition-transform duration-300 ease-in-out"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
             <div className="flex items-center space-x-3">
@@ -297,16 +322,18 @@ export const LeadDrawer: React.FC<LeadDrawerProps> = ({
                 <div>
                   <span className="text-slate-400">Deal Value:</span>
                   <p className="text-base font-bold font-mono text-slate-900 mt-0.5">
-                    ₹{lead.estimated_value.toLocaleString()}
+                    {formatCurrency(lead.estimated_value)}
                   </p>
                 </div>
 
                 <div>
                   <span className="text-slate-400">Weighted Forecast:</span>
                   <p className="text-base font-bold font-mono text-indigo-600 mt-0.5">
-                    ₹{((lead.estimated_value * lead.probability_percent) / 100).toLocaleString()}
+                    {lead.estimated_value != null
+                      ? formatCurrency((Number(lead.estimated_value) * Number(lead.probability_percent || 0)) / 100)
+                      : '—'}
                     <span className="text-xs font-normal text-slate-500 ml-1">
-                      ({lead.probability_percent}%)
+                      ({lead.probability_percent ?? 0}%)
                     </span>
                   </p>
                 </div>
@@ -483,6 +510,7 @@ export const LeadDrawer: React.FC<LeadDrawerProps> = ({
           lead={lead}
         />
       )}
-    </div>
+    </>,
+    document.body
   );
 };

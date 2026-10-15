@@ -51,6 +51,11 @@ export class AttendanceRepository {
     is_early_checkout?: boolean;
     remarks?: string | null;
     edited_by?: number | null;
+    check_in_latitude?: number | null;
+    check_in_longitude?: number | null;
+    check_in_accuracy?: number | null;
+    check_in_distance_meters?: number | null;
+    office_location_id?: number | null;
   }): Promise<Attendance> {
     const [id] = await db('attendance').insert({
       employee_id: data.employee_id,
@@ -66,6 +71,11 @@ export class AttendanceRepository {
       is_early_checkout: Boolean(data.is_early_checkout),
       remarks: data.remarks || null,
       edited_by: data.edited_by || null,
+      check_in_latitude: data.check_in_latitude ?? null,
+      check_in_longitude: data.check_in_longitude ?? null,
+      check_in_accuracy: data.check_in_accuracy ?? null,
+      check_in_distance_meters: data.check_in_distance_meters ?? null,
+      office_location_id: data.office_location_id ?? null,
     });
 
     return (await this.findById(id))!;
@@ -84,6 +94,11 @@ export class AttendanceRepository {
     if (data.is_early_checkout !== undefined) payload.is_early_checkout = data.is_early_checkout;
     if (data.remarks !== undefined) payload.remarks = data.remarks;
     if (data.edited_by !== undefined) payload.edited_by = data.edited_by;
+    if (data.check_in_latitude !== undefined) payload.check_in_latitude = data.check_in_latitude;
+    if (data.check_in_longitude !== undefined) payload.check_in_longitude = data.check_in_longitude;
+    if (data.check_in_accuracy !== undefined) payload.check_in_accuracy = data.check_in_accuracy;
+    if (data.check_in_distance_meters !== undefined) payload.check_in_distance_meters = data.check_in_distance_meters;
+    if (data.office_location_id !== undefined) payload.office_location_id = data.office_location_id;
     payload.updated_at = db.fn.now();
 
     await db('attendance').where({ id }).update(payload);
@@ -298,6 +313,11 @@ export class AttendanceRepository {
       is_early_checkout: Boolean(row.is_early_checkout),
       remarks: row.remarks,
       edited_by: row.edited_by ? Number(row.edited_by) : null,
+      check_in_latitude: row.check_in_latitude !== null && row.check_in_latitude !== undefined ? Number(row.check_in_latitude) : null,
+      check_in_longitude: row.check_in_longitude !== null && row.check_in_longitude !== undefined ? Number(row.check_in_longitude) : null,
+      check_in_accuracy: row.check_in_accuracy !== null && row.check_in_accuracy !== undefined ? Number(row.check_in_accuracy) : null,
+      check_in_distance_meters: row.check_in_distance_meters !== null && row.check_in_distance_meters !== undefined ? Number(row.check_in_distance_meters) : null,
+      office_location_id: row.office_location_id ? Number(row.office_location_id) : null,
       created_at: row.created_at,
       updated_at: row.updated_at,
       breaks,

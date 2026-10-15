@@ -39,7 +39,7 @@ export class AuthController {
       { sent: true },
       200,
       undefined,
-      'If your email is registered, password reset instructions have been sent.'
+      'Password reset instructions have been sent to your email.'
     );
   });
 

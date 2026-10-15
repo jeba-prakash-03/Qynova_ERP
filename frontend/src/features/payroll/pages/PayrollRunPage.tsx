@@ -372,8 +372,23 @@ export const PayrollRunPage: React.FC = () => {
           isOpen={Boolean(selectedAdjustmentEmployee)}
           onClose={() => setSelectedAdjustmentEmployee(null)}
           title={`Adjustments for ${selectedAdjustmentEmployee.employee_name}`}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => setSelectedAdjustmentEmployee(null)}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                form="payroll-adj-form"
+                variant="primary"
+                isLoading={adjustmentMutation.isPending}
+              >
+                Save Adjustments
+              </Button>
+            </>
+          }
         >
-          <form onSubmit={handleSaveAdjustment} className="space-y-4 text-xs">
+          <form id="payroll-adj-form" onSubmit={handleSaveAdjustment} className="space-y-4 text-xs">
             <p className="text-[#6b7663]">
               Add pre-run incentives, bonus, allowances, overtime, PF, and deductions for month {selectedMonth}.
             </p>
@@ -450,15 +465,6 @@ export const PayrollRunPage: React.FC = () => {
                 className="w-full text-xs border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] rounded-[12px] p-2 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
               />
             </FormField>
-
-            <div className="flex justify-end gap-2 pt-3 border-t border-[rgba(76,91,70,0.14)]">
-              <Button variant="secondary" onClick={() => setSelectedAdjustmentEmployee(null)}>
-                Cancel
-              </Button>
-              <Button variant="primary" type="submit" isLoading={adjustmentMutation.isPending}>
-                Save Adjustments
-              </Button>
-            </div>
           </form>
         </Modal>
       )}

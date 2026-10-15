@@ -98,6 +98,12 @@ export class HolidaysRepository {
     if (data.late_grace_minutes !== undefined) updatePayload.late_grace_minutes = data.late_grace_minutes;
     if (data.min_hours_full_day !== undefined) updatePayload.min_hours_full_day = data.min_hours_full_day;
     if (data.min_hours_half_day !== undefined) updatePayload.min_hours_half_day = data.min_hours_half_day;
+    if (data.geofencing_enabled !== undefined) updatePayload.geofencing_enabled = data.geofencing_enabled;
+    if (data.office_name !== undefined) updatePayload.office_name = data.office_name;
+    if (data.office_latitude !== undefined) updatePayload.office_latitude = data.office_latitude;
+    if (data.office_longitude !== undefined) updatePayload.office_longitude = data.office_longitude;
+    if (data.office_radius_meters !== undefined) updatePayload.office_radius_meters = data.office_radius_meters;
+    if (data.min_location_accuracy_meters !== undefined) updatePayload.min_location_accuracy_meters = data.min_location_accuracy_meters;
     updatePayload.updated_at = db.fn.now();
 
     await db('work_settings').where({ id: current.id }).update(updatePayload);
@@ -132,6 +138,12 @@ export class HolidaysRepository {
       late_grace_minutes: Number(row.late_grace_minutes),
       min_hours_full_day: Number(row.min_hours_full_day),
       min_hours_half_day: Number(row.min_hours_half_day),
+      geofencing_enabled: Boolean(row.geofencing_enabled),
+      office_name: row.office_name ?? null,
+      office_latitude: row.office_latitude !== null && row.office_latitude !== undefined ? Number(row.office_latitude) : null,
+      office_longitude: row.office_longitude !== null && row.office_longitude !== undefined ? Number(row.office_longitude) : null,
+      office_radius_meters: row.office_radius_meters !== null && row.office_radius_meters !== undefined ? Number(row.office_radius_meters) : 100,
+      min_location_accuracy_meters: row.min_location_accuracy_meters !== null && row.min_location_accuracy_meters !== undefined ? Number(row.min_location_accuracy_meters) : 50,
       created_at: row.created_at,
       updated_at: row.updated_at,
     };

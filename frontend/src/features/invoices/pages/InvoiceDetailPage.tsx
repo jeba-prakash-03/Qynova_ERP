@@ -2,17 +2,13 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  FileText,
   ArrowLeft,
   Download,
   CreditCard,
   Building2,
   Calendar,
   Layers,
-  CheckCircle,
   Clock,
-  AlertCircle,
-  DollarSign,
   Send,
   Eye,
   XCircle,
@@ -21,7 +17,7 @@ import { invoicesApi } from '../api';
 import { InvoiceStatus, INVOICE_STATUS_CONFIG } from '../types';
 import { RecordPaymentModal } from '../components/RecordPaymentModal';
 import { Can } from '../../../shared/components/Can';
-import { Loader } from '../../../shared/components/Loader';
+import { SkeletonCard, SkeletonTable } from '../../../shared/components/Loader';
 import { ErrorState } from '../../../shared/components/ErrorState';
 import { useToast } from '../../../shared/context/ToastContext';
 
@@ -82,8 +78,9 @@ export const InvoiceDetailPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <Loader size="lg" text="Loading invoice details..." />
+      <div className="space-y-6">
+        <SkeletonCard lines={5} />
+        <SkeletonCard lines={4} />
       </div>
     );
   }
@@ -105,9 +102,9 @@ export const InvoiceDetailPage: React.FC = () => {
 
   const statusConfig = INVOICE_STATUS_CONFIG[invoice.status] || {
     label: invoice.status,
-    bg: 'bg-slate-100',
-    color: 'text-slate-700',
-    border: 'border-slate-200',
+    bg: 'bg-[#dbe2d5]',
+    color: 'text-[#26301f]',
+    border: 'border-[#c5d0be]',
   };
 
   const balanceDue = Number(invoice.balance_due) || 0;
@@ -121,22 +118,22 @@ export const InvoiceDetailPage: React.FC = () => {
         <div className="flex items-center space-x-4">
           <Link
             to="/invoices"
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-800"
+            className="flex h-10 w-10 items-center justify-center rounded-xl clay-card text-[#6b7663] transition hover:text-[#14776b]"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+              <h1 className="text-2xl font-bold tracking-tight text-[#26301f] font-mono">
                 {invoice.invoice_number}
               </h1>
               <span
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border ${statusConfig.bg} ${statusConfig.color} ${statusConfig.border}`}
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${statusConfig.bg} ${statusConfig.color} ${statusConfig.border}`}
               >
                 {statusConfig.label}
               </span>
             </div>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-xs text-[#6b7663]">
               Created on {new Date(invoice.created_at).toLocaleDateString()}
             </p>
           </div>
@@ -150,9 +147,9 @@ export const InvoiceDetailPage: React.FC = () => {
               <button
                 onClick={() => updateStatusMutation.mutate('sent')}
                 disabled={updateStatusMutation.isPending}
-                className="inline-flex items-center space-x-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+                className="inline-flex items-center space-x-1.5 rounded-xl border border-[#c5d0be] bg-[#e2e8dc] px-3.5 py-2 text-xs font-semibold text-[#26301f] shadow-xs transition hover:bg-[#dbe2d5] disabled:opacity-50"
               >
-                <Send className="h-4 w-4 text-sky-600" />
+                <Send className="h-4 w-4 text-[#14776b]" />
                 <span>Mark Sent</span>
               </button>
             </Can>
@@ -163,9 +160,9 @@ export const InvoiceDetailPage: React.FC = () => {
               <button
                 onClick={() => updateStatusMutation.mutate('viewed')}
                 disabled={updateStatusMutation.isPending}
-                className="inline-flex items-center space-x-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+                className="inline-flex items-center space-x-1.5 rounded-xl border border-[#c5d0be] bg-[#e2e8dc] px-3.5 py-2 text-xs font-semibold text-[#26301f] shadow-xs transition hover:bg-[#dbe2d5] disabled:opacity-50"
               >
-                <Eye className="h-4 w-4 text-indigo-600" />
+                <Eye className="h-4 w-4 text-[#14776b]" />
                 <span>Mark Viewed</span>
               </button>
             </Can>
@@ -180,9 +177,9 @@ export const InvoiceDetailPage: React.FC = () => {
                   }
                 }}
                 disabled={updateStatusMutation.isPending}
-                className="inline-flex items-center space-x-1.5 rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm font-medium text-rose-700 shadow-sm transition hover:bg-rose-50 disabled:opacity-50"
+                className="inline-flex items-center space-x-1.5 rounded-xl border border-[#c4643f]/30 bg-[#c4643f]/10 px-3.5 py-2 text-xs font-semibold text-[#9e3a1b] shadow-xs transition hover:bg-[#c4643f]/20 disabled:opacity-50"
               >
-                <XCircle className="h-4 w-4 text-rose-500" />
+                <XCircle className="h-4 w-4 text-[#c4643f]" />
                 <span>Cancel Invoice</span>
               </button>
             </Can>
@@ -191,9 +188,9 @@ export const InvoiceDetailPage: React.FC = () => {
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloading}
-            className="inline-flex items-center space-x-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+            className="inline-flex items-center space-x-2 rounded-xl border border-[#c5d0be] bg-[#e2e8dc] px-3.5 py-2 text-xs font-semibold text-[#26301f] shadow-xs transition hover:bg-[#dbe2d5] disabled:opacity-50"
           >
-            <Download className="h-4 w-4 text-slate-500" />
+            <Download className="h-4 w-4 text-[#6b7663]" />
             <span>{isDownloading ? 'Generating...' : 'Download PDF'}</span>
           </button>
 
@@ -201,7 +198,7 @@ export const InvoiceDetailPage: React.FC = () => {
             <Can permission="payments.create">
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
-                className="inline-flex items-center space-x-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-700"
+                className="inline-flex items-center space-x-2 rounded-xl bg-[#14776b] hover:bg-[#11655b] px-4 py-2 text-xs font-semibold text-white shadow-sm transition active:scale-[0.98]"
               >
                 <CreditCard className="h-4 w-4" />
                 <span>Record Payment</span>
@@ -214,40 +211,40 @@ export const InvoiceDetailPage: React.FC = () => {
       {/* Overview Cards */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Bill To & Details */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="clay-card rounded-2xl border border-[#c5d0be]/50 p-6">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
             Client & Project Details
           </h2>
           <div className="mt-4 space-y-4">
             <div>
-              <span className="text-xs text-slate-400">Bill To</span>
+              <span className="text-xs text-[#6b7663]">Bill To</span>
               <div className="mt-1 flex items-center space-x-2">
-                <Building2 className="h-4 w-4 text-slate-400" />
+                <Building2 className="h-4 w-4 text-[#6b7663]/70" />
                 <Link
                   to={`/clients/${invoice.client_id}`}
-                  className="font-medium text-slate-900 hover:text-indigo-600"
+                  className="font-semibold text-[#26301f] hover:text-[#14776b] transition-colors"
                 >
                   {invoice.client_company || invoice.client_name || `Client #${invoice.client_id}`}
                 </Link>
               </div>
               {invoice.client_gstin && (
-                <p className="mt-1 text-xs text-slate-500">GSTIN: {invoice.client_gstin}</p>
+                <p className="mt-1 text-xs text-[#6b7663]">GSTIN: {invoice.client_gstin}</p>
               )}
             </div>
 
             {invoice.project_id && (
-              <div className="border-t border-slate-100 pt-3">
-                <span className="text-xs text-slate-400">Associated Project</span>
+              <div className="border-t border-[#c5d0be]/40 pt-3">
+                <span className="text-xs text-[#6b7663]">Associated Project</span>
                 <div className="mt-1 flex items-center space-x-2">
-                  <Layers className="h-4 w-4 text-slate-400" />
+                  <Layers className="h-4 w-4 text-[#6b7663]/70" />
                   <Link
                     to={`/projects/${invoice.project_id}`}
-                    className="font-medium text-slate-900 hover:text-indigo-600"
+                    className="font-semibold text-[#26301f] hover:text-[#14776b] transition-colors"
                   >
                     {invoice.project_name || `Project #${invoice.project_id}`}
                   </Link>
                   {invoice.project_code && (
-                    <span className="font-mono text-xs text-slate-500">
+                    <span className="font-mono text-xs text-[#6b7663]">
                       ({invoice.project_code})
                     </span>
                   )}
@@ -256,9 +253,9 @@ export const InvoiceDetailPage: React.FC = () => {
             )}
 
             {invoice.milestone_title && (
-              <div className="border-t border-slate-100 pt-3">
-                <span className="text-xs text-slate-400">Milestone</span>
-                <p className="mt-1 text-sm font-medium text-slate-800">
+              <div className="border-t border-[#c5d0be]/40 pt-3">
+                <span className="text-xs text-[#6b7663]">Milestone</span>
+                <p className="mt-1 text-sm font-semibold text-[#26301f]">
                   {invoice.milestone_title}
                 </p>
               </div>
@@ -267,26 +264,26 @@ export const InvoiceDetailPage: React.FC = () => {
         </div>
 
         {/* Dates & Timeline */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="clay-card rounded-2xl border border-[#c5d0be]/50 p-6">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
             Timeline & Terms
           </h2>
           <div className="mt-4 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span className="text-sm text-slate-500 flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-slate-400" /> Issue Date:
+            <div className="flex items-center justify-between border-b border-[#c5d0be]/40 pb-3">
+              <span className="text-sm text-[#6b7663] flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-[#6b7663]/70" /> Issue Date:
               </span>
-              <span className="text-sm font-medium text-slate-900">
+              <span className="text-sm font-semibold font-mono text-[#26301f]">
                 {new Date(invoice.issue_date).toLocaleDateString()}
               </span>
             </div>
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span className="text-sm text-slate-500 flex items-center gap-2">
-                <Clock className="h-4 w-4 text-slate-400" /> Due Date:
+            <div className="flex items-center justify-between border-b border-[#c5d0be]/40 pb-3">
+              <span className="text-sm text-[#6b7663] flex items-center gap-2">
+                <Clock className="h-4 w-4 text-[#6b7663]/70" /> Due Date:
               </span>
               <span
-                className={`text-sm font-medium ${
-                  invoice.status === 'overdue' ? 'text-rose-600' : 'text-slate-900'
+                className={`text-sm font-semibold font-mono ${
+                  invoice.status === 'overdue' ? 'text-[#c4643f]' : 'text-[#26301f]'
                 }`}
               >
                 {new Date(invoice.due_date).toLocaleDateString()}
@@ -294,40 +291,40 @@ export const InvoiceDetailPage: React.FC = () => {
             </div>
             {invoice.terms && (
               <div>
-                <span className="text-xs text-slate-400">Terms:</span>
-                <p className="mt-1 text-xs text-slate-600 italic">{invoice.terms}</p>
+                <span className="text-xs text-[#6b7663]">Terms:</span>
+                <p className="mt-1 text-xs text-[#26301f]/80 italic">{invoice.terms}</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Financial Summary */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="clay-card rounded-2xl border border-[#c5d0be]/50 p-6">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
             Financial Balance
           </h2>
           <div className="mt-4 space-y-3">
-            <div className="flex justify-between text-sm text-slate-600">
+            <div className="flex justify-between text-sm text-[#6b7663]">
               <span>Subtotal:</span>
-              <span className="font-medium text-slate-900">{formatCurrency(invoice.subtotal)}</span>
+              <span className="font-semibold font-mono text-[#26301f]">{formatCurrency(invoice.subtotal)}</span>
             </div>
-            <div className="flex justify-between text-sm text-slate-600">
+            <div className="flex justify-between text-sm text-[#6b7663]">
               <span>GST ({invoice.tax_percent}%):</span>
-              <span className="font-medium text-slate-900">{formatCurrency(invoice.tax_amount)}</span>
+              <span className="font-semibold font-mono text-[#26301f]">{formatCurrency(invoice.tax_amount)}</span>
             </div>
-            <div className="flex justify-between border-t border-slate-200 pt-3 text-base font-bold text-slate-900">
+            <div className="flex justify-between border-t border-[#c5d0be]/40 pt-3 text-base font-bold text-[#26301f]">
               <span>Total:</span>
-              <span>{formatCurrency(invoice.total)}</span>
+              <span className="font-mono">{formatCurrency(invoice.total)}</span>
             </div>
-            <div className="flex justify-between text-sm text-emerald-700">
-              <span>Amount Paid:</span>
-              <span className="font-semibold">{formatCurrency(invoice.amount_paid)}</span>
+            <div className="flex justify-between text-sm text-[#14776b]">
+              <span className="font-medium">Amount Paid:</span>
+              <span className="font-bold font-mono">{formatCurrency(invoice.amount_paid)}</span>
             </div>
             <div
-              className={`flex justify-between rounded-lg p-2.5 text-sm font-bold ${
+              className={`flex justify-between rounded-xl p-3 text-sm font-bold font-mono clay-inset ${
                 balanceDue > 0
-                  ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  ? 'text-[#c4643f] border border-[#c4643f]/30'
+                  : 'text-[#14776b] border border-[#14776b]/30'
               }`}
             >
               <span>Balance Due:</span>
@@ -338,13 +335,13 @@ export const InvoiceDetailPage: React.FC = () => {
       </div>
 
       {/* Invoice Line Items */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 bg-slate-50 px-6 py-4">
-          <h2 className="text-base font-semibold text-slate-900">Line Items</h2>
+      <div className="clay-card rounded-2xl border border-[#c5d0be]/50 overflow-hidden">
+        <div className="border-b border-[#c5d0be]/40 bg-[#dbe2d5]/40 px-6 py-4">
+          <h2 className="text-base font-bold font-baloo text-[#26301f]">Line Items</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="border-b border-slate-200 bg-slate-100/75 text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <table className="w-full text-left text-sm min-w-[640px]">
+            <thead className="border-b border-[#c5d0be]/40 bg-[#dbe2d5]/30 text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
               <tr>
                 <th className="py-3 pl-6 pr-4">#</th>
                 <th className="px-4 py-3">Description</th>
@@ -353,56 +350,56 @@ export const InvoiceDetailPage: React.FC = () => {
                 <th className="py-3 pl-4 pr-6 text-right">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-[#c5d0be]/30">
               {invoice.items && invoice.items.length > 0 ? (
                 invoice.items.map((item, idx) => (
-                  <tr key={item.id || idx} className="hover:bg-slate-50/50">
-                    <td className="py-3.5 pl-6 pr-4 font-mono text-xs text-slate-400">
+                  <tr key={item.id || idx} className="hover:bg-[#dbe2d5]/30 transition-colors">
+                    <td className="py-3.5 pl-6 pr-4 font-mono text-xs text-[#6b7663]">
                       {idx + 1}
                     </td>
-                    <td className="px-4 py-3.5 font-medium text-slate-900">
+                    <td className="px-4 py-3.5 font-medium text-[#26301f]">
                       {item.description}
                     </td>
-                    <td className="px-4 py-3.5 text-right font-mono">{item.quantity}</td>
-                    <td className="px-4 py-3.5 text-right font-mono">
+                    <td className="px-4 py-3.5 text-right font-mono text-[#26301f]">{item.quantity}</td>
+                    <td className="px-4 py-3.5 text-right font-mono text-[#26301f]">
                       {formatCurrency(item.unit_price)}
                     </td>
-                    <td className="py-3.5 pl-4 pr-6 text-right font-mono font-medium text-slate-900">
+                    <td className="py-3.5 pl-4 pr-6 text-right font-mono font-semibold text-[#26301f]">
                       {formatCurrency(item.amount)}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-slate-400">
+                  <td colSpan={5} className="py-8 text-center text-[#6b7663]">
                     No line items listed on this invoice.
                   </td>
                 </tr>
               )}
             </tbody>
             {invoice.items && invoice.items.length > 0 && (
-              <tfoot className="border-t-2 border-slate-200 bg-slate-50 font-medium text-slate-900">
+              <tfoot className="border-t border-[#c5d0be]/40 bg-[#dbe2d5]/40 font-medium text-[#26301f]">
                 <tr>
                   <td colSpan={4} className="py-3 text-right">
                     Subtotal:
                   </td>
-                  <td className="py-3 pr-6 text-right font-mono">
+                  <td className="py-3 pr-6 text-right font-mono font-semibold">
                     {formatCurrency(invoice.subtotal)}
                   </td>
                 </tr>
                 <tr>
-                  <td colSpan={4} className="py-2 text-right text-slate-600">
+                  <td colSpan={4} className="py-2 text-right text-[#6b7663]">
                     Tax / GST ({invoice.tax_percent}%):
                   </td>
-                  <td className="py-2 pr-6 text-right font-mono text-slate-600">
+                  <td className="py-2 pr-6 text-right font-mono text-[#6b7663]">
                     {formatCurrency(invoice.tax_amount)}
                   </td>
                 </tr>
-                <tr className="border-t border-slate-200 font-bold">
+                <tr className="border-t border-[#c5d0be]/40 font-bold">
                   <td colSpan={4} className="py-3 text-right text-base">
                     Total Amount:
                   </td>
-                  <td className="py-3 pr-6 text-right font-mono text-base text-indigo-700">
+                  <td className="py-3 pr-6 text-right font-mono text-base text-[#14776b]">
                     {formatCurrency(invoice.total)}
                   </td>
                 </tr>
@@ -413,17 +410,17 @@ export const InvoiceDetailPage: React.FC = () => {
       </div>
 
       {/* Payment History */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-6 py-4">
+      <div className="clay-card rounded-2xl border border-[#c5d0be]/50 overflow-hidden">
+        <div className="flex items-center justify-between border-b border-[#c5d0be]/40 bg-[#dbe2d5]/40 px-6 py-4">
           <div className="flex items-center space-x-2">
-            <CreditCard className="h-5 w-5 text-slate-600" />
-            <h2 className="text-base font-semibold text-slate-900">Payment Transactions</h2>
+            <CreditCard className="h-5 w-5 text-[#14776b]" />
+            <h2 className="text-base font-bold font-baloo text-[#26301f]">Payment Transactions</h2>
           </div>
           {!isPaid && !isCancelled && (
             <Can permission="payments.create">
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
-                className="inline-flex items-center space-x-1.5 rounded-md bg-white border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                className="inline-flex items-center space-x-1.5 rounded-xl bg-[#14776b] hover:bg-[#11655b] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs transition"
               >
                 <span>+ Add Payment</span>
               </button>
@@ -432,8 +429,8 @@ export const InvoiceDetailPage: React.FC = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-600">
-            <thead className="border-b border-slate-200 bg-slate-100/75 text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <table className="w-full text-left text-sm min-w-[640px]">
+            <thead className="border-b border-[#c5d0be]/40 bg-[#dbe2d5]/30 text-xs font-semibold uppercase tracking-wider text-[#6b7663]">
               <tr>
                 <th className="py-3 pl-6 pr-4">Payment #</th>
                 <th className="px-4 py-3">Date</th>
@@ -443,33 +440,33 @@ export const InvoiceDetailPage: React.FC = () => {
                 <th className="py-3 pl-4 pr-6 text-right">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-[#c5d0be]/30">
               {invoice.payments && invoice.payments.length > 0 ? (
                 invoice.payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50/50">
-                    <td className="py-3.5 pl-6 pr-4 font-mono text-xs font-medium text-slate-900">
+                  <tr key={p.id} className="hover:bg-[#dbe2d5]/30 transition-colors">
+                    <td className="py-3.5 pl-6 pr-4 font-mono text-xs font-semibold text-[#14776b]">
                       {p.payment_number}
                     </td>
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5 text-[#26301f]">
                       {new Date(p.payment_date).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3.5 capitalize">
+                    <td className="px-4 py-3.5 capitalize text-[#26301f]">
                       {p.method.replace('_', ' ')}
                     </td>
-                    <td className="px-4 py-3.5 font-mono text-xs text-slate-500">
+                    <td className="px-4 py-3.5 font-mono text-xs text-[#6b7663]">
                       {p.reference || '-'}
                     </td>
-                    <td className="px-4 py-3.5 text-slate-700">
+                    <td className="px-4 py-3.5 text-[#26301f]">
                       {p.recorded_by_name || 'System'}
                     </td>
-                    <td className="py-3.5 pl-4 pr-6 text-right font-mono font-semibold text-emerald-700">
+                    <td className="py-3.5 pl-4 pr-6 text-right font-mono font-bold text-[#14776b]">
                       {formatCurrency(p.amount)}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400">
+                  <td colSpan={6} className="py-8 text-center text-[#6b7663]">
                     No payments have been recorded for this invoice yet.
                   </td>
                 </tr>

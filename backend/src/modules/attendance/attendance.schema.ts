@@ -3,6 +3,9 @@ import { z } from 'zod';
 export const checkInSchema = z.object({
   work_type: z.enum(['office', 'wfh']).default('office').optional(),
   remarks: z.string().max(500).optional(),
+  latitude: z.number().min(-90, 'Latitude must be between -90 and 90').max(90, 'Latitude must be between -90 and 90').optional(),
+  longitude: z.number().min(-180, 'Longitude must be between -180 and 180').max(180, 'Longitude must be between -180 and 180').optional(),
+  accuracy: z.number().positive('Accuracy must be a positive number in metres').optional(),
 });
 
 export const checkOutSchema = z.object({

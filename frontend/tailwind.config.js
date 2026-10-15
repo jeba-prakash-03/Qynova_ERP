@@ -76,6 +76,7 @@ export default {
       boxShadow: {
         'clay-raised': '8px 10px 24px rgba(88, 104, 84, 0.28), -6px -7px 18px rgba(255, 255, 255, 0.78)',
         'clay-raised-sm': '4px 6px 14px rgba(88, 104, 84, 0.22), -3px -4px 10px rgba(255, 255, 255, 0.75)',
+        'clay-raised-hover': '10px 14px 28px rgba(88, 104, 84, 0.32), -8px -9px 22px rgba(255, 255, 255, 0.85)',
         'clay-raised-lg': '12px 14px 30px rgba(88, 104, 84, 0.30), -8px -10px 22px rgba(255, 255, 255, 0.85)',
         'clay-inset': 'inset 4px 5px 10px rgba(104, 118, 100, 0.30), inset -3px -4px 9px rgba(255, 255, 255, 0.70)',
         'clay-inset-sm': 'inset 2px 3px 6px rgba(104, 118, 100, 0.25), inset -2px -2px 5px rgba(255, 255, 255, 0.65)',
@@ -87,6 +88,9 @@ export default {
         'clay-card': '26px',
         'clay-control': '16px',
         'clay-pill': '999px',
+      },
+      transitionDuration: {
+        '180': '180ms',
       }
     },
   },

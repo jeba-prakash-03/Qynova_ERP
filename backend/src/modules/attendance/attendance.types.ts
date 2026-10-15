@@ -33,6 +33,11 @@ export interface Attendance {
   is_early_checkout: boolean;
   remarks: string | null;
   edited_by: number | null;
+  check_in_latitude?: number | null;
+  check_in_longitude?: number | null;
+  check_in_accuracy?: number | null;
+  check_in_distance_meters?: number | null;
+  office_location_id?: number | null;
   created_at: string;
   updated_at: string;
   breaks?: AttendanceBreak[];
@@ -41,6 +46,9 @@ export interface Attendance {
 export interface CheckInDto {
   work_type?: WorkType;
   remarks?: string;
+  latitude?: number;
+  longitude?: number;
+  accuracy?: number;
 }
 
 export interface CheckOutDto {

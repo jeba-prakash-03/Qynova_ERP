@@ -13,7 +13,6 @@ import {
   Calendar,
   Building,
   User,
-  Clock,
   ArrowRight,
 } from 'lucide-react';
 import { projectsApi } from '../api';
@@ -23,30 +22,31 @@ import { ConfirmDialog } from '../../../shared/components/ConfirmDialog';
 import { Can } from '../../../shared/components/Can';
 import { useToast } from '../../../shared/context/ToastContext';
 import { ProjectFormModal } from '../components/ProjectFormModal';
-import { Loader } from '../../../shared/components/Loader';
+import { SkeletonCard, SkeletonTable } from '../../../shared/components/Loader';
 import { EmptyState } from '../../../shared/components/EmptyState';
+import { formatCurrency } from '../../../shared/utils/format.util';
 
 const priorityBadges: Record<ProjectPriority, string> = {
-  low: 'bg-slate-100 text-slate-700 border-slate-200',
-  medium: 'bg-blue-50 text-blue-700 border-blue-200',
-  high: 'bg-amber-50 text-amber-700 border-amber-200',
-  critical: 'bg-rose-50 text-rose-700 border-rose-200',
+  low: 'bg-[#dbe2d5] text-[#26301f] border-[#c5d0be]',
+  medium: 'bg-[#22304a]/10 text-[#22304a] border-[#22304a]/25',
+  high: 'bg-[#cf9b34]/15 text-[#916515] border-[#cf9b34]/30',
+  critical: 'bg-[#c4643f]/15 text-[#9e3a1b] border-[#c4643f]/30',
 };
 
 const statusBadges: Record<ProjectStatus, string> = {
-  lead: 'bg-purple-50 text-purple-700 border-purple-200',
-  proposal: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  won: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  contract: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-  planning: 'bg-blue-50 text-blue-700 border-blue-200',
-  development: 'bg-teal-50 text-teal-700 border-teal-200',
-  testing: 'bg-amber-50 text-amber-700 border-amber-200',
-  uat: 'bg-orange-50 text-orange-700 border-orange-200',
-  deployment: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  maintenance: 'bg-slate-100 text-slate-700 border-slate-200',
-  completed: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-  on_hold: 'bg-amber-100 text-amber-800 border-amber-300',
-  cancelled: 'bg-rose-100 text-rose-800 border-rose-300',
+  lead: 'bg-purple-100/70 text-purple-800 border-purple-200',
+  proposal: 'bg-indigo-100/70 text-indigo-800 border-indigo-200',
+  won: 'bg-[#14776b]/15 text-[#14776b] border-[#14776b]/30',
+  contract: 'bg-cyan-100/70 text-cyan-800 border-cyan-200',
+  planning: 'bg-[#22304a]/10 text-[#22304a] border-[#22304a]/25',
+  development: 'bg-[#14776b]/15 text-[#14776b] border-[#14776b]/30',
+  testing: 'bg-[#cf9b34]/15 text-[#916515] border-[#cf9b34]/30',
+  uat: 'bg-orange-100/70 text-orange-800 border-orange-200',
+  deployment: 'bg-emerald-100/70 text-emerald-800 border-emerald-300',
+  maintenance: 'bg-[#dbe2d5] text-[#6b7663] border-[#c5d0be]',
+  completed: 'bg-emerald-100/80 text-emerald-900 border-emerald-300',
+  on_hold: 'bg-[#cf9b34]/20 text-[#855700] border-[#cf9b34]/30',
+  cancelled: 'bg-[#c4643f]/15 text-[#9e3a1b] border-[#c4643f]/30',
 };
 
 export const ProjectListPage: React.FC = () => {
@@ -134,7 +134,7 @@ export const ProjectListPage: React.FC = () => {
     {
       header: 'Project Code',
       cell: (project: Project) => (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-mono font-bold clay-inset text-[#14776b] border border-[#14776b]/20">
           {project.project_code}
         </span>
       ),
@@ -147,12 +147,12 @@ export const ProjectListPage: React.FC = () => {
         <div>
           <Link
             to={`/projects/${project.id}`}
-            className="text-sm font-semibold text-slate-900 hover:text-indigo-600 transition"
+            className="text-sm font-semibold text-[#26301f] hover:text-[#14776b] transition-colors"
           >
             {project.name}
           </Link>
-          <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-            <Building className="w-3 h-3 text-slate-400" />
+          <div className="flex items-center gap-1.5 text-xs text-[#6b7663] mt-0.5">
+            <Building className="w-3 h-3 text-[#6b7663]/70" />
             <span>{project.client_name || 'Client'}</span>
           </div>
         </div>
@@ -165,12 +165,12 @@ export const ProjectListPage: React.FC = () => {
       cell: (project: Project) => (
         <div className="text-xs">
           {project.project_manager_name ? (
-            <div className="flex items-center gap-1.5 font-medium text-slate-800">
-              <User className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 font-medium text-[#26301f]">
+              <User className="w-3.5 h-3.5 text-[#6b7663]" />
               <span>{project.project_manager_name}</span>
             </div>
           ) : (
-            <span className="text-slate-400 italic">Unassigned</span>
+            <span className="text-[#6b7663]/60 italic">Unassigned</span>
           )}
         </div>
       ),
@@ -178,8 +178,8 @@ export const ProjectListPage: React.FC = () => {
     {
       header: 'Budget',
       cell: (project: Project) => (
-        <span className="text-xs font-semibold text-slate-800">
-          ₹{Number(project.budget).toLocaleString()}
+        <span className="text-xs font-semibold font-mono text-[#26301f]">
+          {formatCurrency(project.budget)}
         </span>
       ),
       sortable: true,
@@ -189,7 +189,7 @@ export const ProjectListPage: React.FC = () => {
       header: 'Priority',
       cell: (project: Project) => (
         <span
-          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border capitalize ${
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border capitalize ${
             priorityBadges[project.priority as ProjectPriority] || priorityBadges.medium
           }`}
         >
@@ -203,8 +203,8 @@ export const ProjectListPage: React.FC = () => {
       header: 'Status',
       cell: (project: Project) => (
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${
-            statusBadges[project.status as ProjectStatus] || 'bg-slate-100 text-slate-700'
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border capitalize ${
+            statusBadges[project.status as ProjectStatus] || 'bg-[#dbe2d5] text-[#26301f]'
           }`}
         >
           {project.status.replace('_', ' ')}
@@ -216,8 +216,8 @@ export const ProjectListPage: React.FC = () => {
     {
       header: 'Timeline',
       cell: (project: Project) => (
-        <div className="text-xs text-slate-500 flex items-center gap-1">
-          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+        <div className="text-xs text-[#6b7663] flex items-center gap-1.5">
+          <Calendar className="w-3.5 h-3.5 text-[#6b7663]/70" />
           <span>{project.start_date.split('T')[0]}</span>
           {project.end_date && <span> → {project.end_date.split('T')[0]}</span>}
         </div>
@@ -226,11 +226,11 @@ export const ProjectListPage: React.FC = () => {
     {
       header: 'Actions',
       cell: (project: Project) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Link
             to={`/projects/${project.id}`}
             title="View Details"
-            className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded transition"
+            className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#dbe2d5]/60 rounded-lg transition-colors"
           >
             <Eye className="w-4 h-4" />
           </Link>
@@ -238,7 +238,7 @@ export const ProjectListPage: React.FC = () => {
             <button
               onClick={() => handleOpenEdit(project)}
               title="Edit Project"
-              className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#dbe2d5]/60 rounded-lg transition-colors"
             >
               <Edit2 className="w-4 h-4" />
             </button>
@@ -247,7 +247,7 @@ export const ProjectListPage: React.FC = () => {
             <button
               onClick={() => setDeleteTarget(project)}
               title="Delete Project"
-              className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-slate-100 rounded transition"
+              className="p-1.5 text-[#6b7663] hover:text-[#c4643f] hover:bg-[#c4643f]/10 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -261,30 +261,28 @@ export const ProjectListPage: React.FC = () => {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-              <FolderKanban className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Projects & Delivery</h1>
-              <p className="text-sm text-slate-500">
-                Track project lifecycles, milestones, teams, budgets, and deliverable execution
-              </p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#14776b]/15 text-[#14776b] rounded-xl clay-card">
+            <FolderKanban className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold font-baloo text-[#26301f]">Projects & Delivery</h1>
+            <p className="text-sm text-[#6b7663]">
+              Track project lifecycles, milestones, teams, budgets, and deliverable execution
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {/* Cards / Table View Toggle */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+          <div className="flex items-center clay-inset p-1 rounded-xl">
             <button
               onClick={() => setViewMode('cards')}
               title="Cards View"
-              className={`p-1.5 rounded-md transition ${
+              className={`p-1.5 rounded-lg transition-all duration-180 ${
                 viewMode === 'cards'
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-[#e2e8dc] text-[#14776b] shadow-xs'
+                  : 'text-[#6b7663] hover:text-[#26301f]'
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
@@ -292,10 +290,10 @@ export const ProjectListPage: React.FC = () => {
             <button
               onClick={() => setViewMode('table')}
               title="Table View"
-              className={`p-1.5 rounded-md transition ${
+              className={`p-1.5 rounded-lg transition-all duration-180 ${
                 viewMode === 'table'
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-[#e2e8dc] text-[#14776b] shadow-xs'
+                  : 'text-[#6b7663] hover:text-[#26301f]'
               }`}
             >
               <TableIcon className="w-4 h-4" />
@@ -305,7 +303,7 @@ export const ProjectListPage: React.FC = () => {
           <Can permission="projects.create">
             <button
               onClick={handleOpenCreate}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#14776b] hover:bg-[#11655b] active:scale-[0.98] text-white rounded-xl text-sm font-semibold transition-all duration-180 shadow-sm"
             >
               <Plus className="w-4 h-4" />
               New Project
@@ -315,15 +313,15 @@ export const ProjectListPage: React.FC = () => {
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+      <div className="clay-card p-4 rounded-2xl flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#6b7663] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by project name, PRJ-code, or client..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-9 pr-4 py-2 text-sm clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] placeholder-[#6b7663] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           />
         </div>
 
@@ -331,7 +329,7 @@ export const ProjectListPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="w-full px-3 py-2 text-sm clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           >
             <option value="">All Statuses</option>
             <option value="lead">Lead</option>
@@ -350,7 +348,7 @@ export const ProjectListPage: React.FC = () => {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="w-full px-3 py-2 text-sm clay-inset bg-[#dbe2d5]/50 border border-[#c5d0be]/40 rounded-xl text-[#26301f] focus:outline-none focus:ring-2 focus:ring-[#14776b]/30"
           >
             <option value="">All Priorities</option>
             <option value="low">Low</option>
@@ -363,9 +361,15 @@ export const ProjectListPage: React.FC = () => {
 
       {/* Project Content: Cards or Table */}
       {isLoading ? (
-        <div className="py-20 flex justify-center">
-          <Loader text="Loading projects..." />
-        </div>
+        viewMode === 'cards' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[...Array(6)].map((_, i) => (
+              <SkeletonCard key={i} lines={4} />
+            ))}
+          </div>
+        ) : (
+          <SkeletonTable rows={6} cols={6} />
+        )
       ) : projects.length === 0 ? (
         <EmptyState
           title="No Projects Found"
@@ -380,25 +384,25 @@ export const ProjectListPage: React.FC = () => {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="bg-white rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition flex flex-col justify-between overflow-hidden group"
+              className="clay-card-interactive bg-[#e2e8dc] rounded-2xl border border-[#c5d0be]/50 transition-all duration-180 flex flex-col justify-between overflow-hidden group"
             >
               <div className="p-5">
                 {/* Card Top Pill Row */}
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold clay-inset text-[#14776b] border border-[#14776b]/20">
                     {project.project_code}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[11px] font-medium border capitalize ${
+                      className={`px-2 py-0.5 rounded-full text-[11px] font-semibold border capitalize ${
                         priorityBadges[project.priority] || priorityBadges.medium
                       }`}
                     >
                       {project.priority}
                     </span>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[11px] font-medium border capitalize ${
-                        statusBadges[project.status] || 'bg-slate-100 text-slate-700'
+                      className={`px-2 py-0.5 rounded-full text-[11px] font-semibold border capitalize ${
+                        statusBadges[project.status] || 'bg-[#dbe2d5] text-[#26301f]'
                       }`}
                     >
                       {project.status.replace('_', ' ')}
@@ -408,17 +412,17 @@ export const ProjectListPage: React.FC = () => {
 
                 {/* Title and Client */}
                 <Link to={`/projects/${project.id}`}>
-                  <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition line-clamp-1">
+                  <h3 className="text-base font-bold text-[#26301f] group-hover:text-[#14776b] transition-colors line-clamp-1">
                     {project.name}
                   </h3>
                 </Link>
 
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-                  <Building className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="font-medium text-slate-700">{project.client_name}</span>
+                <div className="flex items-center gap-1.5 text-xs text-[#6b7663] mt-1">
+                  <Building className="w-3.5 h-3.5 text-[#6b7663]/70" />
+                  <span className="font-medium text-[#26301f]/80">{project.client_name}</span>
                 </div>
 
-                <p className="text-xs text-slate-500 mt-2.5 line-clamp-2">
+                <p className="text-xs text-[#6b7663] mt-2.5 line-clamp-2 leading-relaxed">
                   {project.description || 'No description provided.'}
                 </p>
 
@@ -428,13 +432,13 @@ export const ProjectListPage: React.FC = () => {
                     {project.technologies.slice(0, 3).map((t) => (
                       <span
                         key={t}
-                        className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600"
+                        className="px-2 py-0.5 rounded-md text-[10px] font-semibold clay-inset text-[#26301f]/75 border border-[#c5d0be]/40"
                       >
                         {t}
                       </span>
                     ))}
                     {project.technologies.length > 3 && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500">
+                      <span className="px-1.5 py-0.5 rounded-md text-[10px] font-semibold clay-inset text-[#6b7663] border border-[#c5d0be]/40">
                         +{project.technologies.length - 3}
                       </span>
                     )}
@@ -443,13 +447,13 @@ export const ProjectListPage: React.FC = () => {
               </div>
 
               {/* Card Footer */}
-              <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+              <div className="px-5 py-3.5 bg-[#dbe2d5]/60 border-t border-[#c5d0be]/40 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-semibold">
+                  <span className="text-[#6b7663] block text-[10px] uppercase font-semibold tracking-wider">
                     Budget
                   </span>
-                  <span className="font-bold text-slate-800">
-                    ₹{Number(project.budget).toLocaleString()}
+                  <span className="font-bold font-mono text-[#26301f]">
+                    {formatCurrency(project.budget)}
                   </span>
                 </div>
 
@@ -457,7 +461,7 @@ export const ProjectListPage: React.FC = () => {
                   <Can permission="projects.edit">
                     <button
                       onClick={() => handleOpenEdit(project)}
-                      className="p-1.5 text-slate-400 hover:text-indigo-600 rounded transition"
+                      className="p-1.5 text-[#6b7663] hover:text-[#14776b] hover:bg-[#e2e8dc] rounded-lg transition-colors"
                       title="Edit Project"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -465,7 +469,7 @@ export const ProjectListPage: React.FC = () => {
                   </Can>
                   <Link
                     to={`/projects/${project.id}`}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#14776b] hover:text-[#11655b] transition-colors"
                   >
                     View <ArrowRight className="w-3 h-3" />
                   </Link>
@@ -475,7 +479,7 @@ export const ProjectListPage: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="clay-card rounded-2xl border border-[#c5d0be]/50 overflow-hidden">
           <DataTable<Project>
             columns={columns}
             data={projects}

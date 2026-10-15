@@ -108,15 +108,15 @@ export const NotificationSettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[rgba(76,91,70,0.14)]">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Bell className="w-6 h-6 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-[#26301f] font-display flex items-center gap-2.5">
+            <Bell className="w-6 h-6 text-[#14776b]" />
             Notification Settings
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-[#6b7663] mt-1">
             Configure how you receive updates across in-app alerts, browser web push, and email.
           </p>
         </div>
@@ -126,9 +126,8 @@ export const NotificationSettingsPage: React.FC = () => {
             variant="secondary"
             size="sm"
             onClick={() => refetch()}
-            className="flex items-center gap-2 text-slate-600"
+            leftIcon={<RefreshCw className="w-4 h-4" />}
           >
-            <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
           <Button
@@ -136,42 +135,41 @@ export const NotificationSettingsPage: React.FC = () => {
             size="sm"
             onClick={handleSendTest}
             disabled={testSending}
-            className="flex items-center gap-2 shadow-sm"
+            leftIcon={<Send className="w-4 h-4" />}
           >
-            <Send className="w-4 h-4" />
             {testSending ? 'Sending Test...' : 'Send Test Notification'}
           </Button>
         </div>
       </div>
 
       {/* Device Browser Push Status Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
+      <div className="bg-[#e2e8dc] rounded-[26px] border border-[rgba(76,91,70,0.14)] p-6 shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
           <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+            className={`w-11 h-11 rounded-[16px] flex items-center justify-center shrink-0 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.15)] ${
               permission === 'granted' && (pushStatus?.activeDeviceCount ?? 0) > 0
-                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                ? 'bg-[#daebd9] text-[#1b4e23] border border-[#3f8f4a]/30'
                 : permission === 'granted'
-                ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                ? 'bg-[#f7eed9] text-[#cf9b34] border border-[#cf9b34]/30'
                 : permission === 'denied'
-                ? 'bg-rose-50 text-rose-600 border border-rose-200'
-                : 'bg-indigo-50 text-indigo-600 border border-indigo-200'
+                ? 'bg-[#f4ded6] text-[#c4643f] border border-[#c4643f]/30'
+                : 'bg-[#dbe2d5] text-[#14776b] border border-[rgba(76,91,70,0.18)]'
             }`}
           >
             <Smartphone className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-slate-900">Current Browser Push Status</h2>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h2 className="text-base font-bold text-[#26301f] font-display">Current Browser Push Status</h2>
               <span
-                className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
                   permission === 'granted' && (pushStatus?.activeDeviceCount ?? 0) > 0
-                    ? 'bg-emerald-100 text-emerald-800'
+                    ? 'bg-[#daebd9] text-[#1b4e23] border-[#3f8f4a]/30'
                     : permission === 'granted'
-                    ? 'bg-amber-100 text-amber-800'
+                    ? 'bg-[#f7eed9] text-[#cf9b34] border-[#cf9b34]/30'
                     : permission === 'denied'
-                    ? 'bg-rose-100 text-rose-800'
-                    : 'bg-indigo-100 text-indigo-800'
+                    ? 'bg-[#f4ded6] text-[#c4643f] border-[#c4643f]/30'
+                    : 'bg-[#dbe2d5] text-[#26301f] border-[rgba(76,91,70,0.18)]'
                 }`}
               >
                 {permission === 'granted' && (pushStatus?.activeDeviceCount ?? 0) > 0
@@ -183,7 +181,7 @@ export const NotificationSettingsPage: React.FC = () => {
                   : 'Not Enabled'}
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#6b7663] mt-1 max-w-xl">
               {permission === 'granted' && (pushStatus?.activeDeviceCount ?? 0) > 0
                 ? 'This device is registered to receive real-time push alerts even when the tab is closed.'
                 : permission === 'granted'
@@ -207,7 +205,6 @@ export const NotificationSettingsPage: React.FC = () => {
                   refetchStatus();
                 }}
                 disabled={isEnablingPush}
-                className="text-xs"
               >
                 {isEnablingPush ? 'Activating...' : 'Enable on this Device'}
               </Button>
@@ -219,7 +216,6 @@ export const NotificationSettingsPage: React.FC = () => {
                 size="sm"
                 onClick={handleSyncDevice}
                 disabled={syncingDevice}
-                className="text-xs"
               >
                 {syncingDevice
                   ? 'Registering...'
@@ -233,50 +229,50 @@ export const NotificationSettingsPage: React.FC = () => {
       </div>
 
       {/* Preferences Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-slate-100">
-          <h2 className="text-base font-bold text-slate-900">Channel Preferences by Event</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+      <div className="bg-[#e2e8dc] rounded-[26px] border border-[rgba(76,91,70,0.14)] shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)] overflow-hidden">
+        <div className="p-5 border-b border-[rgba(76,91,70,0.12)] bg-[#dbe2d5]/60">
+          <h2 className="text-base font-bold text-[#26301f] font-display">Channel Preferences by Event</h2>
+          <p className="text-xs text-[#6b7663] mt-0.5">
             Turn specific channels on or off for each activity. In-app notifications will always appear in the bell unless disabled.
           </p>
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-sm text-slate-500">Loading notification preferences...</div>
+          <div className="p-8 text-center text-xs text-[#6b7663]">Loading notification preferences...</div>
         ) : preferences.length === 0 ? (
-          <div className="p-8 text-center text-sm text-slate-500">No preference settings available.</div>
+          <div className="p-8 text-center text-xs text-[#6b7663]">No preference settings available.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[560px]">
               <thead>
-                <tr className="bg-slate-50/75 border-b border-slate-200 text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                <tr className="bg-[#dbe2d5] border-b border-[rgba(76,91,70,0.14)] text-[#26301f] text-xs font-semibold uppercase tracking-wider font-display">
                   <th className="py-3.5 px-6">Event Type</th>
                   <th className="py-3.5 px-6 text-center w-36">
                     <div className="flex items-center justify-center gap-1.5">
-                      <Monitor className="w-3.5 h-3.5 text-slate-400" />
+                      <Monitor className="w-3.5 h-3.5 text-[#14776b]" />
                       In-App
                     </div>
                   </th>
                   <th className="py-3.5 px-6 text-center w-36">
                     <div className="flex items-center justify-center gap-1.5">
-                      <Smartphone className="w-3.5 h-3.5 text-slate-400" />
+                      <Smartphone className="w-3.5 h-3.5 text-[#14776b]" />
                       Web Push
                     </div>
                   </th>
                   <th className="py-3.5 px-6 text-center w-36">
                     <div className="flex items-center justify-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-slate-400" />
+                      <Mail className="w-3.5 h-3.5 text-[#14776b]" />
                       Email
                     </div>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
+              <tbody className="divide-y divide-[rgba(76,91,70,0.10)] text-sm text-[#35422d]">
                 {preferences.map((item) => (
-                  <tr key={item.event_type} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={item.event_type} className="hover:bg-[#dbe2d5]/50 transition-colors">
                     <td className="py-4 px-6">
-                      <div className="font-semibold text-slate-800">{item.label}</div>
-                      <div className="text-xs text-slate-400 font-mono mt-0.5">{item.event_type}</div>
+                      <div className="font-bold text-[#26301f] font-display">{item.label}</div>
+                      <div className="text-xs text-[#6b7663] font-mono mt-0.5">{item.event_type}</div>
                     </td>
 
                     {/* In-App Toggle */}
@@ -284,12 +280,15 @@ export const NotificationSettingsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleToggle(item, 'in_app')}
-                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
-                          item.in_app ? 'bg-indigo-600' : 'bg-slate-200'
+                        aria-label={`Toggle In-App for ${item.label}`}
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-180 ease-in-out focus:outline-none ${
+                          item.in_app
+                            ? 'bg-[#14776b] shadow-[1px_2px_4px_rgba(20,119,107,0.35)]'
+                            : 'bg-[#dbe2d5] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.2)]'
                         }`}
                       >
                         <span
-                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-[1px_1px_3px_rgba(0,0,0,0.25)] ring-0 transition duration-180 ease-in-out ${
                             item.in_app ? 'translate-x-5' : 'translate-x-0'
                           }`}
                         />
@@ -301,12 +300,15 @@ export const NotificationSettingsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleToggle(item, 'push')}
-                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
-                          item.push ? 'bg-indigo-600' : 'bg-slate-200'
+                        aria-label={`Toggle Push for ${item.label}`}
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-180 ease-in-out focus:outline-none ${
+                          item.push
+                            ? 'bg-[#14776b] shadow-[1px_2px_4px_rgba(20,119,107,0.35)]'
+                            : 'bg-[#dbe2d5] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.2)]'
                         }`}
                       >
                         <span
-                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-[1px_1px_3px_rgba(0,0,0,0.25)] ring-0 transition duration-180 ease-in-out ${
                             item.push ? 'translate-x-5' : 'translate-x-0'
                           }`}
                         />
@@ -318,12 +320,15 @@ export const NotificationSettingsPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleToggle(item, 'email')}
-                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
-                          item.email ? 'bg-indigo-600' : 'bg-slate-200'
+                        aria-label={`Toggle Email for ${item.label}`}
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-180 ease-in-out focus:outline-none ${
+                          item.email
+                            ? 'bg-[#14776b] shadow-[1px_2px_4px_rgba(20,119,107,0.35)]'
+                            : 'bg-[#dbe2d5] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.2)]'
                         }`}
                       >
                         <span
-                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-[1px_1px_3px_rgba(0,0,0,0.25)] ring-0 transition duration-180 ease-in-out ${
                             item.email ? 'translate-x-5' : 'translate-x-0'
                           }`}
                         />
@@ -338,10 +343,10 @@ export const NotificationSettingsPage: React.FC = () => {
       </div>
 
       {/* Security and RBAC Notice */}
-      <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-500 flex items-start gap-3">
-        <AlertCircle className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+      <div className="rounded-[20px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] p-4 text-xs text-[#6b7663] flex items-start gap-3 shadow-[inset_1px_1px_3px_rgba(104,118,100,0.12)]">
+        <AlertCircle className="w-4 h-4 text-[#14776b] shrink-0 mt-0.5" />
         <div>
-          <span className="font-semibold text-slate-700">Privacy & Security:</span> Web push notifications never contain sensitive personal data like salary amounts, account numbers, or leave reasons. Notifications remain strictly generic with detailed records accessible through authenticated links.
+          <span className="font-bold text-[#26301f]">Privacy & Security:</span> Web push notifications never contain sensitive personal data like salary amounts, account numbers, or leave reasons. Notifications remain strictly generic with detailed records accessible through authenticated links.
         </div>
       </div>
     </div>
@@ -349,3 +354,4 @@ export const NotificationSettingsPage: React.FC = () => {
 };
 
 export default NotificationSettingsPage;
+

@@ -339,15 +339,45 @@ export const AttendanceSheetPage: React.FC = () => {
     });
   };
 
-  const handleExport = (format: 'xlsx' | 'csv') => {
-    const params = new URLSearchParams();
-    params.append('type', viewMode);
-    if (viewMode === 'daily') params.append('date', selectedDate);
-    else params.append('month', selectedMonth);
-    params.append('format', format);
+  const [isExporting, setIsExporting] = useState(false);
 
-    const exportUrl = `${axiosClient.defaults.baseURL}/attendance/export?${params.toString()}`;
-    window.open(exportUrl, '_blank');
+  const handleExport = async (format: 'xlsx' | 'csv') => {
+    try {
+      setIsExporting(true);
+      const params = new URLSearchParams();
+      params.append('type', viewMode);
+      if (viewMode === 'daily') params.append('date', selectedDate);
+      else params.append('month', selectedMonth);
+      params.append('format', format);
+
+      const response = await axiosClient.get(`/attendance/export?${params.toString()}`, {
+        responseType: 'blob',
+      });
+
+      const mimeType =
+        format === 'csv'
+          ? 'text/csv'
+          : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      const blob = new Blob([response.data], { type: mimeType });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const fileName =
+        viewMode === 'daily'
+          ? `attendance_daily_${selectedDate}.${format}`
+          : `attendance_monthly_${selectedMonth}.${format}`;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      success('Attendance sheet exported successfully');
+    } catch (err: any) {
+      console.error('Attendance export failed:', err);
+      error(err?.response?.data?.message || 'Failed to export attendance sheet. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -394,6 +424,7 @@ export const AttendanceSheetPage: React.FC = () => {
             <Button
               variant="secondary"
               size="md"
+              isLoading={isExporting}
               leftIcon={<FileSpreadsheet className="w-4 h-4 text-[#1b4e23]" />}
               onClick={() => handleExport('xlsx')}
             >
@@ -769,8 +800,25 @@ export const AttendanceSheetPage: React.FC = () => {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           title="Add Employee Attendance"
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                form="add-attendance-form"
+                variant="primary"
+                isLoading={addMutation.isPending}
+                disabled={!addForm.employee_id || addForm.reason.trim().length < 5}
+              >
+                Save Attendance
+              </Button>
+            </>
+          }
         >
           <form
+            id="add-attendance-form"
             onSubmit={(e) => {
               e.preventDefault();
               addMutation.mutate();
@@ -890,20 +938,6 @@ export const AttendanceSheetPage: React.FC = () => {
                 ))}
               </div>
             </FormField>
-
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[rgba(76,91,70,0.14)]">
-              <Button variant="secondary" onClick={() => setIsAddModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                isLoading={addMutation.isPending}
-                disabled={!addForm.employee_id || addForm.reason.trim().length < 5}
-              >
-                Save Attendance
-              </Button>
-            </div>
           </form>
         </Modal>
 
@@ -912,8 +946,25 @@ export const AttendanceSheetPage: React.FC = () => {
           isOpen={Boolean(editingItem)}
           onClose={() => setEditingItem(null)}
           title={`Edit Attendance: ${editingItem?.first_name} ${editingItem?.last_name}`}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => setEditingItem(null)}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                form="edit-attendance-form"
+                variant="primary"
+                isLoading={editMutation.isPending}
+                disabled={editForm.reason.trim().length < 5}
+              >
+                Save Changes
+              </Button>
+            </>
+          }
         >
           <form
+            id="edit-attendance-form"
             onSubmit={(e) => {
               e.preventDefault();
               editMutation.mutate();
@@ -1015,20 +1066,6 @@ export const AttendanceSheetPage: React.FC = () => {
                 ))}
               </div>
             </FormField>
-
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[rgba(76,91,70,0.14)]">
-              <Button variant="secondary" onClick={() => setEditingItem(null)}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                isLoading={editMutation.isPending}
-                disabled={editForm.reason.trim().length < 5}
-              >
-                Save Changes
-              </Button>
-            </div>
           </form>
         </Modal>
 

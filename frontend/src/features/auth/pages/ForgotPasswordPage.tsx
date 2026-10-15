@@ -53,10 +53,11 @@ export const ForgotPasswordPage: React.FC = () => {
       await authApi.forgotPassword(trimmed);
       setSubmitted(true);
       setCooldownSec(60);
-    } catch {
-      // Security best practice: Always show generic confirmation
-      setSubmitted(true);
-      setCooldownSec(60);
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.message ||
+        'No registered account found with this email address. Please check your email or contact support.';
+      setErrorMsg(msg);
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +81,7 @@ export const ForgotPasswordPage: React.FC = () => {
 
       {submitted ? (
         <div className="space-y-6 animate-auth-fade">
-          {/* Generic confirmation card */}
+          {/* Confirmation card */}
           <div
             role="status"
             className="p-5 rounded-[22px] bg-[#dbe2d5] border border-[rgba(76,91,70,0.14)] text-[#26301f] space-y-3 shadow-[8px_10px_24px_rgba(88,104,84,0.22),-6px_-7px_18px_rgba(255,255,255,0.7)]"
@@ -93,7 +94,7 @@ export const ForgotPasswordPage: React.FC = () => {
                 Check your inbox
               </h3>
               <p className="text-xs text-[#6b7663] leading-relaxed mt-1">
-                If an account exists for that email, we've sent a reset link. Please check your spam folder if it doesn't arrive shortly.
+                Password reset instructions have been sent to your email. Please check your spam folder if it doesn't arrive shortly.
               </p>
             </div>
           </div>
