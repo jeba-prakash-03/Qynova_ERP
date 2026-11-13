@@ -6,6 +6,8 @@ import { auditService } from '../../shared/services/audit.service';
 import { notificationService } from '../../shared/services/notification.service';
 import { payrollGeneratedEmailTemplate } from '../../shared/services/email.templates';
 import { TokenUserPayload } from '../../shared/utils/jwt.util';
+import { getKolkataDateString } from '../../shared/utils/date.util';
+import { setSalaryStructureSchema } from './payroll.schema';
 
 export interface SalaryStructure {
   id: number;
@@ -65,7 +67,7 @@ export interface PayrollItem {
 export interface PayrollRun {
   id: number;
   month: string; // YYYY-MM
-  status: 'draft' | 'processed' | 'processing' | 'locked' | 'approved' | 'paid';
+  status: 'draft' | 'processed' | 'locked' | 'paid';
   total_gross: number;
   total_deductions: number;
   total_net: number;
@@ -86,22 +88,55 @@ export class PayrollService {
     effectiveFrom?: string,
     currentUserId?: number
   ): Promise<SalaryStructure> {
-    const today = effectiveFrom || new Date().toISOString().split('T')[0];
+    const validated = setSalaryStructureSchema.parse({
+      employee_id: employeeId,
+      base_salary: baseSalary,
+      is_annual: isAnnual,
+      effective_from: effectiveFrom,
+    });
+
+    const emp = await db('employees')
+      .where({ id: validated.employee_id })
+      .whereNull('deleted_at')
+      .first();
+
+    if (!emp) {
+      throw new NotFoundError(`Employee with ID ${validated.employee_id} not found.`);
+    }
+
+    const effectiveDate = validated.effective_from || getKolkataDateString();
+
+    const activeStructure = await db('salary_structures')
+      .where({ employee_id: validated.employee_id })
+      .whereNull('effective_to')
+      .orderBy('effective_from', 'desc')
+      .first();
+
+    if (activeStructure) {
+      const activeEffectiveFrom = activeStructure.effective_from instanceof Date
+        ? activeStructure.effective_from.toISOString().split('T')[0]
+        : String(activeStructure.effective_from);
+      if (effectiveDate < activeEffectiveFrom) {
+        throw new BadRequestError(
+          `Effective from date (${effectiveDate}) cannot be earlier than current active salary structure effective date (${activeEffectiveFrom}).`
+        );
+      }
+    }
 
     let createdId: number = 0;
     await db.transaction(async (trx: any) => {
       // 1. Close active structure if exists
       await trx('salary_structures')
-        .where({ employee_id: employeeId })
+        .where({ employee_id: validated.employee_id })
         .whereNull('effective_to')
-        .update({ effective_to: today });
+        .update({ effective_to: effectiveDate });
 
       // 2. Insert new structure
       const [id] = await trx('salary_structures').insert({
-        employee_id: employeeId,
-        base_salary: baseSalary,
-        is_annual: isAnnual,
-        effective_from: today,
+        employee_id: validated.employee_id,
+        base_salary: validated.base_salary,
+        is_annual: validated.is_annual,
+        effective_from: effectiveDate,
         effective_to: null,
         created_by: currentUserId || null,
       });
@@ -113,8 +148,8 @@ export class PayrollService {
         userId: currentUserId,
         action: 'payroll.salary_updated',
         entity: 'salary_structures',
-        entityId: employeeId,
-        newValue: { baseSalary, isAnnual, effectiveFrom: today },
+        entityId: validated.employee_id,
+        newValue: { baseSalary: validated.base_salary, isAnnual: validated.is_annual, effectiveFrom: effectiveDate },
       });
     }
 
@@ -142,6 +177,7 @@ export class PayrollService {
         builder.whereNull('effective_to').orWhere('effective_to', '>=', startDate);
       })
       .orderBy('effective_from', 'desc')
+      .orderBy('id', 'desc')
       .first();
 
     return row || null;
@@ -240,7 +276,7 @@ export class PayrollService {
   // ==========================================
   async generatePayroll(month: string, currentUserId?: number): Promise<PayrollRun> {
     const existingRun = await db('payroll_runs').where({ month }).first();
-    if (existingRun && (existingRun.status === 'locked' || existingRun.status === 'paid' || existingRun.status === 'approved')) {
+    if (existingRun && (existingRun.status === 'locked' || existingRun.status === 'paid')) {
       throw new BadRequestError(`Payroll for month ${month} is locked and cannot be recalculated.`);
     }
 
@@ -256,6 +292,21 @@ export class PayrollService {
     if (workingDaysInMonth <= 0) {
       throw new BadRequestError(`No working days found for month ${month}`);
     }
+
+    // Load Company Settings for Free Leave and PF configuration
+    const companySettings = await db('company_settings').where({ id: 1 }).first();
+    const freeLeaveAllowed =
+      companySettings?.free_leave_per_month !== null && companySettings?.free_leave_per_month !== undefined
+        ? Number(companySettings.free_leave_per_month)
+        : 1.0;
+    const pfPercent =
+      companySettings?.pf_percent !== null && companySettings?.pf_percent !== undefined
+        ? Number(companySettings.pf_percent)
+        : 12.0;
+    const pfWageCap =
+      companySettings?.pf_wage_cap !== null && companySettings?.pf_wage_cap !== undefined
+        ? Number(companySettings.pf_wage_cap)
+        : 15000.0;
 
     const employees = await db('employees as e')
       .leftJoin('departments as d', 'e.department_id', 'd.id')
@@ -324,24 +375,36 @@ export class PayrollService {
         monthlySalary = Math.round(dailySalary * activeWorkingDays * 100) / 100;
       }
 
-      // Approved leaves
+      // Query approved leaves: join leave_requests -> leave_types
+      // Only count days that are genuinely unpaid (is_paid = false/0), excluding WFH and PERM entirely
       const approvedLeaveRows = await db('leave_request_days as lrd')
         .join('leave_requests as lr', 'lrd.leave_request_id', 'lr.id')
+        .join('leave_types as lt', 'lr.leave_type_id', 'lt.id')
         .where('lr.employee_id', emp.id)
         .where('lrd.status', 'approved')
         .where('lrd.date', '>=', empActiveStart)
         .where('lrd.date', '<=', empActiveEnd)
-        .select('lrd.date', 'lrd.day_type');
+        .select('lrd.date', 'lrd.day_type', 'lt.code as leave_code', 'lt.is_paid');
 
-      let approvedLeaveDays = 0;
-      const leaveDateSet = new Set<string>();
+      let unpaidApprovedLeaveDays = 0;
+      const approvedLeaveDateSet = new Set<string>();
+
       for (const row of approvedLeaveRows) {
         const dateStr = row.date instanceof Date ? row.date.toISOString().split('T')[0] : String(row.date);
-        leaveDateSet.add(dateStr);
-        approvedLeaveDays += row.day_type === 'full' ? 1.0 : 0.5;
+        approvedLeaveDateSet.add(dateStr);
+
+        // Exclude WFH and PERM entirely from unpaid leave counting
+        if (row.leave_code === 'WFH' || row.leave_code === 'PERM') {
+          continue;
+        }
+
+        // Count only genuinely unpaid leaves (is_paid = false / 0)
+        if (!row.is_paid) {
+          unpaidApprovedLeaveDays += row.day_type === 'full' ? 1.0 : 0.5;
+        }
       }
 
-      // Attendance absents
+      // Attendance absents (unapproved absences)
       const absentRows = await db('attendance')
         .where({ employee_id: emp.id, status: 'absent' })
         .where('date', '>=', empActiveStart)
@@ -351,21 +414,19 @@ export class PayrollService {
       let absentDays = 0;
       for (const aRow of absentRows) {
         const dateStr = aRow.date instanceof Date ? aRow.date.toISOString().split('T')[0] : String(aRow.date);
-        if (!leaveDateSet.has(dateStr) && activeDates.includes(dateStr)) {
+        if (!approvedLeaveDateSet.has(dateStr) && activeDates.includes(dateStr)) {
           absentDays += 1.0;
         }
       }
 
-
-
-      const totalLeaveAndAbsent = approvedLeaveDays + absentDays;
+      const totalUnpaidDays = unpaidApprovedLeaveDays + absentDays;
       let freeLeaveApplied = 0;
       let lopDays = 0;
 
-      // 1 free leave per month
-      if (totalLeaveAndAbsent > 0) {
-        freeLeaveApplied = Math.min(1.0, totalLeaveAndAbsent);
-        lopDays = totalLeaveAndAbsent - freeLeaveApplied;
+      // Apply free_leave_per_month from company_settings (default 1.0 if null) to unpaid/absent days
+      if (totalUnpaidDays > 0) {
+        freeLeaveApplied = Math.min(freeLeaveAllowed, totalUnpaidDays);
+        lopDays = Math.max(0, totalUnpaidDays - freeLeaveApplied);
       }
 
       const lopDeduction = Math.round(lopDays * dailySalary * 100) / 100;
@@ -380,11 +441,20 @@ export class PayrollService {
       const allowances = Number(adjustment?.allowances || 0);
       const overtime = Number(adjustment?.overtime || 0);
       
-      // PF: if configured explicitly in adjustment use it, else standard 12% of basic
+      // Basic component is 50% of monthly salary
+      const basicSalary = Math.round(monthlySalary * 0.5 * 100) / 100;
+      const pfEligibleSalary = pfWageCap > 0 ? Math.min(basicSalary, pfWageCap) : basicSalary;
+
+      // PF: if configured explicitly in adjustment use it, else apply pf_percent (default 12%) to basic component up to wage cap
       const pfDeduction =
         adjustment?.pf !== null && adjustment?.pf !== undefined
           ? Number(adjustment.pf)
-          : Math.round(monthlySalary * 0.12 * 100) / 100;
+          : Math.round(pfEligibleSalary * (pfPercent / 100) * 100) / 100;
+
+      // TODO: Statutory deductions unimplemented:
+      // - ESI (Employee State Insurance): Statutory deduction applicable for employees with gross <= ₹21,000/month (0.75% employee contribution, 3.25% employer contribution).
+      // - Professional Tax (PT): State-specific slab-based deduction (e.g. Karnataka ₹200/month for salary >= ₹15,000).
+      // - TDS (Tax Deducted at Source / Section 192): Income tax withholding based on annual projected tax liability under Old/New tax regime.
 
       const otherDeductions = Number(adjustment?.other_deductions || 0);
 
@@ -407,7 +477,7 @@ export class PayrollService {
         monthly_salary: Math.round(monthlySalary * 100) / 100,
         daily_salary: Math.round(dailySalary * 100) / 100,
         working_days_in_month: workingDaysInMonth,
-        approved_leave_days: approvedLeaveDays,
+        approved_leave_days: unpaidApprovedLeaveDays,
         absent_days: absentDays,
         free_leave_applied: freeLeaveApplied,
         lop_days: lopDays,
@@ -526,19 +596,49 @@ export class PayrollService {
   async updatePayrollRunStatus(
     month: string,
     targetStatus: 'draft' | 'processed' | 'locked' | 'paid',
-    currentUserId?: number
+    currentUser?: { userId?: number; roles?: string[] } | number
   ): Promise<PayrollRun> {
     const run = await db('payroll_runs').where({ month }).first();
     if (!run) {
       throw new NotFoundError(`Payroll run for month ${month} not found.`);
     }
 
-    if (run.status === 'locked' && targetStatus === 'draft') {
-      throw new BadRequestError(`Locked payroll cannot be moved back to draft.`);
+    const currentStatus = run.status;
+    const allowedTransitions: Record<string, string[]> = {
+      draft: ['processed'],
+      processed: ['draft', 'locked'],
+      locked: ['paid'],
+      paid: [],
+    };
+
+    const validNext = allowedTransitions[currentStatus] || [];
+    if (!validNext.includes(targetStatus)) {
+      throw new BadRequestError(
+        `Invalid status transition from '${currentStatus}' to '${targetStatus}'. Allowed transitions: ${
+          validNext.length > 0 ? validNext.join(', ') : 'none (terminal state)'
+        }.`
+      );
     }
 
-    if (run.status === 'paid' && targetStatus !== 'paid') {
-      throw new BadRequestError(`Paid payroll cannot be modified.`);
+    const userId = typeof currentUser === 'number' ? currentUser : currentUser?.userId;
+    let userRoles = typeof currentUser === 'object' && currentUser !== null && 'roles' in currentUser ? currentUser.roles : undefined;
+
+    if (!userRoles && userId) {
+      const userRoleRows = await db('user_roles as ur')
+        .join('roles as r', 'ur.role_id', 'r.id')
+        .where('ur.user_id', userId)
+        .select('r.name');
+      userRoles = userRoleRows.map((r: any) => r.name);
+    }
+
+    // Maker-checker policy: user who locked or paid must be different from creator, unless Admin
+    if (targetStatus === 'locked' || targetStatus === 'paid') {
+      const isAdmin = userRoles?.some((r: string) => r.toLowerCase() === 'admin');
+      if (!isAdmin && run.created_by && userId && Number(run.created_by) === Number(userId)) {
+        throw new ForbiddenError(
+          `Maker-checker violation: User ${userId} generated this payroll run and cannot lock or pay it. Another user or an Admin is required.`
+        );
+      }
     }
 
     await db.transaction(async (trx: any) => {
@@ -546,9 +646,9 @@ export class PayrollService {
       await trx('payroll_items').where({ payroll_run_id: run.id }).update({ status: targetStatus });
     });
 
-    if (currentUserId) {
+    if (userId) {
       await auditService.record({
-        userId: currentUserId,
+        userId,
         action: `payroll.status_${targetStatus}`,
         entity: 'payroll_runs',
         entityId: run.id,
@@ -596,8 +696,11 @@ export class PayrollService {
     return this.getPayrollRunByMonth(month);
   }
 
-  async lockPayrollRun(month: string, currentUserId?: number): Promise<PayrollRun> {
-    return this.updatePayrollRunStatus(month, 'locked', currentUserId);
+  async lockPayrollRun(
+    month: string,
+    currentUser?: { userId?: number; roles?: string[] } | number
+  ): Promise<PayrollRun> {
+    return this.updatePayrollRunStatus(month, 'locked', currentUser);
   }
 
   async getMyPayslips(employeeId: number): Promise<PayrollItem[]> {

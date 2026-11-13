@@ -29,6 +29,7 @@ export interface CompanySettings {
   email_footer_text?: string | null;
   free_leave_per_month?: number | null;
   pf_percent?: number | null;
+  pf_wage_cap?: number | null;
   overtime_multiplier?: number | null;
   updated_by?: number | null;
   updated_at?: string | null;
@@ -71,6 +72,7 @@ export interface UpdateCompanySettingsDTO {
   email_footer_text?: string | null;
   free_leave_per_month?: number;
   pf_percent?: number;
+  pf_wage_cap?: number | null;
   overtime_multiplier?: number;
 }
 

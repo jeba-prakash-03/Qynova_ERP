@@ -6,7 +6,20 @@ import {
   requireAnyPermission,
   requireEmployee,
 } from '../../shared/middleware/permission.middleware';
+import { validate } from '../../shared/middleware/validate.middleware';
 import { asyncHandler } from '../../shared/utils/async-handler.util';
+import {
+  setSalaryStructureSchema,
+  getSalaryHistoryParamsSchema,
+  setPayrollAdjustmentSchema,
+  getPayrollAdjustmentsQuerySchema,
+  generatePayrollSchema,
+  payrollMonthParamSchema,
+  updatePayrollStatusSchema,
+  payslipIdParamSchema,
+  fnfParamsSchema,
+  calculateFnFSchema,
+} from './payroll.schema';
 
 const router = Router();
 
@@ -23,6 +36,7 @@ router.get(
 // 2. Download Payslip PDF (employee own or admin/hr)
 router.get(
   '/payslips/:id/pdf',
+  validate({ params: payslipIdParamSchema }),
   asyncHandler(payrollController.downloadPayslipPdf)
 );
 
@@ -30,6 +44,7 @@ router.get(
 router.post(
   '/salary',
   requirePermission('payroll.edit'),
+  validate({ body: setSalaryStructureSchema }),
   asyncHandler(payrollController.setSalaryStructure)
 );
 
@@ -37,6 +52,7 @@ router.post(
 router.get(
   '/salary/:employeeId',
   requireAnyPermission('payroll.view', 'employees.view'),
+  validate({ params: getSalaryHistoryParamsSchema }),
   asyncHandler(payrollController.getSalaryHistory)
 );
 
@@ -44,12 +60,14 @@ router.get(
 router.get(
   '/adjustments',
   requirePermission('payroll.view'),
+  validate({ query: getPayrollAdjustmentsQuerySchema }),
   asyncHandler(payrollController.getAdjustments)
 );
 
 router.post(
   '/adjustments',
   requirePermission('payroll.edit'),
+  validate({ body: setPayrollAdjustmentSchema }),
   asyncHandler(payrollController.setAdjustment)
 );
 
@@ -57,6 +75,7 @@ router.post(
 router.post(
   '/generate',
   requirePermission('payroll.run'),
+  validate({ body: generatePayrollSchema }),
   asyncHandler(payrollController.generatePayroll)
 );
 
@@ -64,6 +83,7 @@ router.post(
 router.get(
   '/runs/:month',
   requirePermission('payroll.view'),
+  validate({ params: payrollMonthParamSchema }),
   asyncHandler(payrollController.getPayrollRun)
 );
 
@@ -71,6 +91,7 @@ router.get(
 router.post(
   '/runs/:month/lock',
   requirePermission('payroll.approve'),
+  validate({ params: payrollMonthParamSchema }),
   asyncHandler(payrollController.lockPayroll)
 );
 
@@ -78,6 +99,7 @@ router.post(
 router.post(
   '/runs/:month/status',
   requirePermission('payroll.approve'),
+  validate({ params: payrollMonthParamSchema, body: updatePayrollStatusSchema }),
   asyncHandler(payrollController.updateStatus)
 );
 
@@ -85,12 +107,14 @@ router.post(
 router.get(
   '/fnf/:employeeId',
   requireAnyPermission('payroll.view', 'payroll.run'),
+  validate({ params: fnfParamsSchema }),
   asyncHandler(payrollController.calculateFnF)
 );
 
 router.post(
   '/fnf/:employeeId',
   requireAnyPermission('payroll.run', 'payroll.edit'),
+  validate({ params: fnfParamsSchema, body: calculateFnFSchema }),
   asyncHandler(payrollController.calculateFnF)
 );
 

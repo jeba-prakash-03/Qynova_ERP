@@ -83,7 +83,10 @@ export class PayrollController {
   // Lock Payroll Run
   lockPayroll = async (req: Request, res: Response) => {
     const { month } = req.params;
-    const locked = await payrollService.lockPayrollRun(month, req.user?.userId);
+    const locked = await payrollService.lockPayrollRun(month, {
+      userId: req.user?.userId,
+      roles: req.user?.roles,
+    });
     return sendSuccess(res, locked, 200, undefined, `Payroll for ${month} is locked`);
   };
 
@@ -91,10 +94,10 @@ export class PayrollController {
   updateStatus = async (req: Request, res: Response) => {
     const { month } = req.params;
     const { status } = req.body;
-    if (!status || !['draft', 'processed', 'locked', 'paid'].includes(status)) {
-      throw new BadRequestError('Status must be draft, processed, locked, or paid');
-    }
-    const updated = await payrollService.updatePayrollRunStatus(month, status, req.user?.userId);
+    const updated = await payrollService.updatePayrollRunStatus(month, status, {
+      userId: req.user?.userId,
+      roles: req.user?.roles,
+    });
     return sendSuccess(res, updated, 200, undefined, `Payroll for ${month} status updated to ${status}`);
   };
 

@@ -9,6 +9,7 @@ export class SettingsRepository {
       ...row,
       free_leave_per_month: row.free_leave_per_month !== null ? Number(row.free_leave_per_month) : 1.0,
       pf_percent: row.pf_percent !== null ? Number(row.pf_percent) : 12.0,
+      pf_wage_cap: row.pf_wage_cap !== null && row.pf_wage_cap !== undefined ? Number(row.pf_wage_cap) : null,
       overtime_multiplier: row.overtime_multiplier !== null ? Number(row.overtime_multiplier) : 1.5,
     };
   }

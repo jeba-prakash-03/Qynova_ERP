@@ -31,6 +31,7 @@ export const updateCompanySettingsSchema = z.object({
   email_footer_text: z.string().nullable().optional(),
   free_leave_per_month: z.number().min(0, 'Free leave per month must be 0 or more').optional(),
   pf_percent: z.number().min(0).max(100, 'PF percentage must be between 0 and 100').optional(),
+  pf_wage_cap: z.number().min(0, 'PF wage cap must be 0 or more').nullable().optional(),
   overtime_multiplier: z.number().min(1, 'Overtime multiplier must be at least 1.0').optional(),
 });
 

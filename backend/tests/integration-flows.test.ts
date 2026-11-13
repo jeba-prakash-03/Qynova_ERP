@@ -436,7 +436,17 @@ describe('Comprehensive Integration Flows (Task 3a - 3g)', () => {
       expect([200, 201]).toContain(genRes.status);
       expect(genRes.body.success).toBe(true);
 
-      // Process and mark payroll run as paid
+      // Process and mark payroll run as paid through valid transition lifecycle
+      await request(app)
+        .post(`/api/v1/payroll/runs/${testMonth}/status`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ status: 'processed' });
+
+      await request(app)
+        .post(`/api/v1/payroll/runs/${testMonth}/status`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ status: 'locked' });
+
       const approveRes = await request(app)
         .post(`/api/v1/payroll/runs/${testMonth}/status`)
         .set('Authorization', `Bearer ${adminToken}`)

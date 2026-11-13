@@ -194,15 +194,35 @@ export const PayrollRunPage: React.FC = () => {
             </Button>
           )}
 
-          {payrollRun && !isLocked && (
+          {payrollRun && payrollRun.status === 'draft' && (
             <Button
               variant="secondary"
               isLoading={statusMutation.isPending}
-              leftIcon={<Lock className="w-4 h-4" />}
-              onClick={() => statusMutation.mutate('locked')}
+              leftIcon={<Play className="w-4 h-4" />}
+              onClick={() => statusMutation.mutate('processed')}
             >
-              Lock Payroll
+              Process Run
             </Button>
+          )}
+
+          {payrollRun && payrollRun.status === 'processed' && (
+            <>
+              <Button
+                variant="secondary"
+                isLoading={statusMutation.isPending}
+                onClick={() => statusMutation.mutate('draft')}
+              >
+                Revert to Draft
+              </Button>
+              <Button
+                variant="secondary"
+                isLoading={statusMutation.isPending}
+                leftIcon={<Lock className="w-4 h-4" />}
+                onClick={() => statusMutation.mutate('locked')}
+              >
+                Lock Payroll
+              </Button>
+            </>
           )}
 
           {payrollRun && payrollRun.status === 'locked' && (
