@@ -61,7 +61,6 @@ router.post(
 // 6. Cancel leave request
 router.patch(
   '/:id/cancel',
-  requireEmployee,
   asyncHandler(leavesController.cancelLeave)
 );
 

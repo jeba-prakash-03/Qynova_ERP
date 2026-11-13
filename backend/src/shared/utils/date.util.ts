@@ -72,6 +72,39 @@ export function parseDateString(dateStr: string): { year: number; month: number;
 }
 
 /**
+ * Parse YYYY-MM-DD into a UTC Date object.
+ * Completely immune to local timezone offsets.
+ */
+export function parseUtcDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
+/**
+ * Format a Date object to YYYY-MM-DD using UTC getters.
+ */
+export function formatUtcDate(d: Date): string {
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/**
+ * Get UTC Day of week (0 = Sunday, 6 = Saturday) for 'YYYY-MM-DD'.
+ */
+export function getUtcDayOfWeek(dateStr: string): number {
+  return parseUtcDate(dateStr).getUTCDay();
+}
+
+/**
+ * Number of days in month using UTC.
+ */
+export function getDaysInMonthUtc(year: number, month: number): number {
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
+/**
  * Generate an array of 'YYYY-MM-DD' between startDate and endDate inclusive using UTC date maths
  */
 export function getDateRangeArray(startDateStr: string, endDateStr: string): string[] {

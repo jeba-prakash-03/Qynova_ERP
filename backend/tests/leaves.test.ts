@@ -46,6 +46,8 @@ describe('Leaves Module — Unit & API Tests', () => {
     wfhTypeId = types.find((t: any) => t.code === 'WFH').id;
 
     // Allocate 12 days CL to employee and manager for test year 2026
+    await db('leave_requests').whereIn('employee_id', [employeeId, managerEmployeeId]).delete();
+    await db('attendance').whereIn('employee_id', [employeeId, managerEmployeeId]).delete();
     await db('leave_balances')
       .whereIn('employee_id', [employeeId, managerEmployeeId])
       .where({ leave_type_id: clTypeId, year: 2026 })
@@ -346,6 +348,262 @@ describe('Leaves Module — Unit & API Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(Array.isArray(res.body.data)).toBe(true);
+    });
+  });
+
+  describe('6. Approved Leave Cancellation & HR Cancellation', () => {
+    afterEach(async () => {
+      await db('leave_requests').where({ employee_id: employeeId }).where('from_date', '>=', '2026-10-01').delete();
+    });
+
+    it('should allow HR/Admin to cancel future approved leave and revert used balance', async () => {
+      // 1. Employee applies for future leave (2026-12-15 to 2026-12-16, Tue-Wed = 2 days)
+      const applyRes = await request(app)
+        .post('/api/v1/leave-requests')
+        .set('Authorization', `Bearer ${employeeToken}`)
+        .send({
+          leave_type_id: clTypeId,
+          from_date: '2026-12-15',
+          to_date: '2026-12-16',
+          reason: 'Future holiday trip',
+        });
+      expect(applyRes.status).toBe(201);
+      const reqId = applyRes.body.data.id;
+
+      // 2. Manager approves
+      const appRes = await request(app)
+        .patch(`/api/v1/leave-requests/${reqId}/approve`)
+        .set('Authorization', `Bearer ${managerToken}`)
+        .send({ decision_note: 'Approved for trip' });
+      expect(appRes.status).toBe(200);
+
+      // Verify balance transitioned to used
+      const balBefore = await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+        .first();
+      const usedBefore = Number(balBefore.used);
+
+      // 3. HR / Admin cancels the approved leave
+      const cancelRes = await request(app)
+        .patch(`/api/v1/leave-requests/${reqId}/cancel`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send();
+
+      expect(cancelRes.status).toBe(200);
+      expect(cancelRes.body.data.status).toBe('cancelled');
+      expect(cancelRes.body.data.decision_note).toMatch(/HR\/Admin/i);
+
+      // Verify balance reverted
+      const balAfter = await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+        .first();
+      expect(Number(balAfter.used)).toBe(usedBefore - 2.0);
+    });
+
+    it('should keep status approved/partially_approved when cancelling only future days of multi-day leave', async () => {
+      // Create request with 1 past day and 1 future day
+      const pastDay = '2026-10-01'; // Thursday
+      const futureDay = '2026-12-18'; // Friday
+
+      // Create request directly in DB with status = approved
+      const [reqId] = await db('leave_requests').insert({
+        employee_id: employeeId,
+        leave_type_id: clTypeId,
+        from_date: pastDay,
+        to_date: futureDay,
+        days: 2.0,
+        approved_days: 2.0,
+        reason: 'Spanned across past and future',
+        status: 'approved',
+      });
+
+      await db('leave_request_days').insert([
+        { leave_request_id: reqId, date: pastDay, day_type: 'full', status: 'approved' },
+        { leave_request_id: reqId, date: futureDay, day_type: 'full', status: 'approved' },
+      ]);
+
+      await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+        .update({ used: db.raw('used + 2.0') });
+
+      const balBefore = await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+        .first();
+
+      // Cancel by employee
+      const cancelRes = await request(app)
+        .patch(`/api/v1/leave-requests/${reqId}/cancel`)
+        .set('Authorization', `Bearer ${employeeToken}`)
+        .send();
+
+      expect(cancelRes.status).toBe(200);
+      // Status must remain 'approved' because past day was taken
+      expect(cancelRes.body.data.status).toBe('approved');
+      expect(Number(cancelRes.body.data.approved_days)).toBe(1.0);
+
+      // Reverted only future day (1.0)
+      const balAfter = await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+        .first();
+      expect(Number(balAfter.used)).toBe(Number(balBefore.used) - 1.0);
+
+      // Check day statuses
+      const days = await db('leave_request_days').where({ leave_request_id: reqId });
+      const pastRow = days.find((d: any) => d.date.includes('2026-10-01'));
+      const futureRow = days.find((d: any) => d.date.includes('2026-12-18'));
+      expect(pastRow.status).toBe('approved');
+      expect(futureRow.status).toBe('cancelled');
+    });
+  });
+
+  describe('7. Cross-Year Leave Balance Splitting', () => {
+    afterEach(async () => {
+      await db('leave_requests').where({ employee_id: employeeId }).where('from_date', '>=', '2026-12-30').delete();
+    });
+
+    it('should split balance deduction across calendar years (2026 and 2027)', async () => {
+      // Reset 2026 balance
+      await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+        .update({ used: 0.0, pending: 0.0 });
+
+      // Allocate 5 days to 2026 and 5 days to 2027
+      await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2027 })
+        .delete();
+      await db('leave_balances').insert({
+        employee_id: employeeId,
+        leave_type_id: clTypeId,
+        year: 2027,
+        allocated: 5.0,
+        used: 0.0,
+        pending: 0.0,
+      });
+
+      // 2026-12-30 (Wed), 2026-12-31 (Thu) in 2026
+      // 2027-01-04 (Mon) in 2027
+      const res = await request(app)
+        .post('/api/v1/leave-requests')
+        .set('Authorization', `Bearer ${employeeToken}`)
+        .send({
+          leave_type_id: clTypeId,
+          from_date: '2026-12-30',
+          to_date: '2027-01-04',
+          reason: 'Year end holiday spanning new year',
+        });
+
+      expect(res.status).toBe(201);
+      const reqId = res.body.data.id;
+
+      // Verify pending balance in 2026
+      const bal2026AfterApply = await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+        .first();
+      // 2 working days in 2026 (Dec 30, Dec 31)
+      expect(Number(bal2026AfterApply.pending)).toBe(2.0);
+
+      // Verify pending balance in 2027
+      const bal2027AfterApply = await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2027 })
+        .first();
+      // At least 1 working day in 2027
+      expect(Number(bal2027AfterApply.pending)).toBeGreaterThanOrEqual(1.0);
+
+      // Manager approves
+      const approveRes = await request(app)
+        .patch(`/api/v1/leave-requests/${reqId}/approve`)
+        .set('Authorization', `Bearer ${managerToken}`)
+        .send({ decision_note: 'Approved new year holiday' });
+
+      expect(approveRes.status).toBe(200);
+
+      // Verify pending -> used transition in 2026
+      const bal2026AfterApprove = await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2026 })
+        .first();
+      expect(Number(bal2026AfterApprove.pending)).toBe(0.0);
+      expect(Number(bal2026AfterApprove.used)).toBe(2.0);
+
+      // Verify pending -> used transition in 2027
+      const bal2027AfterApprove = await db('leave_balances')
+        .where({ employee_id: employeeId, leave_type_id: clTypeId, year: 2027 })
+        .first();
+      expect(Number(bal2027AfterApprove.pending)).toBe(0.0);
+      expect(Number(bal2027AfterApprove.used)).toBe(Number(bal2027AfterApply.pending));
+    });
+  });
+
+  describe('8. Dedicated leave.approve_all Permission & Rejection Notification', () => {
+    afterEach(async () => {
+      await db('leave_requests').where({ employee_id: employeeId }).where('from_date', '>=', '2026-12-20').delete();
+    });
+
+    it('should prevent non-manager without leave.approve_all from approving other employee leave', async () => {
+      // Create leave for employee
+      const applyRes = await request(app)
+        .post('/api/v1/leave-requests')
+        .set('Authorization', `Bearer ${employeeToken}`)
+        .send({
+          leave_type_id: clTypeId,
+          from_date: '2026-12-22',
+          to_date: '2026-12-23',
+          reason: 'Christmas preparation',
+        });
+      const reqId = applyRes.body.data.id;
+
+      // Another user without leave.approve_all or manager relation cannot approve
+      // Employee token itself trying to approve
+      const selfApprove = await request(app)
+        .patch(`/api/v1/leave-requests/${reqId}/approve`)
+        .set('Authorization', `Bearer ${employeeToken}`)
+        .send({ decision_note: 'Try self approve' });
+      expect(selfApprove.status).toBe(403);
+    });
+
+    it('should derive status rejected and send rejection when all dates are rejected in approveLeave', async () => {
+      const applyRes = await request(app)
+        .post('/api/v1/leave-requests')
+        .set('Authorization', `Bearer ${employeeToken}`)
+        .send({
+          leave_type_id: clTypeId,
+          from_date: '2026-12-24',
+          to_date: '2026-12-24',
+          reason: 'Eve off',
+        });
+      const reqId = applyRes.body.data.id;
+
+      // Approve call with rejected_dates containing the date
+      const res = await request(app)
+        .patch(`/api/v1/leave-requests/${reqId}/approve`)
+        .set('Authorization', `Bearer ${managerToken}`)
+        .send({
+          approved_dates: [],
+          rejected_dates: ['2026-12-24'],
+          decision_note: 'Cannot spare staff on Christmas Eve',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.status).toBe('rejected');
+    });
+  });
+
+  describe('9. Timezone-Safe Date Math (UTC and America/New_York)', () => {
+    it('should compute exact identical working days irrespective of TZ environment variable', async () => {
+      const originalTz = process.env.TZ;
+      try {
+        process.env.TZ = 'UTC';
+        const resUtc = await leavesService.calculateWorkingDays('2026-10-01', '2026-10-05');
+
+        process.env.TZ = 'America/New_York';
+        const resNy = await leavesService.calculateWorkingDays('2026-10-01', '2026-10-05');
+
+        expect(resUtc.days).toBe(resNy.days);
+        expect(resUtc.workingDates).toEqual(resNy.workingDates);
+        expect(resUtc.holidayDates).toEqual(resNy.holidayDates);
+        expect(resUtc.weekendDates).toEqual(resNy.weekendDates);
+      } finally {
+        process.env.TZ = originalTz;
+      }
     });
   });
 });

@@ -94,8 +94,8 @@ export class HolidaysService {
     const pad = (n: number) => n.toString().padStart(2, '0');
     const monthStr = pad(month);
 
-    // Number of days in month (handling leap years)
-    const totalDays = new Date(year, month, 0).getDate();
+    // Number of days in month (handling leap years, timezone-safe UTC)
+    const totalDays = new Date(Date.UTC(year, month, 0)).getUTCDate();
 
     const startDate = `${year}-${monthStr}-01`;
     const endDate = `${year}-${monthStr}-${pad(totalDays)}`;
@@ -112,9 +112,8 @@ export class HolidaysService {
 
     for (let day = 1; day <= totalDays; day++) {
       const dateStr = `${year}-${monthStr}-${pad(day)}`;
-      // Day of week in Asia/Kolkata or standard date string
-      const dateObj = new Date(year, month - 1, day);
-      const dayOfWeek = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
+      // Day of week in UTC (0 = Sunday, 6 = Saturday)
+      const dayOfWeek = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
 
       // Skip weekly off days
       if (weeklyOffs.has(dayOfWeek)) {

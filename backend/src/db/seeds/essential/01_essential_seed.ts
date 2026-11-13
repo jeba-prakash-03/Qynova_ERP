@@ -71,7 +71,7 @@ export async function seed(knex: Knex): Promise<void> {
     'designations.view', 'designations.create', 'designations.edit',
     'documents.view', 'documents.view_own', 'documents.create', 'documents.edit',
     'attendance.view', 'attendance.edit', 'attendance.approve', 'attendance.export', 'attendance.view_own',
-    'leave.view', 'leave.approve', 'leave.export', 'leave.create', 'leave.view_own',
+    'leave.view', 'leave.approve', 'leave.approve_all', 'leave.export', 'leave.create', 'leave.view_own',
     'holidays.view', 'holidays.create', 'holidays.edit',
     'payroll.view', 'payroll.create', 'payroll.edit', 'payroll.approve', 'payroll.run', 'payroll.export', 'payroll.view_own',
     'payslips.view', 'payslips.create', 'payslips.export', 'payslips.view_own',

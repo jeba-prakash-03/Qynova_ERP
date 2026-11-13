@@ -63,20 +63,24 @@ export class LeavesService {
       );
     }
 
-    const start = new Date(fromDate);
-    const end = new Date(toDate);
+    const [startYear, startMonth, startDay] = fromDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = toDate.split('-').map(Number);
 
-    // Collect all year-month pairs spanned by the range
+    // Collect all year-month pairs spanned by the range using integer math
     const monthsToFetch: Array<{ year: number; month: number }> = [];
-    const cur = new Date(start.getFullYear(), start.getMonth(), 1);
-    const last = new Date(end.getFullYear(), end.getMonth(), 1);
+    let curYear = startYear;
+    let curMonth = startMonth;
 
-    while (cur <= last) {
+    while (curYear < endYear || (curYear === endYear && curMonth <= endMonth)) {
       monthsToFetch.push({
-        year: cur.getFullYear(),
-        month: cur.getMonth() + 1, // 1-indexed
+        year: curYear,
+        month: curMonth,
       });
-      cur.setMonth(cur.getMonth() + 1);
+      curMonth++;
+      if (curMonth > 12) {
+        curMonth = 1;
+        curYear++;
+      }
     }
 
     // Accumulate all working dates across the spanned months
@@ -86,19 +90,19 @@ export class LeavesService {
       res.workingDates.forEach((d) => allWorkingDates.add(d));
     }
 
-    // Iterate day-by-day across [fromDate, toDate]
+    // Iterate day-by-day across [fromDate, toDate] using timezone-safe UTC
     const workingDates: string[] = [];
     const holidayOrWeekendDates: string[] = [];
     const weekendDates: string[] = [];
     const holidayDates: string[] = [];
 
     const pad = (n: number) => n.toString().padStart(2, '0');
-    const iter = new Date(fromDate);
-    const endDateObj = new Date(toDate);
+    const iter = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+    const endDateObj = new Date(Date.UTC(endYear, endMonth - 1, endDay));
 
     while (iter <= endDateObj) {
-      const dateStr = `${iter.getFullYear()}-${pad(iter.getMonth() + 1)}-${pad(iter.getDate())}`;
-      const dayOfWeek = iter.getDay();
+      const dateStr = `${iter.getUTCFullYear()}-${pad(iter.getUTCMonth() + 1)}-${pad(iter.getUTCDate())}`;
+      const dayOfWeek = iter.getUTCDay();
 
       if (allWorkingDates.has(dateStr)) {
         workingDates.push(dateStr);
@@ -111,7 +115,7 @@ export class LeavesService {
         }
       }
 
-      iter.setDate(iter.getDate() + 1);
+      iter.setUTCDate(iter.getUTCDate() + 1);
     }
 
     let days = workingDates.length;
@@ -131,7 +135,7 @@ export class LeavesService {
   // LEAVE BALANCES
   // ==========================================
   async getEmployeeBalances(employeeId: number, year?: number): Promise<LeaveBalance[]> {
-    const targetYear = year || new Date().getFullYear();
+    const targetYear = year || parseInt(getTodayKolkata().slice(0, 4), 10);
     return leavesRepository.findBalancesByEmployee(employeeId, targetYear);
   }
 
@@ -174,6 +178,7 @@ export class LeavesService {
     const leaveType = await this.getTypeById(data.leave_type_id);
     const isPermission = leaveType.code === 'PERM';
     const isWfh = leaveType.code === 'WFH';
+    const isLop = leaveType.code === 'LOP';
 
     if (data.is_half_day && !leaveType.allow_half_day) {
       throw new BadRequestError(`Half day is not allowed for ${leaveType.name}`);
@@ -193,19 +198,6 @@ export class LeavesService {
       }
       if (durationMinutes > 120) {
         throw new BadRequestError('Permission duration cannot exceed 2 hours (120 minutes)');
-      }
-
-      // Check max 2 per month for this employee
-      const monthPrefix = data.from_date.slice(0, 7);
-      const existingPermsCount = await db('leave_requests')
-        .where({ employee_id: employeeId, leave_type_id: leaveType.id })
-        .whereIn('status', ['pending', 'approved', 'partially_approved'])
-        .whereRaw('from_date LIKE ?', [`${monthPrefix}%`])
-        .count('id as count')
-        .first();
-
-      if (Number(existingPermsCount?.count || 0) >= 2) {
-        throw new BadRequestError('Maximum limit of 2 Permission requests per month reached');
       }
     }
 
@@ -255,8 +247,9 @@ export class LeavesService {
     if (empRec && empRec.joining_date) {
       const empJoiningDate = empRec.joining_date instanceof Date ? empRec.joining_date.toISOString().split('T')[0] : String(empRec.joining_date);
       if (data.from_date < empJoiningDate) {
-        const jDateObj = new Date(empJoiningDate + 'T00:00:00');
-        const formattedDate = jDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const [jY, jM, jD] = empJoiningDate.split('-').map(Number);
+        const jDateObj = new Date(Date.UTC(jY, jM - 1, jD));
+        const formattedDate = jDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
         throw new BadRequestError(
           `Leave cannot be applied for dates before joining date (${formattedDate}).`,
           [{ field: 'from_date', message: `Leave cannot be applied for dates before joining date (${formattedDate}).` }]
@@ -279,55 +272,101 @@ export class LeavesService {
       );
     }
 
-    // 2. Block overlapping requests
-    const overlap = await leavesRepository.findOverlapping(
-      employeeId,
-      data.from_date,
-      data.to_date,
-      Boolean(data.is_half_day || isPermission),
-      fromTime,
-      toTime
-    );
-
-    if (overlap) {
-      throw new BadRequestError(
-        `You already have an active leave request (${overlap.leave_type_name}, ${overlap.from_date} to ${overlap.to_date}, status: ${overlap.status}) overlapping with these dates.`
-      );
-    }
-
-    // 3. Verify balance (except LOP and Permission)
-    const requestYear = new Date(data.from_date).getFullYear();
-    const balance = await leavesRepository.findBalance(
-      employeeId,
-      leaveType.id,
-      requestYear
-    );
-
-    const isLop = leaveType.code === 'LOP';
-    if (!isLop && !isPermission) {
-      const remaining = balance?.remaining ?? 0;
-      if (daysCount > remaining) {
-        throw new BadRequestError(
-          `Insufficient leave balance for ${leaveType.name}. Available remaining: ${remaining}, Requested: ${daysCount}`
-        );
+    // Group working days by calendar year for cross-year leave splitting
+    const daysByYear = new Map<number, number>();
+    if (isPermission) {
+      const yr = parseInt(data.from_date.slice(0, 4), 10);
+      daysByYear.set(yr, 0);
+    } else {
+      for (const dateStr of calc.workingDates) {
+        const yr = parseInt(dateStr.slice(0, 4), 10);
+        const dayWeight = data.is_half_day ? 0.5 : 1.0;
+        daysByYear.set(yr, (daysByYear.get(yr) || 0) + dayWeight);
       }
     }
 
-    // 4. Create request and increment pending in DB Transaction
+    // 2. Execute DB transaction with concurrency control
     let createdRequest: LeaveRequest;
     await db.transaction(async (trx) => {
-      if (!balance && !isPermission) {
-        await leavesRepository.upsertBalance(
-          {
-            employee_id: employeeId,
-            leave_type_id: leaveType.id,
-            year: requestYear,
-            allocated: 0,
-          },
-          trx
+      // Permission monthly limit check inside transaction
+      if (isPermission) {
+        const monthPrefix = data.from_date.slice(0, 7);
+        const existingPermsCount = await trx('leave_requests')
+          .where({ employee_id: employeeId, leave_type_id: leaveType.id })
+          .whereIn('status', ['pending', 'approved', 'partially_approved'])
+          .whereRaw('from_date LIKE ?', [`${monthPrefix}%`])
+          .count('id as count')
+          .first();
+
+        if (Number(existingPermsCount?.count || 0) >= 2) {
+          throw new BadRequestError('Maximum limit of 2 Permission requests per month reached');
+        }
+      }
+
+      // Overlap check inside transaction
+      const overlap = await leavesRepository.findOverlapping(
+        employeeId,
+        data.from_date,
+        data.to_date,
+        Boolean(data.is_half_day || isPermission),
+        fromTime,
+        toTime,
+        undefined,
+        trx
+      );
+
+      if (overlap) {
+        throw new BadRequestError(
+          `You already have an active leave request (${overlap.leave_type_name}, ${overlap.from_date} to ${overlap.to_date}, status: ${overlap.status}) overlapping with these dates.`
         );
       }
 
+      // Check balance with forUpdate() on each calendar year spanned
+      for (const [year, requestedDaysForYear] of daysByYear.entries()) {
+        let balanceRow = await trx('leave_balances')
+          .where({
+            employee_id: employeeId,
+            leave_type_id: leaveType.id,
+            year,
+          })
+          .forUpdate()
+          .first();
+
+        if (!balanceRow && !isPermission) {
+          await leavesRepository.upsertBalance(
+            {
+              employee_id: employeeId,
+              leave_type_id: leaveType.id,
+              year,
+              allocated: 0,
+            },
+            trx
+          );
+          balanceRow = await trx('leave_balances')
+            .where({
+              employee_id: employeeId,
+              leave_type_id: leaveType.id,
+              year,
+            })
+            .forUpdate()
+            .first();
+        }
+
+        if (!isLop && !isPermission) {
+          const allocated = Number(balanceRow?.allocated || 0);
+          const used = Number(balanceRow?.used || 0);
+          const pending = Number(balanceRow?.pending || 0);
+          const remaining = allocated - used - pending;
+
+          if (requestedDaysForYear > remaining) {
+            throw new BadRequestError(
+              `Insufficient leave balance for ${leaveType.name} in year ${year}. Available remaining: ${remaining}, Requested: ${requestedDaysForYear}`
+            );
+          }
+        }
+      }
+
+      // Create master leave request row
       createdRequest = await leavesRepository.createRequest(
         {
           employee_id: employeeId,
@@ -365,19 +404,21 @@ export class LeavesService {
         await leavesRepository.createRequestDays(dayRows, trx);
       }
 
-      // Increment pending in leave_balances if daysCount > 0
-      if (daysCount > 0) {
-        await leavesRepository.adjustBalance(
-          employeeId,
-          leaveType.id,
-          requestYear,
-          { pendingDelta: daysCount },
-          trx
-        );
+      // Increment pending in leave_balances split per year
+      for (const [year, requestedDaysForYear] of daysByYear.entries()) {
+        if (requestedDaysForYear > 0) {
+          await leavesRepository.adjustBalance(
+            employeeId,
+            leaveType.id,
+            year,
+            { pendingDelta: requestedDaysForYear },
+            trx
+          );
+        }
       }
     });
 
-    // 5. Notify Reporting Manager (fallback to HR if no manager)
+    // Notify Reporting Manager (fallback to HR if no manager)
     try {
       const employee = await db('employees').where({ id: employeeId }).first();
       let notifyUserId: number | null = null;
@@ -427,8 +468,8 @@ export class LeavesService {
           },
         });
       }
-    } catch {
-      // Non-fatal
+    } catch (err) {
+      console.error('[LEAVE_APPLY_NOTIFICATION_ERROR]', err);
     }
 
     return createdRequest!;
@@ -447,97 +488,116 @@ export class LeavesService {
     },
     dto: ApproveLeaveRequestDto
   ): Promise<LeaveRequest> {
-    const request = await leavesRepository.findRequestById(requestId);
-    if (!request) {
-      throw new NotFoundError(`Leave request with ID ${requestId} not found`);
-    }
-
-    if (request.status !== 'pending') {
-      throw new BadRequestError(
-        `Cannot approve request with status '${request.status}'. Only pending requests can be approved.`
-      );
-    }
-
-    // Self approval prevention
-    if (currentUser.employeeId && currentUser.employeeId === request.employee_id) {
-      throw new ForbiddenError('You cannot approve your own leave request.');
-    }
-
-    // Permission check: reporting manager or HR/Admin
-    const employee = await db('employees').where({ id: request.employee_id }).first();
-    const isReportingManager =
-      currentUser.employeeId &&
-      employee?.reporting_manager_id === currentUser.employeeId;
     const isHrOrAdmin =
       hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
       currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
-      currentUser.permissions.includes('leave.view') ||
-      currentUser.permissions.includes('*');
-
-    if (!isReportingManager && !isHrOrAdmin) {
-      throw new ForbiddenError(
-        'You are not authorized to approve this leave request. Only the reporting manager or HR/Admin can approve.'
-      );
-    }
-
-    const dayRows = await leavesRepository.findRequestDays(requestId);
-    const approvedDateSet = new Set(dto.approved_dates || dayRows.map((d) => d.date));
-    const rejectedDateSet = new Set(dto.rejected_dates || []);
-
-    const hasRejectedDays = dayRows.some((d) => !approvedDateSet.has(d.date) || rejectedDateSet.has(d.date));
-    if (hasRejectedDays && (!dto.decision_note || dto.decision_note.trim().length === 0)) {
-      throw new BadRequestError('Decision note is mandatory when partially approving or rejecting days.');
-    }
-
-    let approvedDaysCount = 0.0;
-    let rejectedDaysCount = 0.0;
-
-    const approvedDates: string[] = [];
-
-    for (const d of dayRows) {
-      const isApproved = approvedDateSet.has(d.date) && !rejectedDateSet.has(d.date);
-      const dayWeight = request.is_half_day ? 0.5 : 1.0;
-      const note = dto.day_notes?.[d.date] || dto.decision_note || (isApproved ? 'Approved' : 'Rejected');
-
-      if (isApproved) {
-        approvedDaysCount += dayWeight;
-        approvedDates.push(d.date);
-        await leavesRepository.updateRequestDayStatus(
-          d.id,
-          'approved',
-          note,
-          currentUser.employeeId
-        );
-      } else {
-        rejectedDaysCount += dayWeight;
-        await leavesRepository.updateRequestDayStatus(
-          d.id,
-          'rejected',
-          note,
-          currentUser.employeeId
-        );
-      }
-    }
-
-    // If dayRows were empty (legacy fallback), default to request.days
-    if (dayRows.length === 0) {
-      approvedDaysCount = request.days;
-    }
-
-    // Determine derived request status
-    let derivedStatus: 'approved' | 'partially_approved' | 'rejected' = 'approved';
-    if (approvedDaysCount === 0) {
-      derivedStatus = 'rejected';
-    } else if (rejectedDaysCount > 0) {
-      derivedStatus = 'partially_approved';
-    }
-
-    const requestYear = new Date(request.from_date).getFullYear();
-    const isWfh = request.leave_type_code === 'WFH';
+      currentUser.permissions.includes('leave.approve_all');
 
     let updatedRequest: LeaveRequest;
+    let employeeUserId: number | null = null;
+    let employeeFullName = '';
+    let applicantFromDate = '';
+    let applicantToDate = '';
+    let leaveTypeName = '';
+    let totalRequestedDays = 0;
+    let derivedStatus: string = 'approved';
+    let finalApprovedDaysCount = 0;
+
     await db.transaction(async (trx) => {
-      // 1. Update master leave_requests row
+      // 1. Read request with forUpdate() inside transaction
+      await trx('leave_requests').where({ id: requestId }).forUpdate().first();
+      const request = await leavesRepository.findRequestById(requestId, trx);
+      if (!request) {
+        throw new NotFoundError(`Leave request with ID ${requestId} not found`);
+      }
+
+      // Re-check status inside transaction
+      if (request.status !== 'pending') {
+        throw new BadRequestError(
+          `Cannot approve request with status '${request.status}'. Only pending requests can be approved.`
+        );
+      }
+
+      // Self approval prevention
+      if (currentUser.employeeId && currentUser.employeeId === request.employee_id) {
+        throw new ForbiddenError('You cannot approve your own leave request.');
+      }
+
+      // Permission check: reporting manager or HR/Admin
+      const employee = await trx('employees').where({ id: request.employee_id }).first();
+      const isReportingManager =
+        currentUser.employeeId &&
+        employee?.reporting_manager_id === currentUser.employeeId;
+
+      if (!isReportingManager && !isHrOrAdmin) {
+        throw new ForbiddenError(
+          'You are not authorized to approve this leave request. Only the reporting manager or HR/Admin can approve.'
+        );
+      }
+
+      const dayRows = await leavesRepository.findRequestDays(requestId, trx);
+      const approvedDateSet = new Set(dto.approved_dates || dayRows.map((d) => d.date));
+      const rejectedDateSet = new Set(dto.rejected_dates || []);
+
+      const hasRejectedDays = dayRows.some((d) => !approvedDateSet.has(d.date) || rejectedDateSet.has(d.date));
+      if (hasRejectedDays && (!dto.decision_note || dto.decision_note.trim().length === 0)) {
+        throw new BadRequestError('Decision note is mandatory when partially approving or rejecting days.');
+      }
+
+      let approvedDaysCount = 0.0;
+      let rejectedDaysCount = 0.0;
+      const approvedDates: string[] = [];
+
+      const requestedDaysByYear = new Map<number, number>();
+      const approvedDaysByYear = new Map<number, number>();
+
+      for (const d of dayRows) {
+        const yr = parseInt(d.date.slice(0, 4), 10);
+        const dayWeight = request.is_half_day ? 0.5 : 1.0;
+        requestedDaysByYear.set(yr, (requestedDaysByYear.get(yr) || 0) + dayWeight);
+
+        const isApproved = approvedDateSet.has(d.date) && !rejectedDateSet.has(d.date);
+        const note = dto.day_notes?.[d.date] || dto.decision_note || (isApproved ? 'Approved' : 'Rejected');
+
+        if (isApproved) {
+          approvedDaysCount += dayWeight;
+          approvedDates.push(d.date);
+          approvedDaysByYear.set(yr, (approvedDaysByYear.get(yr) || 0) + dayWeight);
+          await leavesRepository.updateRequestDayStatus(
+            d.id,
+            'approved',
+            note,
+            currentUser.employeeId,
+            trx
+          );
+        } else {
+          rejectedDaysCount += dayWeight;
+          await leavesRepository.updateRequestDayStatus(
+            d.id,
+            'rejected',
+            note,
+            currentUser.employeeId,
+            trx
+          );
+        }
+      }
+
+      if (dayRows.length === 0) {
+        const fallbackYear = parseInt(request.from_date.slice(0, 4), 10);
+        requestedDaysByYear.set(fallbackYear, request.days);
+        approvedDaysByYear.set(fallbackYear, request.days);
+        approvedDaysCount = request.days;
+      }
+
+      if (approvedDaysCount === 0) {
+        derivedStatus = 'rejected';
+      } else if (rejectedDaysCount > 0) {
+        derivedStatus = 'partially_approved';
+      }
+
+      const isWfh = request.leave_type_code === 'WFH';
+
+      // Update master leave_requests row
       updatedRequest = await leavesRepository.updateRequestStatus(
         request.id,
         {
@@ -548,22 +608,26 @@ export class LeavesService {
           approved_days: approvedDaysCount,
           rejected_days: rejectedDaysCount,
         },
-        trx
+        trx,
+        ['pending']
       );
 
-      // 2. Adjust balance: pending -= requested.days, used += approvedDaysCount
-      await leavesRepository.adjustBalance(
-        request.employee_id,
-        request.leave_type_id,
-        requestYear,
-        {
-          pendingDelta: -request.days,
-          usedDelta: approvedDaysCount,
-        },
-        trx
-      );
+      // Adjust balances per year
+      for (const [yr, reqCount] of requestedDaysByYear.entries()) {
+        const appCount = approvedDaysByYear.get(yr) || 0;
+        await leavesRepository.adjustBalance(
+          request.employee_id,
+          request.leave_type_id,
+          yr,
+          {
+            pendingDelta: -reqCount,
+            usedDelta: appCount,
+          },
+          trx
+        );
+      }
 
-      // 3. Sync attendance ONLY for approved dates
+      // Sync attendance ONLY for approved dates
       for (const dateStr of approvedDates) {
         await leavesRepository.syncAttendanceForLeave(
           request.employee_id,
@@ -574,42 +638,68 @@ export class LeavesService {
           trx
         );
       }
+
+      employeeUserId = employee?.user_id || null;
+      employeeFullName = employee ? `${employee.first_name} ${employee.last_name}` : '';
+      applicantFromDate = request.from_date;
+      applicantToDate = request.to_date;
+      leaveTypeName = request.leave_type_name || 'Leave';
+      totalRequestedDays = request.days;
+      finalApprovedDaysCount = approvedDaysCount;
     });
 
-    // 4. Notify applicant with unique eventKey
+    // Notify applicant with unique eventKey
     try {
-      if (employee?.user_id) {
-        const notifMsg =
-          derivedStatus === 'partially_approved'
-            ? `Leave ${request.from_date} to ${request.to_date} partly approved: ${approvedDaysCount} of ${request.days} days approved.`
-            : `Your leave request for ${approvedDaysCount} day(s) from ${request.from_date} to ${request.to_date} has been approved.`;
-
+      if (employeeUserId) {
         const portalUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/leaves/my`;
+
+        let notifMsg = '';
+        let notifType: 'success' | 'warning' | 'danger' = 'success';
+        let notifTitle = '';
+        let emailSubject = '';
+
+        if (derivedStatus === 'rejected') {
+          notifType = 'danger';
+          notifTitle = 'Leave Request Rejected';
+          notifMsg = `Your leave request for ${applicantFromDate} to ${applicantToDate} was rejected.${dto.decision_note ? ` Reason: ${dto.decision_note}` : ''}`;
+          emailSubject = 'Leave Request Rejected';
+        } else if (derivedStatus === 'partially_approved') {
+          notifType = 'warning';
+          notifTitle = 'Leave Partially Approved';
+          notifMsg = `Leave ${applicantFromDate} to ${applicantToDate} partly approved: ${finalApprovedDaysCount} of ${totalRequestedDays} days approved.`;
+          emailSubject = 'Leave Request Partially Approved';
+        } else {
+          notifType = 'success';
+          notifTitle = 'Leave Request Approved';
+          notifMsg = `Your leave request for ${finalApprovedDaysCount} day(s) from ${applicantFromDate} to ${applicantToDate} has been approved.`;
+          emailSubject = 'Leave Request Approved';
+        }
+
         const emailHtml = leaveStatusEmailTemplate({
-          employeeName: `${employee.first_name} ${employee.last_name}`,
+          employeeName: employeeFullName,
           status: derivedStatus,
-          leaveType: request.leave_type_name || 'Leave',
-          days: approvedDaysCount,
+          leaveType: leaveTypeName,
+          days: derivedStatus === 'rejected' ? totalRequestedDays : finalApprovedDaysCount,
           decisionNote: dto.decision_note,
           portalUrl,
         });
 
         await notificationService.notify({
-          eventKey: `leave.${derivedStatus}:req:${request.id}`,
-          userIds: employee.user_id,
-          type: derivedStatus === 'partially_approved' ? 'warning' : 'success',
-          title: derivedStatus === 'partially_approved' ? 'Leave Partially Approved' : 'Leave Request Approved',
+          eventKey: `leave.${derivedStatus}:req:${requestId}`,
+          userIds: employeeUserId,
+          type: notifType,
+          title: notifTitle,
           message: notifMsg,
           link: '/leaves/my',
           emailDetails: {
             eventType: 'leave_status',
-            subject: `Leave Request ${derivedStatus === 'partially_approved' ? 'Partially Approved' : 'Approved'}`,
+            subject: emailSubject,
             html: emailHtml,
           },
         });
       }
-    } catch {
-      // Non-fatal
+    } catch (err) {
+      console.error('[LEAVE_APPROVE_NOTIFICATION_ERROR]', err);
     }
 
     return updatedRequest!;
@@ -632,46 +722,58 @@ export class LeavesService {
       throw new BadRequestError('Decision note is mandatory when rejecting a leave request.');
     }
 
-    const request = await leavesRepository.findRequestById(requestId);
-    if (!request) {
-      throw new NotFoundError(`Leave request with ID ${requestId} not found`);
-    }
-
-    if (request.status !== 'pending') {
-      throw new BadRequestError(
-        `Cannot reject request with status '${request.status}'. Only pending requests can be rejected.`
-      );
-    }
-
-    // Self rejection check
-    if (currentUser.employeeId && currentUser.employeeId === request.employee_id) {
-      throw new ForbiddenError('You cannot reject your own leave request.');
-    }
-
-    // Permission check
-    const employee = await db('employees').where({ id: request.employee_id }).first();
-    const isReportingManager =
-      currentUser.employeeId &&
-      employee?.reporting_manager_id === currentUser.employeeId;
     const isHrOrAdmin =
       hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
       currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
-      currentUser.permissions.includes('leave.view') ||
-      currentUser.permissions.includes('*');
-
-    if (!isReportingManager && !isHrOrAdmin) {
-      throw new ForbiddenError(
-        'You are not authorized to reject this leave request.'
-      );
-    }
-
-    const requestYear = new Date(request.from_date).getFullYear();
+      currentUser.permissions.includes('leave.approve_all');
 
     let updatedRequest: LeaveRequest;
+    let employeeUserId: number | null = null;
+    let employeeFullName = '';
+    let applicantFromDate = '';
+    let applicantToDate = '';
+    let leaveTypeName = '';
+    let totalRequestedDays = 0;
+
     await db.transaction(async (trx) => {
+      await trx('leave_requests').where({ id: requestId }).forUpdate().first();
+      const request = await leavesRepository.findRequestById(requestId, trx);
+      if (!request) {
+        throw new NotFoundError(`Leave request with ID ${requestId} not found`);
+      }
+
+      if (request.status !== 'pending') {
+        throw new BadRequestError(
+          `Cannot reject request with status '${request.status}'. Only pending requests can be rejected.`
+        );
+      }
+
+      // Self rejection check
+      if (currentUser.employeeId && currentUser.employeeId === request.employee_id) {
+        throw new ForbiddenError('You cannot reject your own leave request.');
+      }
+
+      // Permission check
+      const employee = await trx('employees').where({ id: request.employee_id }).first();
+      const isReportingManager =
+        currentUser.employeeId &&
+        employee?.reporting_manager_id === currentUser.employeeId;
+
+      if (!isReportingManager && !isHrOrAdmin) {
+        throw new ForbiddenError(
+          'You are not authorized to reject this leave request.'
+        );
+      }
+
       // 1. Update day rows
       const dayRows = await leavesRepository.findRequestDays(request.id, trx);
+      const requestedDaysByYear = new Map<number, number>();
+
       for (const d of dayRows) {
+        const yr = parseInt(d.date.slice(0, 4), 10);
+        const dayWeight = request.is_half_day ? 0.5 : 1.0;
+        requestedDaysByYear.set(yr, (requestedDaysByYear.get(yr) || 0) + dayWeight);
+
         await leavesRepository.updateRequestDayStatus(
           d.id,
           'rejected',
@@ -679,6 +781,11 @@ export class LeavesService {
           currentUser.employeeId,
           trx
         );
+      }
+
+      if (dayRows.length === 0) {
+        const fallbackYear = parseInt(request.from_date.slice(0, 4), 10);
+        requestedDaysByYear.set(fallbackYear, request.days);
       }
 
       // 2. Update master request row
@@ -689,46 +796,53 @@ export class LeavesService {
           approver_employee_id: currentUser.employeeId || null,
           decided_at: new Date(),
           decision_note: dto.decision_note,
+          approved_days: 0,
+          rejected_days: request.days,
         },
-        trx
+        trx,
+        ['pending']
       );
 
-      await trx('leave_requests').where({ id: request.id }).update({
-        approved_days: 0,
-        rejected_days: request.days,
-      });
+      // 3. Transition balance: pending -= days per year
+      for (const [yr, reqCount] of requestedDaysByYear.entries()) {
+        await leavesRepository.adjustBalance(
+          request.employee_id,
+          request.leave_type_id,
+          yr,
+          {
+            pendingDelta: -reqCount,
+          },
+          trx
+        );
+      }
 
-      // 3. Transition balance: pending -= days (restored to available)
-      await leavesRepository.adjustBalance(
-        request.employee_id,
-        request.leave_type_id,
-        requestYear,
-        {
-          pendingDelta: -request.days,
-        },
-        trx
-      );
+      employeeUserId = employee?.user_id || null;
+      employeeFullName = employee ? `${employee.first_name} ${employee.last_name}` : '';
+      applicantFromDate = request.from_date;
+      applicantToDate = request.to_date;
+      leaveTypeName = request.leave_type_name || 'Leave';
+      totalRequestedDays = request.days;
     });
 
     // 4. Notify applicant employee
     try {
-      if (employee?.user_id) {
+      if (employeeUserId) {
         const portalUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/leaves/my`;
         const emailHtml = leaveStatusEmailTemplate({
-          employeeName: `${employee.first_name} ${employee.last_name}`,
+          employeeName: employeeFullName,
           status: 'rejected',
-          leaveType: request.leave_type_name || 'Leave',
-          days: request.days,
+          leaveType: leaveTypeName,
+          days: totalRequestedDays,
           decisionNote: dto.decision_note,
           portalUrl,
         });
 
         await notificationService.notify({
-          eventKey: `leave.rejected:req:${request.id}`,
-          userIds: employee.user_id,
+          eventKey: `leave.rejected:req:${requestId}`,
+          userIds: employeeUserId,
           type: 'danger',
           title: 'Leave Request Rejected',
-          message: `Your leave request for ${request.from_date} to ${request.to_date} was rejected. Reason: ${dto.decision_note}`,
+          message: `Your leave request for ${applicantFromDate} to ${applicantToDate} was rejected. Reason: ${dto.decision_note}`,
           link: '/leaves/my',
           emailDetails: {
             eventType: 'leave_status',
@@ -737,8 +851,8 @@ export class LeavesService {
           },
         });
       }
-    } catch {
-      // Non-fatal
+    } catch (err) {
+      console.error('[LEAVE_REJECT_NOTIFICATION_ERROR]', err);
     }
 
     return updatedRequest!;
@@ -756,90 +870,150 @@ export class LeavesService {
       permissions: string[];
     }
   ): Promise<LeaveRequest> {
-    const request = await leavesRepository.findRequestById(requestId);
-    if (!request) {
-      throw new NotFoundError(`Leave request with ID ${requestId} not found`);
-    }
-
-    const isApplicant =
-      currentUser.employeeId && currentUser.employeeId === request.employee_id;
-    const isAdmin = hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR);
-
-    if (!isApplicant && !isAdmin) {
-      throw new ForbiddenError('You can only cancel your own leave requests.');
-    }
-
-    if (request.status === 'cancelled' || request.status === 'rejected') {
-      throw new BadRequestError(
-        `Cannot cancel a leave request that is already ${request.status}.`
-      );
-    }
+    const isAdmin =
+      hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
+      currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+      currentUser.permissions.includes('leave.approve_all');
 
     const todayStr = getTodayKolkata();
-    const requestYear = new Date(request.from_date).getFullYear();
-
     let updatedRequest: LeaveRequest;
+
     await db.transaction(async (trx) => {
+      await trx('leave_requests').where({ id: requestId }).forUpdate().first();
+      const request = await leavesRepository.findRequestById(requestId, trx);
+      if (!request) {
+        throw new NotFoundError(`Leave request with ID ${requestId} not found`);
+      }
+
+      const isApplicant = Boolean(
+        currentUser.employeeId && currentUser.employeeId === request.employee_id
+      );
+
+      if (!isApplicant && !isAdmin) {
+        throw new ForbiddenError('You can only cancel your own leave requests.');
+      }
+
+      if (request.status === 'cancelled' || request.status === 'rejected') {
+        throw new BadRequestError(
+          `Cannot cancel a leave request that is already ${request.status}.`
+        );
+      }
+
+      const actorNote = isAdmin && !isApplicant ? 'Cancelled by HR/Admin' : 'Cancelled by applicant';
       const dayRows = await leavesRepository.findRequestDays(request.id, trx);
 
       if (request.status === 'pending') {
-        // Pending cancellation
+        const requestedDaysByYear = new Map<number, number>();
         for (const d of dayRows) {
-          await leavesRepository.updateRequestDayStatus(d.id, 'cancelled', 'Cancelled by applicant', currentUser.employeeId, trx);
+          const yr = parseInt(d.date.slice(0, 4), 10);
+          const dayWeight = request.is_half_day ? 0.5 : 1.0;
+          requestedDaysByYear.set(yr, (requestedDaysByYear.get(yr) || 0) + dayWeight);
+
+          await leavesRepository.updateRequestDayStatus(
+            d.id,
+            'cancelled',
+            actorNote,
+            currentUser.employeeId,
+            trx
+          );
+        }
+
+        if (dayRows.length === 0) {
+          const fallbackYear = parseInt(request.from_date.slice(0, 4), 10);
+          requestedDaysByYear.set(fallbackYear, request.days);
         }
 
         updatedRequest = await leavesRepository.updateRequestStatus(
           request.id,
           {
             status: 'cancelled',
-            decision_note: 'Cancelled by applicant',
+            decision_note: actorNote,
           },
-          trx
+          trx,
+          ['pending']
         );
 
-        await leavesRepository.adjustBalance(
-          request.employee_id,
-          request.leave_type_id,
-          requestYear,
-          {
-            pendingDelta: -request.days,
-          },
-          trx
-        );
+        for (const [yr, reqCount] of requestedDaysByYear.entries()) {
+          await leavesRepository.adjustBalance(
+            request.employee_id,
+            request.leave_type_id,
+            yr,
+            { pendingDelta: -reqCount },
+            trx
+          );
+        }
       } else if (request.status === 'approved' || request.status === 'partially_approved') {
-        // Approved/Partial cancellation: allowed only if dates >= today
-        const approvedDaysToCancel = dayRows.filter((d) => d.status === 'approved' && d.date >= todayStr);
-        if (approvedDaysToCancel.length === 0 && request.from_date < todayStr) {
+        // Only cancel future days: date >= todayStr
+        const approvedDaysToCancel = dayRows.filter(
+          (d) => d.status === 'approved' && d.date >= todayStr
+        );
+
+        if (approvedDaysToCancel.length === 0) {
           throw new BadRequestError(
             'Cannot cancel an approved leave that has already started or passed in the past.'
           );
         }
 
+        const pastApprovedDays = dayRows.filter(
+          (d) => d.status === 'approved' && d.date < todayStr
+        );
+
         for (const d of approvedDaysToCancel) {
-          await leavesRepository.updateRequestDayStatus(d.id, 'cancelled', 'Cancelled by applicant (Future Leave)', currentUser.employeeId, trx);
+          await leavesRepository.updateRequestDayStatus(
+            d.id,
+            'cancelled',
+            `${actorNote} (Future Leave)`,
+            currentUser.employeeId,
+            trx
+          );
         }
 
-        const daysRevertedCount = approvedDaysToCancel.length * (request.is_half_day ? 0.5 : 1.0);
+        const daysRevertedCount =
+          approvedDaysToCancel.length * (request.is_half_day ? 0.5 : 1.0);
+
+        // Keep status 'approved' or 'partially_approved' if any past days were taken
+        const nextStatus = pastApprovedDays.length > 0 ? request.status : 'cancelled';
+        const note =
+          pastApprovedDays.length > 0
+            ? `${actorNote} (Future days cancelled)`
+            : `${actorNote} (Future Approved Leave)`;
+
+        const remainingApprovedDays = Math.max(
+          0,
+          Number(request.approved_days || request.days) - daysRevertedCount
+        );
 
         updatedRequest = await leavesRepository.updateRequestStatus(
           request.id,
           {
-            status: 'cancelled',
-            decision_note: 'Cancelled by applicant (Future Approved Leave)',
+            status: nextStatus,
+            decision_note: note,
+            approved_days: remainingApprovedDays,
           },
-          trx
+          trx,
+          ['approved', 'partially_approved']
         );
 
-        // Revert used quota
-        await leavesRepository.adjustBalance(
-          request.employee_id,
-          request.leave_type_id,
-          requestYear,
-          {
-            usedDelta: -daysRevertedCount,
-          },
-          trx
-        );
+        // Revert used quota per year for cancelled approved days
+        const cancelledApprovedByYear = new Map<number, number>();
+        for (const d of approvedDaysToCancel) {
+          const yr = parseInt(d.date.slice(0, 4), 10);
+          const dayWeight = request.is_half_day ? 0.5 : 1.0;
+          cancelledApprovedByYear.set(
+            yr,
+            (cancelledApprovedByYear.get(yr) || 0) + dayWeight
+          );
+        }
+
+        for (const [yr, cancelledCount] of cancelledApprovedByYear.entries()) {
+          await leavesRepository.adjustBalance(
+            request.employee_id,
+            request.leave_type_id,
+            yr,
+            { usedDelta: -cancelledCount },
+            trx
+          );
+        }
 
         // Revert attendance rows for cancelled dates
         const datesToRevert = approvedDaysToCancel.map((d) => d.date);
@@ -875,8 +1049,7 @@ export class LeavesService {
     const isHrOrAdmin =
       hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
       currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
-      currentUser.permissions.includes('leave.view') ||
-      currentUser.permissions.includes('*');
+      currentUser.permissions.includes('leave.approve_all');
 
     const requests = isHrOrAdmin
       ? await leavesRepository.findPendingRequests()
@@ -903,7 +1076,7 @@ export class LeavesService {
     const [yearStr, monthStr] = month.split('-');
     const year = parseInt(yearStr, 10);
     const m = parseInt(monthStr, 10);
-    const lastDay = new Date(year, m, 0).getDate();
+    const lastDay = new Date(Date.UTC(year, m, 0)).getUTCDate();
     const pad = (n: number) => n.toString().padStart(2, '0');
 
     const startDate = `${month}-01`;
@@ -911,8 +1084,8 @@ export class LeavesService {
 
     const isHrOrAdmin =
       hasRole(currentUser.roles, SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.HR) ||
-      currentUser.permissions.includes('leave.view') ||
-      currentUser.permissions.includes('*');
+      currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
+      currentUser.permissions.includes('leave.approve_all');
 
     const reportingManagerId = isHrOrAdmin ? undefined : (currentUser.employeeId || -1);
 

@@ -269,14 +269,17 @@ export class LeavesRepository {
       approved_days?: number;
       rejected_days?: number;
     },
-    trx?: Knex.Transaction
+    trx?: Knex.Transaction,
+    expectedStatuses: LeaveRequestStatus[] = ['pending']
   ): Promise<LeaveRequest> {
     const q = trx || db;
-    const rowsAffected = await q('leave_requests')
-      .where({ id, status: 'pending' })
-      .update(updateData);
+    const query = q('leave_requests').where({ id });
+    if (expectedStatuses && expectedStatuses.length > 0) {
+      query.whereIn('status', expectedStatuses);
+    }
+    const rowsAffected = await query.update(updateData);
     if (rowsAffected === 0) {
-      throw new ConflictError('Leave request is no longer pending or has already been decided.');
+      throw new ConflictError('Leave request is no longer in an editable state or status has changed.');
     }
     const updated = await this.findRequestById(id, trx);
     return updated!;

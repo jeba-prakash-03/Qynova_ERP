@@ -121,11 +121,11 @@ This document defines the permission enforcement and role access across all syst
 |---|---|---|---|---|---|---|---|
 | POST | `/api/v1/leave-requests` | `requireEmployee`, `leave.create` | Yes | Yes | Yes | Yes | Yes |
 | GET | `/api/v1/leave-requests/me` | `requireEmployee`, `leave.view_own` | Yes | Yes | Yes | Yes | Yes |
-| GET | `/api/v1/leave-requests/pending` | Admin/HR: Company; Manager: Direct Team | Yes | Yes | Team only | No | No |
-| GET | `/api/v1/leave-requests/calendar` | Admin/HR: Company; Manager: Team; Emp: Self | Yes | Yes | Team only | Self only | Self only |
-| PATCH | `/api/v1/leave-requests/:id/approve` | Reporting Manager or Admin/HR | Yes | Yes | Team only | No | No |
-| PATCH | `/api/v1/leave-requests/:id/reject` | Reporting Manager or Admin/HR | Yes | Yes | Team only | No | No |
-| PATCH | `/api/v1/leave-requests/:id/cancel` | `requireEmployee`, Owner only | Yes | Yes | Self only | Self only | Self only |
+| GET | `/api/v1/leave-requests/pending` | Admin/HR (`leave.approve_all`): Company; Manager (`leave.approve`): Direct Team | Yes | Yes | Team only | No | No |
+| GET | `/api/v1/leave-requests/calendar` | Admin/HR (`leave.approve_all`): Company; Manager: Team; Emp: Self | Yes | Yes | Team only | Self only | Self only |
+| PATCH | `/api/v1/leave-requests/:id/approve` | Reporting Manager or Admin/HR (`leave.approve_all`) | Yes | Yes | Team only | No | No |
+| PATCH | `/api/v1/leave-requests/:id/reject` | Reporting Manager or Admin/HR (`leave.approve_all`) | Yes | Yes | Team only | No | No |
+| PATCH | `/api/v1/leave-requests/:id/cancel` | Owner or Admin/HR (`leave.approve_all`) | Yes | Yes | Self only | Self only | Self only |
 | GET | `/api/v1/leave-balances/me` | `requireEmployee`, `leave.view_own` | Yes | Yes | Yes | Yes | Yes |
 | POST | `/api/v1/leave-balances/allocate` | `leave.approve` (Admin / HR) | Yes | Yes | No | No | No |
 

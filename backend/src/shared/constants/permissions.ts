@@ -85,6 +85,7 @@ export const ALL_SYSTEM_PERMISSIONS: PermissionDefinition[] = [
   { module: 'leave', action: 'edit', name: 'leave.edit', description: 'Edit leave request' },
   { module: 'leave', action: 'delete', name: 'leave.delete', description: 'Cancel/delete leave request' },
   { module: 'leave', action: 'approve', name: 'leave.approve', description: 'Approve or reject leave' },
+  { module: 'leave', action: 'approve_all', name: 'leave.approve_all', description: 'Approve or reject any company leave request' },
   { module: 'leave', action: 'export', name: 'leave.export', description: 'Export leave data' },
 
   // Holidays
