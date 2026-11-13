@@ -98,8 +98,8 @@ export const AttendanceSheetPage: React.FC = () => {
   }>({
     status: 'present',
     work_type: 'office',
-    check_in_time: '09:30',
-    check_out_time: '18:30',
+    check_in_time: '',
+    check_out_time: '',
     reason: '',
   });
 
@@ -118,8 +118,8 @@ export const AttendanceSheetPage: React.FC = () => {
     date: selectedDate,
     status: 'present',
     work_type: 'office',
-    check_in_time: '09:30',
-    check_out_time: '18:30',
+    check_in_time: '',
+    check_out_time: '',
     reason: '',
   });
 
@@ -134,6 +134,17 @@ export const AttendanceSheetPage: React.FC = () => {
     user?.roles?.includes('Admin') ||
     user?.roles?.includes('HR')
   );
+
+  // Fetch configured shift timings from DB
+  const { data: todayShiftData } = useQuery({
+    queryKey: ['attendance', 'shift-timings'],
+    queryFn: async () => {
+      const res = await axiosClient.get('/attendance/today');
+      return res.data?.data;
+    },
+  });
+  const defaultShiftStart = todayShiftData?.shift?.start || '';
+  const defaultShiftEnd = todayShiftData?.shift?.end || '';
 
   // Fetch departments
   const { data: departments = [] } = useQuery({
@@ -303,8 +314,8 @@ export const AttendanceSheetPage: React.FC = () => {
     setEditForm({
       status: item.status,
       work_type: item.work_type || 'office',
-      check_in_time: inTime !== '--:--' ? inTime : (['absent', 'leave'].includes(item.status) ? '' : '09:30'),
-      check_out_time: outTime !== '--:--' ? outTime : (['absent', 'leave'].includes(item.status) ? '' : '18:30'),
+      check_in_time: inTime !== '--:--' ? inTime : (['absent', 'leave'].includes(item.status) ? '' : defaultShiftStart),
+      check_out_time: outTime !== '--:--' ? outTime : (['absent', 'leave'].includes(item.status) ? '' : defaultShiftEnd),
       reason: '',
     });
   };
@@ -333,8 +344,8 @@ export const AttendanceSheetPage: React.FC = () => {
     setEditForm({
       status: dayInfo?.status || 'present',
       work_type: dayInfo?.work_type || 'office',
-      check_in_time: dayInfo?.status === 'absent' ? '' : '09:30',
-      check_out_time: dayInfo?.status === 'absent' ? '' : '18:30',
+      check_in_time: dayInfo?.status === 'absent' ? '' : defaultShiftStart,
+      check_out_time: dayInfo?.status === 'absent' ? '' : defaultShiftEnd,
       reason: '',
     });
   };
@@ -443,8 +454,8 @@ export const AttendanceSheetPage: React.FC = () => {
                     date: selectedDate,
                     status: 'present',
                     work_type: 'office',
-                    check_in_time: '09:30',
-                    check_out_time: '18:30',
+                    check_in_time: defaultShiftStart,
+                    check_out_time: defaultShiftEnd,
                     reason: '',
                   });
                   setIsAddModalOpen(true);

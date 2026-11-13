@@ -1,5 +1,6 @@
 import db from '../../db/knex';
 import type { Knex } from 'knex';
+import { ConflictError } from '../../shared/errors/app-error';
 import {
   LeaveType,
   LeaveBalance,
@@ -271,7 +272,12 @@ export class LeavesRepository {
     trx?: Knex.Transaction
   ): Promise<LeaveRequest> {
     const q = trx || db;
-    await q('leave_requests').where({ id }).update(updateData);
+    const rowsAffected = await q('leave_requests')
+      .where({ id, status: 'pending' })
+      .update(updateData);
+    if (rowsAffected === 0) {
+      throw new ConflictError('Leave request is no longer pending or has already been decided.');
+    }
     const updated = await this.findRequestById(id, trx);
     return updated!;
   }

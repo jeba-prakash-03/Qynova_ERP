@@ -261,14 +261,22 @@ export class PayrollService {
       .leftJoin('departments as d', 'e.department_id', 'd.id')
       .leftJoin('designations as des', 'e.designation_id', 'des.id')
       .whereNull('e.deleted_at')
-      .where('e.status', 'active')
-      .whereNot('e.lifecycle_stage', 'relieved')
+      .where('e.joining_date', '<=', monthEndDate)
+      .where((qb) => {
+        qb.whereNull('e.last_working_date')
+          .orWhere('e.last_working_date', '>=', monthStartDate);
+      })
+      .where((qb) => {
+        qb.whereNot('e.lifecycle_stage', 'relieved')
+          .orWhere('e.last_working_date', '>=', monthStartDate);
+      })
       .select(
         'e.id',
         'e.employee_code',
         'e.first_name',
         'e.last_name',
         'e.joining_date',
+        'e.last_working_date',
         'd.name as department_name',
         'des.name as designation_title'
       );
@@ -287,52 +295,68 @@ export class PayrollService {
         continue;
       }
 
-      let monthlySalary = Number(salaryStruct.base_salary);
+      let unratedMonthlySalary = Number(salaryStruct.base_salary);
       if (salaryStruct.is_annual) {
-        monthlySalary = monthlySalary / 12;
+        unratedMonthlySalary = unratedMonthlySalary / 12;
       }
 
       const empJoiningDate = emp.joining_date instanceof Date ? emp.joining_date.toISOString().split('T')[0] : String(emp.joining_date);
-      let activeWorkingDays = workingDaysInMonth;
-      if (empJoiningDate > monthStartDate && empJoiningDate <= monthEndDate) {
-        const activeDates = workingDates.filter((d) => d >= empJoiningDate);
-        activeWorkingDays = activeDates.length;
-        monthlySalary = (monthlySalary * activeWorkingDays) / workingDaysInMonth;
+      const empLastWorkingDate = emp.last_working_date 
+        ? (emp.last_working_date instanceof Date ? emp.last_working_date.toISOString().split('T')[0] : String(emp.last_working_date))
+        : null;
+
+      const empActiveStart = empJoiningDate > monthStartDate ? empJoiningDate : monthStartDate;
+      const empActiveEnd = empLastWorkingDate && empLastWorkingDate < monthEndDate ? empLastWorkingDate : monthEndDate;
+
+      const activeDates = workingDates.filter((d) => d >= empActiveStart && d <= empActiveEnd);
+      const activeWorkingDays = activeDates.length;
+
+      if (activeWorkingDays === 0) {
+        continue;
       }
 
-      // Daily salary = monthly salary / working days of that month
-      const dailySalary = monthlySalary / workingDaysInMonth;
+      // True daily salary = unrated monthly base / working days in month
+      const dailySalary = Math.round((unratedMonthlySalary / workingDaysInMonth) * 100) / 100;
+
+      // Pro-rated monthly salary for mid-month joiner or leaver
+      let monthlySalary = unratedMonthlySalary;
+      if (activeWorkingDays < workingDaysInMonth) {
+        monthlySalary = Math.round(dailySalary * activeWorkingDays * 100) / 100;
+      }
 
       // Approved leaves
       const approvedLeaveRows = await db('leave_request_days as lrd')
         .join('leave_requests as lr', 'lrd.leave_request_id', 'lr.id')
         .where('lr.employee_id', emp.id)
         .where('lrd.status', 'approved')
-        .where('lrd.date', '>=', monthStartDate)
-        .where('lrd.date', '<=', monthEndDate)
+        .where('lrd.date', '>=', empActiveStart)
+        .where('lrd.date', '<=', empActiveEnd)
         .select('lrd.date', 'lrd.day_type');
 
       let approvedLeaveDays = 0;
       const leaveDateSet = new Set<string>();
       for (const row of approvedLeaveRows) {
-        leaveDateSet.add(row.date);
+        const dateStr = row.date instanceof Date ? row.date.toISOString().split('T')[0] : String(row.date);
+        leaveDateSet.add(dateStr);
         approvedLeaveDays += row.day_type === 'full' ? 1.0 : 0.5;
       }
 
       // Attendance absents
       const absentRows = await db('attendance')
         .where({ employee_id: emp.id, status: 'absent' })
-        .where('date', '>=', monthStartDate)
-        .where('date', '<=', monthEndDate)
+        .where('date', '>=', empActiveStart)
+        .where('date', '<=', empActiveEnd)
         .select('date');
 
       let absentDays = 0;
       for (const aRow of absentRows) {
         const dateStr = aRow.date instanceof Date ? aRow.date.toISOString().split('T')[0] : String(aRow.date);
-        if (!leaveDateSet.has(dateStr) && workingDates.includes(dateStr)) {
+        if (!leaveDateSet.has(dateStr) && activeDates.includes(dateStr)) {
           absentDays += 1.0;
         }
       }
+
+
 
       const totalLeaveAndAbsent = approvedLeaveDays + absentDays;
       let freeLeaveApplied = 0;
@@ -371,8 +395,8 @@ export class PayrollService {
       // Total Deductions = LOP Deduction + PF + Other Deductions
       const totalEmployeeDeductions = Math.round((lopDeduction + pfDeduction + otherDeductions) * 100) / 100;
 
-      // Net Salary = Gross Earning - Total Deductions
-      const netSalary = Math.round((grossEarning - totalEmployeeDeductions) * 100) / 100;
+      // Net Salary = Gross Earning - Total Deductions (never negative)
+      const netSalary = Math.max(0, Math.round((grossEarning - totalEmployeeDeductions) * 100) / 100);
 
       runTotalGross += grossEarning;
       runTotalDeductions += totalEmployeeDeductions;
@@ -758,6 +782,199 @@ export class PayrollService {
     const buffer = await bufferPromise;
     const filename = `Payslip_${item.employee_code}_${item.month}.pdf`;
     return { buffer, filename };
+  }
+
+  // ==========================================
+  // FULL & FINAL (FNF) SETTLEMENT
+  // ==========================================
+  async calculateFnFSettlement(
+    employeeId: number,
+    dto: {
+      last_working_date?: string;
+      worked_days?: number;
+      encash_leave_days?: number;
+      notice_period_required_days?: number;
+      notice_period_served_days?: number;
+      additional_earnings?: number;
+      deductions?: number;
+      remarks?: string;
+    } = {},
+    currentUserId?: number
+  ) {
+    const employee = await db('employees as e')
+      .leftJoin('departments as d', 'e.department_id', 'd.id')
+      .leftJoin('designations as des', 'e.designation_id', 'des.id')
+      .where('e.id', employeeId)
+      .whereNull('e.deleted_at')
+      .select(
+        'e.id',
+        'e.employee_code',
+        'e.first_name',
+        'e.last_name',
+        'e.email',
+        'e.joining_date',
+        'e.last_working_date',
+        'e.lifecycle_stage',
+        'd.name as department_name',
+        'des.name as designation_title'
+      )
+      .first();
+
+    if (!employee) {
+      throw new NotFoundError(`Employee with ID ${employeeId} not found`);
+    }
+
+    const joiningDateStr = employee.joining_date instanceof Date
+      ? employee.joining_date.toISOString().split('T')[0]
+      : String(employee.joining_date);
+
+    const lastWorkingDateStr = dto.last_working_date
+      || (employee.last_working_date
+        ? (employee.last_working_date instanceof Date ? employee.last_working_date.toISOString().split('T')[0] : String(employee.last_working_date))
+        : new Date().toISOString().split('T')[0]);
+
+    const exitMonth = lastWorkingDateStr.substring(0, 7);
+    const [exitYearStr, exitMonthStr] = exitMonth.split('-');
+    const exitYear = parseInt(exitYearStr, 10);
+    const exitM = parseInt(exitMonthStr, 10);
+
+    // 1. Fetch effective salary structure
+    const salaryStruct = (await this.getEffectiveSalary(employeeId, exitMonth))
+      || (await db('salary_structures').where({ employee_id: employeeId }).orderBy('effective_from', 'desc').first());
+
+    if (!salaryStruct) {
+      throw new BadRequestError(`No active salary structure found for employee ${employee.employee_code}`);
+    }
+
+    const monthlySalary = salaryStruct.is_annual ? salaryStruct.base_salary / 12 : salaryStruct.base_salary;
+    const lastDrawnBasic = Math.round(monthlySalary * 0.5 * 100) / 100;
+
+    // 2. Working days in exit month
+    const { count: workingDaysInMonth, workingDates } = await getWorkingDays(exitYear, exitM);
+    const dailySalary = workingDaysInMonth > 0 ? Math.round((monthlySalary / workingDaysInMonth) * 100) / 100 : 0;
+
+    // 3. Earned Salary in Exit Month
+    let finalMonthWorkedDays = 0;
+    if (dto.worked_days !== undefined) {
+      finalMonthWorkedDays = Number(dto.worked_days);
+    } else {
+      const workingDaysBeforeExit = workingDates.filter((d: string) => d <= lastWorkingDateStr);
+      finalMonthWorkedDays = workingDaysBeforeExit.length;
+    }
+    const earnedSalary = Math.round(finalMonthWorkedDays * dailySalary * 100) / 100;
+
+    // 4. Leave Encashment (Privilege Leave / Earned Leave)
+    let plEncashmentDays = 0;
+    if (dto.encash_leave_days !== undefined) {
+      plEncashmentDays = Number(dto.encash_leave_days);
+    } else {
+      const plType = await db('leave_types')
+        .whereIn('code', ['EL', 'PL', 'AL'])
+        .first();
+
+      if (plType) {
+        const bal = await db('leave_balances')
+          .where({
+            employee_id: employeeId,
+            leave_type_id: plType.id,
+            year: exitYear,
+          })
+          .first();
+
+        if (bal) {
+          plEncashmentDays = Math.max(0, Number(bal.allocated) - Number(bal.used) - Number(bal.pending));
+        }
+      }
+    }
+    const plEncashmentAmount = Math.round(plEncashmentDays * dailySalary * 100) / 100;
+
+    // 5. Tenure & Gratuity Calculation (Payment of Gratuity Act 1972)
+    const jDate = new Date(joiningDateStr);
+    const lDate = new Date(lastWorkingDateStr);
+    const diffMs = lDate.getTime() - jDate.getTime();
+    const tenureYears = Math.max(0, diffMs / (1000 * 60 * 60 * 24 * 365.25));
+    const wholeYears = Math.floor(tenureYears);
+    const remainingMonths = (tenureYears - wholeYears) * 12;
+    // Under the Act, 6 months or more counts as another completed year
+    const completedYears = remainingMonths >= 6 ? wholeYears + 1 : wholeYears;
+    const isGratuityEligible = tenureYears >= 4.9; // 5 years continuous service
+    const gratuityAmount = isGratuityEligible
+      ? Math.round(((15 * lastDrawnBasic * completedYears) / 26) * 100) / 100
+      : 0;
+
+    // 6. Notice Period Recovery
+    const noticePeriodRequiredDays = dto.notice_period_required_days !== undefined ? Number(dto.notice_period_required_days) : 30;
+    const noticePeriodServedDays = dto.notice_period_served_days !== undefined ? Number(dto.notice_period_served_days) : noticePeriodRequiredDays;
+    const noticeShortfallDays = Math.max(0, noticePeriodRequiredDays - noticePeriodServedDays);
+    const noticeRecoveryAmount = Math.round(noticeShortfallDays * dailySalary * 100) / 100;
+
+    // 7. Totals & Net Payable
+    const additionalEarnings = Number(dto.additional_earnings || 0);
+    const otherDeductions = Number(dto.deductions || 0);
+
+    const totalEarnings = Math.round((earnedSalary + plEncashmentAmount + gratuityAmount + additionalEarnings) * 100) / 100;
+    const totalDeductions = Math.round((noticeRecoveryAmount + otherDeductions) * 100) / 100;
+    const netPayable = Math.max(0, Math.round((totalEarnings - totalDeductions) * 100) / 100);
+
+    if (currentUserId) {
+      await auditService.record({
+        userId: currentUserId,
+        action: 'payroll.fnf_calculated',
+        entity: 'payroll',
+        entityId: employeeId,
+        newValue: {
+          netPayable,
+          earnedSalary,
+          plEncashmentAmount,
+          gratuityAmount,
+          noticeRecoveryAmount,
+          lastWorkingDateStr,
+        },
+      });
+    }
+
+    return {
+      employee: {
+        id: employee.id,
+        employee_code: employee.employee_code,
+        name: `${employee.first_name} ${employee.last_name}`,
+        email: employee.email,
+        department_name: employee.department_name,
+        designation_title: employee.designation_title,
+        joining_date: joiningDateStr,
+        last_working_date: lastWorkingDateStr,
+        lifecycle_stage: employee.lifecycle_stage,
+        tenure_years: Math.round(tenureYears * 10) / 10,
+        completed_years: completedYears,
+      },
+      salary: {
+        monthly_base: Math.round(monthlySalary * 100) / 100,
+        basic_salary: lastDrawnBasic,
+        daily_rate: dailySalary,
+        working_days_in_month: workingDaysInMonth,
+      },
+      earnings: {
+        worked_days: finalMonthWorkedDays,
+        earned_salary: earnedSalary,
+        pl_encashment_days: plEncashmentDays,
+        pl_encashment_amount: plEncashmentAmount,
+        gratuity_eligible: isGratuityEligible,
+        gratuity_amount: gratuityAmount,
+        additional_earnings: additionalEarnings,
+        total_earnings: totalEarnings,
+      },
+      deductions: {
+        notice_required_days: noticePeriodRequiredDays,
+        notice_served_days: noticePeriodServedDays,
+        notice_shortfall_days: noticeShortfallDays,
+        notice_recovery_amount: noticeRecoveryAmount,
+        other_deductions: otherDeductions,
+        total_deductions: totalDeductions,
+      },
+      net_payable: netPayable,
+      remarks: dto.remarks || null,
+      calculated_at: new Date().toISOString(),
+    };
   }
 }
 

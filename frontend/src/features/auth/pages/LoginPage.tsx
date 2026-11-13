@@ -121,7 +121,13 @@ export const LoginPage: React.FC = () => {
 
   // Helper to validate and extract safe same-origin redirect path
   const getSafeRedirectPath = useCallback((): string | null => {
-    const stateTarget = (location.state as any)?.from?.pathname;
+    const fromState = (location.state as any)?.from;
+    const stateTarget =
+      typeof fromState === 'string'
+        ? fromState
+        : fromState?.pathname
+          ? `${fromState.pathname}${fromState.search || ''}${fromState.hash || ''}`
+          : null;
     const queryTarget = searchParams.get('redirect') || searchParams.get('from');
     const target = stateTarget || queryTarget;
 
@@ -213,7 +219,6 @@ export const LoginPage: React.FC = () => {
 
       // Handle session-only vs persistent remember-me
       if (!rememberMe) {
-        // If not remember-me, remove persistent refresh token from localStorage
         const rt = localStorage.getItem('refreshToken');
         if (rt) {
           sessionStorage.setItem('refreshToken', rt);

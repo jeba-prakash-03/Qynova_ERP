@@ -97,6 +97,66 @@ export class EmailService {
   }
 
   /**
+   * Dispatches invoice notification email to client via email outbox
+   */
+  public async sendInvoiceEmail(invoice: {
+    id: number;
+    invoice_number: string;
+    client_name?: string | null;
+    client_email?: string | null;
+    total: number;
+    balance_due: number;
+    due_date: string;
+  }): Promise<{ queued: boolean; reason?: string }> {
+    if (!invoice.client_email) {
+      return { queued: false, reason: 'Client has no email address' };
+    }
+
+    const companySettings = await db('company_settings').where({ id: 1 }).first();
+    const companyName = companySettings?.company_name || 'Qynova Technologies';
+
+    const subject = `Invoice ${invoice.invoice_number} from ${companyName}`;
+    const formattedTotal = Number(invoice.total).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+    const formattedBalance = Number(invoice.balance_due).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px;">
+        <h2 style="color: #0f172a;">Invoice ${invoice.invoice_number}</h2>
+        <p>Dear ${invoice.client_name || 'Valued Client'},</p>
+        <p>Your invoice <strong>${invoice.invoice_number}</strong> from <strong>${companyName}</strong> has been generated and dispatched.</p>
+        <table style="border-collapse: collapse; width: 100%; margin: 16px 0; background-color: #f8fafc; border: 1px solid #e2e8f0;">
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold; width: 40%;">Invoice Number:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">${invoice.invoice_number}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold;">Total Amount:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">₹${formattedTotal}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold;">Balance Due:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; color: #b91c1c; font-weight: bold;">₹${formattedBalance}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: bold;">Payment Due Date:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">${invoice.due_date}</td>
+          </tr>
+        </table>
+        <p>Please ensure payment is remitted on or before the due date.</p>
+        <p>Thank you for partnering with us!</p>
+        <p>Best regards,<br/><strong>${companyName} Finance Operations</strong></p>
+      </div>
+    `;
+
+    return this.queueEmail({
+      to: invoice.client_email,
+      subject,
+      html,
+      eventKey: `invoice-sent-${invoice.id}`,
+    });
+  }
+
+  /**
    * Worker to process pending outbox emails with retry logic (max 3 attempts)
    */
   public async processOutbox(limit: number = 20): Promise<{ processed: number; sent: number; failed: number }> {

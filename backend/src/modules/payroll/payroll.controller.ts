@@ -119,6 +119,20 @@ export class PayrollController {
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     return res.send(buffer);
   };
+
+  // Full & Final (FnF) Settlement Calculation
+  calculateFnF = async (req: Request, res: Response) => {
+    const employeeId = Number(req.params.employeeId);
+    if (!employeeId) {
+      throw new BadRequestError('Valid employeeId is required');
+    }
+    const result = await payrollService.calculateFnFSettlement(
+      employeeId,
+      req.body || {},
+      req.user?.userId
+    );
+    return sendSuccess(res, result, 200, undefined, 'Full & Final settlement calculated successfully');
+  };
 }
 
 export const payrollController = new PayrollController();

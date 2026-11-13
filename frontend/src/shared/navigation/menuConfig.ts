@@ -20,6 +20,7 @@ import {
   Target,
   Laptop,
   Settings,
+  Calculator,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -188,6 +189,12 @@ export const MENU_CONFIG: MenuGroup[] = [
         title: 'Payroll',
         path: '/payroll/runs',
         icon: Banknote,
+        permission: 'payroll.view',
+      },
+      {
+        title: 'Full & Final (FnF)',
+        path: '/payroll/fnf',
+        icon: Calculator,
         permission: 'payroll.view',
       },
       {

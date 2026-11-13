@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { errorHandler } from './shared/middleware/error.middleware';
 import db from './db/knex';
 import authRoutes from './modules/auth/auth.routes';
@@ -45,6 +46,9 @@ export const createApp = (): Application => {
       allowedHeaders: ['Content-Type', 'Authorization'],
     })
   );
+
+  // Cookie parser
+  app.use(cookieParser());
 
   // Body parsers
   app.use(express.json({ limit: '10mb' }));

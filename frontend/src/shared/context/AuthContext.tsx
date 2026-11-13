@@ -1,14 +1,22 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { UserAuth } from '../../features/auth/types';
 import { authApi } from '../../features/auth/api';
 import { unregisterPushToken } from '../hooks/usePushNotifications';
+import {
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+  clearTokens,
+  getStoredUser,
+  setStoredUser,
+} from '../api/tokenStorage';
 
 interface AuthContextType {
   user: UserAuth | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
+  login: (credentials: { email: string; password: string }, rememberMe?: boolean) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: UserAuth) => void;
   getRedirectPath: (user: UserAuth) => string;
@@ -27,73 +35,157 @@ export const getRoleRedirectPath = (user: UserAuth): string => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserAuth | null>(() => {
-    const saved = localStorage.getItem('user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [user, setUser] = useState<UserAuth | null>(() => getStoredUser() as UserAuth | null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Validate session on mount
+  // Validate or restore session on mount
   useEffect(() => {
+    let isMounted = true;
+
     const initAuth = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
+      const accessToken = getAccessToken();
+      const refreshToken = getRefreshToken();
+
+      if (accessToken) {
         try {
+          // axiosClient interceptor will automatically refresh if accessToken is expired
           const freshUser = await authApi.getMe();
-          setUser(freshUser);
-          localStorage.setItem('user', JSON.stringify(freshUser));
+          if (isMounted) {
+            setUser(freshUser);
+            setStoredUser(freshUser);
+          }
+        } catch (err: any) {
+          const status = err.response?.status;
+          // Only clear session if genuinely unauthenticated (401)
+          if (status === 401) {
+            clearTokens();
+            if (isMounted) setUser(null);
+          }
+          // On network errors or 500, retain cached user from storage
+        }
+      } else if (refreshToken) {
+        // Access token missing in storage, but refresh token exists: attempt silent refresh
+        try {
+          const refreshed = await authApi.refresh(refreshToken);
+          setTokens(refreshed.accessToken, refreshed.refreshToken);
+          const freshUser = await authApi.getMe();
+          if (isMounted) {
+            setUser(freshUser);
+            setStoredUser(freshUser);
+          }
+        } catch (err: any) {
+          const status = err.response?.status;
+          if (status === 401 || status === 400) {
+            clearTokens();
+            if (isMounted) setUser(null);
+          }
+        }
+      } else {
+        // Check if an HTTP-only refresh cookie is available
+        try {
+          const refreshed = await authApi.refresh();
+          setTokens(refreshed.accessToken, refreshed.refreshToken);
+          const freshUser = await authApi.getMe();
+          if (isMounted) {
+            setUser(freshUser);
+            setStoredUser(freshUser);
+          }
         } catch {
-          // Token invalid or refresh expired
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('user');
-          setUser(null);
+          // No active session found
+          clearTokens();
+          if (isMounted) setUser(null);
         }
       }
-      setIsLoading(false);
+
+      if (isMounted) {
+        setIsLoading(false);
+      }
     };
 
     initAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  // Handle global session-expired broadcast from Axios interceptor
+  useEffect(() => {
+    const handleExpired = (event: Event) => {
+      const customEvent = event as CustomEvent<{ reason?: string; redirect?: string }>;
+      const reason = customEvent.detail?.reason || 'expired';
+      const redirect = customEvent.detail?.redirect;
+
+      clearTokens();
+      setUser(null);
+
+      const currentPath = redirect || location.pathname + location.search;
+      if (!location.pathname.startsWith('/login')) {
+        const redirectParam = encodeURIComponent(currentPath);
+        navigate(`/login?reason=${encodeURIComponent(reason)}&redirect=${redirectParam}`, {
+          replace: true,
+        });
+      }
+    };
+
+    window.addEventListener('auth:session-expired', handleExpired);
+    return () => {
+      window.removeEventListener('auth:session-expired', handleExpired);
+    };
+  }, [navigate, location]);
+
   const login = useCallback(
-    async (credentials: { email: string; password: string }) => {
+    async (credentials: { email: string; password: string }, rememberMe = true) => {
       const data = await authApi.login(credentials);
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      setTokens(data.accessToken, data.refreshToken, rememberMe);
+      setStoredUser(data.user);
       setUser(data.user);
 
       if (data.user.must_change_password) {
         navigate('/change-password');
       } else {
-        const targetPath = getRoleRedirectPath(data.user);
-        navigate(targetPath);
+        // Check for safe redirect in query/state
+        const searchParams = new URLSearchParams(location.search);
+        const queryRedirect = searchParams.get('redirect') || searchParams.get('from');
+        const stateRedirect = (location.state as any)?.from?.pathname;
+        const target = stateRedirect || queryRedirect;
+
+        if (
+          target &&
+          typeof target === 'string' &&
+          target.startsWith('/') &&
+          !target.startsWith('//') &&
+          !target.startsWith('/login')
+        ) {
+          navigate(target);
+        } else {
+          const targetPath = getRoleRedirectPath(data.user);
+          navigate(targetPath);
+        }
       }
     },
-    [navigate]
+    [navigate, location]
   );
 
   const logout = useCallback(async () => {
-    const refreshToken = localStorage.getItem('refreshToken') || undefined;
+    const refreshToken = getRefreshToken() || undefined;
     try {
       await unregisterPushToken();
       await authApi.logout(refreshToken);
     } catch {
       // Ignore network errors on logout
     } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
+      clearTokens();
       setUser(null);
-      navigate('/login');
+      navigate('/login?reason=signed_out');
     }
   }, [navigate]);
 
   const updateUser = useCallback((updatedUser: UserAuth) => {
     setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setStoredUser(updatedUser);
   }, []);
 
   return (

@@ -551,9 +551,17 @@ ${options?.custom_message ? `<p>${options.custom_message}</p>` : ''}
 <p>Best regards,<br/>
 <strong>${companySettings.company_name} HR Team</strong></p>`;
 
+    // Ensure PDF file exists on disk, regenerating from snapshot if necessary
+    let pdfPath: string | undefined = undefined;
+    try {
+      pdfPath = await this.ensurePdfFileExists(letter);
+    } catch {
+      // Fallback if snapshot missing
+    }
+
     // Queue in email_outbox with attachment
-    const attachments = letter.file_path && fs.existsSync(letter.file_path)
-      ? [{ filename: `Offer_Letter_${letter.reference_no}.pdf`, path: letter.file_path }]
+    const attachments = pdfPath && fs.existsSync(pdfPath)
+      ? [{ filename: `Offer_Letter_${letter.reference_no}.pdf`, path: pdfPath }]
       : undefined;
 
     await emailService.queueEmail({
@@ -725,11 +733,38 @@ ${options?.custom_message ? `<p>${options.custom_message}</p>` : ''}
       }
     }
 
-    if (!letter.file_path || !fs.existsSync(letter.file_path)) {
-      throw new NotFoundError('Offer letter PDF file not found on disk');
+    return this.ensurePdfFileExists(letter);
+  }
+
+  async ensurePdfFileExists(letter: OfferLetterRecord): Promise<string> {
+    if (letter.file_path && fs.existsSync(letter.file_path)) {
+      return letter.file_path;
     }
 
-    return letter.file_path;
+    if (!letter.snapshot) {
+      throw new NotFoundError('Offer letter snapshot is missing, cannot generate PDF');
+    }
+
+    const uploadBase = process.env.UPLOAD_DIR || path.join(process.cwd(), 'storage');
+    const pdfDir = path.join(uploadBase, 'documents', 'offer-letters');
+    const pdfFilename = `${letter.reference_no}_v${letter.version || 1}.pdf`;
+    const pdfFilePath = path.join(pdfDir, pdfFilename);
+
+    const snapshot = typeof letter.snapshot === 'string'
+      ? JSON.parse(letter.snapshot)
+      : letter.snapshot;
+
+    await generateOfferLetterPdf({
+      snapshot,
+      outputPath: pdfFilePath,
+    });
+
+    if (letter.file_path !== pdfFilePath) {
+      await db('offer_letters').where({ id: letter.id }).update({ file_path: pdfFilePath });
+      letter.file_path = pdfFilePath;
+    }
+
+    return pdfFilePath;
   }
 
   // ==========================================

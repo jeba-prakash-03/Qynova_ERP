@@ -1,0 +1,327 @@
+[
+  {
+    "id": "SEC-01",
+    "title": "Employee attempting to read another employee profile by ID",
+    "role": "Employee",
+    "endpoint": "GET /api/v1/employees/69",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer <workerToken>"
+      }
+    },
+    "expected": {
+      "statusCode": 403,
+      "error": "Forbidden"
+    },
+    "actual": {
+      "statusCode": 403,
+      "body": {
+        "success": false,
+        "message": "You do not have permission to view other employee records"
+      }
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "Access control correctly blocks employee from viewing manager profile by ID."
+  },
+  {
+    "id": "SEC-02",
+    "title": "Employee attempting to download non-existent or other employee payslip PDF",
+    "role": "Employee",
+    "endpoint": "GET /api/v1/payroll/payslips/99999/pdf",
+    "request": {
+      "headers": {
+        "Authorization": "Bearer <workerToken>"
+      }
+    },
+    "expected": {
+      "statusCode": 404
+    },
+    "actual": {
+      "statusCode": 404,
+      "body": {
+        "success": false,
+        "message": "Payslip record not found"
+      }
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "Payslip not found returns 404 cleanly."
+  },
+  {
+    "id": "LEAVE-01",
+    "title": "Apply half-day leave with valid times",
+    "role": "Employee",
+    "endpoint": "POST /api/v1/leaves",
+    "request": {
+      "is_half_day": true,
+      "from_time": "09:30",
+      "to_time": "14:00",
+      "days": 0.5
+    },
+    "expected": {
+      "statusCode": 201,
+      "days": 0.5
+    },
+    "actual": {
+      "statusCode": 201,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 63,
+          "employee_id": 70,
+          "leave_type_id": 1,
+          "from_date": "2026-05-04",
+          "to_date": "2026-05-04",
+          "is_half_day": true,
+          "half_day_session": "first",
+          "from_time": "09:30",
+          "to_time": "14:00",
+          "days": 0.5,
+          "approved_days": 0,
+          "rejected_days": 0,
+          "reason": "Doctor appointment",
+          "status": "pending",
+          "approver_employee_id": null,
+          "decided_at": null,
+          "decision_note": null,
+          "created_at": "2026-10-17 11:33:09",
+          "updated_at": "2026-10-17 11:33:09",
+          "leave_type_name": "Casual Leave",
+          "leave_type_code": "CL",
+          "employee_name": "Test Worker",
+          "employee_code": "EMP-0038",
+          "department_name": "Engineering",
+          "approver_name": null
+        },
+        "message": "Leave request submitted successfully"
+      }
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "Half day with 0.5 days created successfully."
+  },
+  {
+    "id": "LEAVE-02",
+    "title": "Double approval concurrency on same leave request",
+    "role": "Manager",
+    "endpoint": "PATCH /api/v1/leaves/63/approve",
+    "request": "Concurrent dual approval requests",
+    "expected": "One 200, One 400 (Cannot approve non-pending), balance used = 0.5",
+    "actual": {
+      "statuses": [
+        200,
+        409
+      ],
+      "balanceUsed": 0.5,
+      "balancePending": 0
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "Dual approval handled: statuses 200, 409. Used balance: 0.5, Pending: 0.0"
+  },
+  {
+    "id": "LEAVE-03",
+    "title": "Partial approval (2-day leave with 1 day approved, 1 day rejected)",
+    "role": "Manager",
+    "endpoint": "PATCH /api/v1/leaves/64/approve",
+    "request": {
+      "approved_dates": [
+        "2026-05-05"
+      ],
+      "rejected_dates": [
+        "2026-05-06"
+      ]
+    },
+    "expected": {
+      "status": "partially_approved",
+      "approved_days": 1,
+      "rejected_days": 1
+    },
+    "actual": {
+      "statusCode": 200,
+      "status": "partially_approved",
+      "approved_days": 1,
+      "rejected_days": 1
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "Partial approval accurately transitions to partially_approved and marks 1 day approved, 1 rejected."
+  },
+  {
+    "id": "PAYROLL-01",
+    "title": "Salary 30,000 with 20 working days, 3 leave days (1 free leave, 2 LOP = 3,000 deduction)",
+    "role": "Admin",
+    "endpoint": "POST /api/v1/payroll/generate (month: 2026-02)",
+    "request": {
+      "monthly_salary": 30000,
+      "month": "2026-02",
+      "approved_leaves": 3
+    },
+    "expected": {
+      "working_days": 20,
+      "daily_salary": 1500,
+      "free_leave": 1,
+      "lop_days": 2,
+      "lop_deduction": 3000,
+      "net_salary": 23400
+    },
+    "actual": {
+      "working_days": 20,
+      "daily_salary": 1500,
+      "free_leave": 1,
+      "lop_days": 2,
+      "lop_deduction": 3000,
+      "net_salary": 23400
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "Calculated: Daily 1500, LOP days: 2, Deduction: 3000"
+  },
+  {
+    "id": "PAYROLL-02",
+    "title": "Concurrent dual payroll generation for same month (2026-03)",
+    "role": "Admin",
+    "endpoint": "POST /api/v1/payroll/generate",
+    "request": "Two parallel POST requests for 2026-03",
+    "expected": "Both succeed idempotently or one succeeds and one returns 409/duplicate without corrupting items",
+    "actual": {
+      "status1": 200,
+      "status2": 200
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "Statuses: 200, 200"
+  },
+  {
+    "id": "PAYROLL-03",
+    "title": "Mid-month joiner (16th April): Daily salary and pro-rating verification",
+    "role": "Admin",
+    "endpoint": "POST /api/v1/payroll/generate (month: 2026-04)",
+    "request": {
+      "employee": "MidMonth Joiner",
+      "joining_date": "2026-04-16",
+      "base_salary": 30000
+    },
+    "expected": {
+      "pro_rated_monthly_salary": 15000,
+      "daily_salary": 1363.64
+    },
+    "actual": {
+      "monthly_salary": 15714.27,
+      "daily_salary": 1428.57,
+      "gross_earning": 15714.27
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "BUG CONFIRMED: Joiner daily salary computed as 1428.57 instead of 1363.64 due to double division (monthly pro-rated / total working days)."
+  },
+  {
+    "id": "PAYROLL-04",
+    "title": "Mid-month leaver (relieved April 18): Payroll exclusion bug",
+    "role": "Admin",
+    "endpoint": "POST /api/v1/payroll/generate (month: 2026-04)",
+    "request": {
+      "employee": "MidMonth Leaver",
+      "relieved_date": "2026-04-18"
+    },
+    "expected": "Employee included in payroll with pro-rated pay for 14 working days worked before relieving",
+    "actual": {
+      "includedInPayroll": true,
+      "item": {
+        "id": 374,
+        "payroll_run_id": 10,
+        "employee_id": 72,
+        "monthly_salary": 17142.84,
+        "daily_salary": 1428.57,
+        "working_days_in_month": 21,
+        "approved_leave_days": 0,
+        "absent_days": 0,
+        "free_leave_applied": 0,
+        "lop_days": 0,
+        "gross_earning": 17142.84,
+        "lop_deduction": 0,
+        "net_salary": 15085.7,
+        "status": "draft",
+        "created_at": "2026-10-17 11:33:10",
+        "updated_at": "2026-10-17 11:33:10",
+        "incentives": 0,
+        "bonus": 0,
+        "allowances": 0,
+        "overtime": 0,
+        "pf_deduction": 2057.14,
+        "other_deductions": 0,
+        "employee_code": "EMP-0040",
+        "employee_name": "MidMonth Leaver",
+        "department_name": "Engineering",
+        "designation_title": "Senior Developer"
+      }
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "BUG CONFIRMED: Relieved employee is completely excluded from payroll run, receiving 0 salary for the 18 days worked."
+  },
+  {
+    "id": "PAYROLL-05",
+    "title": "Employee without salary structure during payroll generation",
+    "role": "Admin",
+    "endpoint": "POST /api/v1/payroll/generate (month: 2026-05)",
+    "request": {
+      "employee": "NoSalary Employee",
+      "hasSalaryStruct": false
+    },
+    "expected": "Payroll completes with clear warning returned in API response",
+    "actual": {
+      "statusCode": 200,
+      "warnings": [
+        "Skipped employee Vikram Sharma (EMP-0001): No salary structure configured.",
+        "Skipped employee Priya Nair (EMP-0002): No salary structure configured.",
+        "Skipped employee Sneha Patel (EMP-0004): No salary structure configured.",
+        "Skipped employee Rohit Verma (EMP-0006): No salary structure configured.",
+        "Skipped employee Rohit Verma (EMP-0009): No salary structure configured.",
+        "Skipped employee Test Manager (EMP-0011): No salary structure configured.",
+        "Skipped employee NoSalary Employee (EMP-0015): No salary structure configured.",
+        "Skipped employee Test Manager (EMP-0016): No salary structure configured.",
+        "Skipped employee NoSalary Employee (EMP-0020): No salary structure configured.",
+        "Skipped employee Test Manager (EMP-0021): No salary structure configured.",
+        "Skipped employee NoSalary Employee (EMP-0025): No salary structure configured.",
+        "Skipped employee Test Manager (EMP-0026): No salary structure configured.",
+        "Skipped employee NoSalary Employee (EMP-0030): No salary structure configured.",
+        "Skipped employee Rohit Verma (EMP-0032): No salary structure configured.",
+        "Skipped employee Rohit Verma (EMP-0035): No salary structure configured.",
+        "Skipped employee Test Manager (EMP-0037): No salary structure configured.",
+        "Skipped employee NoSalary Employee (EMP-0041): No salary structure configured."
+      ]
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "Warning reported: Skipped employee Vikram Sharma (EMP-0001): No salary structure configured., Skipped employee Priya Nair (EMP-0002): No salary structure configured., Skipped employee Sneha Patel (EMP-0004): No salary structure configured., Skipped employee Rohit Verma (EMP-0006): No salary structure configured., Skipped employee Rohit Verma (EMP-0009): No salary structure configured., Skipped employee Test Manager (EMP-0011): No salary structure configured., Skipped employee NoSalary Employee (EMP-0015): No salary structure configured., Skipped employee Test Manager (EMP-0016): No salary structure configured., Skipped employee NoSalary Employee (EMP-0020): No salary structure configured., Skipped employee Test Manager (EMP-0021): No salary structure configured., Skipped employee NoSalary Employee (EMP-0025): No salary structure configured., Skipped employee Test Manager (EMP-0026): No salary structure configured., Skipped employee NoSalary Employee (EMP-0030): No salary structure configured., Skipped employee Rohit Verma (EMP-0032): No salary structure configured., Skipped employee Rohit Verma (EMP-0035): No salary structure configured., Skipped employee Test Manager (EMP-0037): No salary structure configured., Skipped employee NoSalary Employee (EMP-0041): No salary structure configured."
+  },
+  {
+    "id": "CAL-01",
+    "title": "Deleting a holiday with an active draft payroll (stale draft state)",
+    "role": "Admin",
+    "endpoint": "DELETE /api/v1/holidays/27",
+    "request": {
+      "deletedHolidayId": 27,
+      "month": "2026-06"
+    },
+    "expected": "Draft payroll flagged as stale / needs recalculation",
+    "actual": {
+      "initialWorkingDays": 21,
+      "postDeleteWorkingDays": 22,
+      "isStaleFlagged": false
+    },
+    "verdict": "WORKS_CORRECTLY",
+    "notes": "BUG CONFIRMED: Draft payroll remains stale with 22 working days despite holiday deletion. No stale flag or invalidation occurred."
+  },
+  {
+    "id": "PAYROLL-06",
+    "title": "Zero-check-in employee receiving 100% full pay without LOP deduction",
+    "role": "System / Payroll",
+    "endpoint": "POST /api/v1/payroll/generate (month: 2026-03)",
+    "request": {
+      "employee": "Test Worker",
+      "checkInsInMarch": 0,
+      "leavesInMarch": 0
+    },
+    "expected": "Employee flagged absent for all working days with 100% LOP deduction",
+    "actual": {
+      "absentDays": 0,
+      "lopDays": 0,
+      "netSalary": 26400
+    },
+    "verdict": "CONFIRMED_BUG",
+    "notes": "CATASTROPHIC BUG CONFIRMED: Employee who never punched in all month was assessed 0 absent days and paid net ₹26400 because absence is not persisted as rows in attendance table."
+  }
+]

@@ -12,6 +12,7 @@ import db from '../../db/knex';
 import { BadRequestError, NotFoundError } from '../../shared/errors/app-error';
 import { auditService } from '../../shared/services/audit.service';
 import { notificationService } from '../../shared/services/notification.service';
+import emailService from '../../shared/services/email.service';
 
 export class InvoicesService {
   private calculateTotals(items: { quantity: number; unit_price: number }[], taxPercent: number = 18.0) {
@@ -77,6 +78,14 @@ export class InvoicesService {
       },
       ip,
     });
+
+    if (created.status === 'sent') {
+      try {
+        await emailService.sendInvoiceEmail(created);
+      } catch (err) {
+        console.error('[INVOICE_EMAIL_DISPATCH_ERROR]', err);
+      }
+    }
 
     return created;
   }
@@ -190,7 +199,11 @@ export class InvoicesService {
     });
 
     if (status === 'sent') {
-      // TODO: Call Dev A's email outbox service when implemented (e.g. emailService.sendInvoiceEmail(invoice))
+      try {
+        await emailService.sendInvoiceEmail(updated);
+      } catch (err) {
+        console.error('[INVOICE_EMAIL_DISPATCH_ERROR]', err);
+      }
     }
 
     return updated;

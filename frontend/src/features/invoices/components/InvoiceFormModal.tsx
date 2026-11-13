@@ -47,7 +47,7 @@ export const InvoiceFormModal: React.FC<InvoiceFormModalProps> = ({
   );
 
   const [items, setItems] = useState<FormItem[]>([
-    { description: 'Consulting & Engineering Services', quantity: 1, unit_price: 50000 },
+    { description: '', quantity: 1, unit_price: 0 },
   ]);
 
   // Sync defaults

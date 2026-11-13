@@ -59,11 +59,7 @@ export const CrmPipelinePage: React.FC = () => {
   const [lostModalLead, setLostModalLead] = useState<Lead | null>(null);
 
   // Fetch Pipeline Overview
-  const {
-    data: pipelineOverview,
-    isLoading: isOverviewLoading,
-    error: overviewError,
-  } = useQuery<PipelineOverview>({
+  const { data: pipelineOverview } = useQuery<PipelineOverview>({
     queryKey: ['crm', 'pipeline-overview'],
     queryFn: crmApi.getPipeline,
   });
@@ -814,15 +810,17 @@ export const CrmPipelinePage: React.FC = () => {
       />
 
       {/* Detailed Lead Drawer */}
-      <LeadDrawer
-        leadId={activeDrawerLeadId}
-        onClose={() => setActiveDrawerLeadId(null)}
-        onEdit={(lead) => {
-          setActiveDrawerLeadId(null);
-          setEditingLead(lead);
-          setIsCreateModalOpen(true);
-        }}
-      />
+      {activeDrawerLeadId !== null && (
+        <LeadDrawer
+          leadId={activeDrawerLeadId}
+          onClose={() => setActiveDrawerLeadId(null)}
+          onEdit={(lead) => {
+            setActiveDrawerLeadId(null);
+            setEditingLead(lead);
+            setIsCreateModalOpen(true);
+          }}
+        />
+      )}
 
       {/* Convert Lead to Client & Project Modal */}
       <ConvertLeadModal

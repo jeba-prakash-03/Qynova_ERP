@@ -5,20 +5,55 @@ import { asyncHandler } from '../../shared/utils/async-handler.util';
 import { UnauthorizedError } from '../../shared/errors/app-error';
 
 export class AuthController {
+  private setRefreshTokenCookie(res: Response, token: string): void {
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.cookie('refreshToken', token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days matching JWT_REFRESH_EXPIRES_IN
+    });
+  }
+
+  private clearRefreshTokenCookie(res: Response): void {
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      path: '/',
+    });
+  }
+
   public login = asyncHandler(async (req: Request, res: Response) => {
     const ip = req.ip || (req.headers['x-forwarded-for'] as string);
     const userAgent = req.headers['user-agent'];
     const result = await authService.login(req.body, ip, userAgent);
+    this.setRefreshTokenCookie(res, result.refreshToken);
     return sendSuccess(res, result, 200, undefined, 'Login successful');
   });
 
   public refresh = asyncHandler(async (req: Request, res: Response) => {
-    const result = await authService.refreshTokens(req.body.refreshToken);
+    const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedError('Refresh token is required');
+    }
+    const result = await authService.refreshTokens(refreshToken);
+    this.setRefreshTokenCookie(res, result.refreshToken);
     return sendSuccess(res, result, 200, undefined, 'Tokens refreshed successfully');
   });
 
   public logout = asyncHandler(async (req: Request, res: Response) => {
-    await authService.logout(req.body.refreshToken);
+    const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+    if (refreshToken) {
+      try {
+        await authService.logout(refreshToken);
+      } catch {
+        // Ignore errors if token was already revoked or invalid
+      }
+    }
+    this.clearRefreshTokenCookie(res);
     return sendSuccess(res, { loggedOut: true }, 200, undefined, 'Logout successful');
   });
 

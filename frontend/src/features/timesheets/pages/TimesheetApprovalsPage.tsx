@@ -15,6 +15,11 @@ interface TimesheetItem {
   employee_code: string;
   employee_name: string;
   department_name?: string | null;
+  project_id?: number | null;
+  project_name?: string | null;
+  project_code?: string | null;
+  task_id?: number | null;
+  task_title?: string | null;
   date: string;
   hours: number;
   task_description: string;
@@ -74,7 +79,10 @@ export const TimesheetApprovalsPage: React.FC = () => {
     return (
       t.employee_name?.toLowerCase().includes(term) ||
       t.employee_code?.toLowerCase().includes(term) ||
-      t.task_description?.toLowerCase().includes(term)
+      t.task_description?.toLowerCase().includes(term) ||
+      t.project_name?.toLowerCase().includes(term) ||
+      t.project_code?.toLowerCase().includes(term) ||
+      t.task_title?.toLowerCase().includes(term)
     );
   });
 
@@ -96,7 +104,7 @@ export const TimesheetApprovalsPage: React.FC = () => {
           <Search className="w-4 h-4 text-[#6b7663] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search employee or task..."
+            placeholder="Search employee, project, task..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-xs border border-[rgba(76,91,70,0.18)] bg-[#dbe2d5] text-[#26301f] placeholder:text-[#6b7663] rounded-[14px] shadow-[inset_1px_2px_4px_rgba(104,118,100,0.12)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
@@ -122,8 +130,9 @@ export const TimesheetApprovalsPage: React.FC = () => {
                 <tr className="bg-[#dbe2d5] border-b border-[rgba(76,91,70,0.14)] text-xs font-semibold text-[#26301f] font-display">
                   <th className="py-3 px-4 font-display">Employee</th>
                   <th className="py-3 px-4 font-display">Date</th>
+                  <th className="py-3 px-4 font-display">Project & Task</th>
                   <th className="py-3 px-4 font-display">Hours</th>
-                  <th className="py-3 px-4 font-display">Task Description</th>
+                  <th className="py-3 px-4 font-display">Work Description</th>
                   <th className="py-3 px-4 font-display">Status</th>
                   <th className="py-3 px-4 text-right font-display">Actions</th>
                 </tr>
@@ -139,6 +148,20 @@ export const TimesheetApprovalsPage: React.FC = () => {
                     </td>
                     <td className="py-3.5 px-4 font-mono text-xs tabular-nums text-[#35422d]">
                       {entry.date ? new Date(entry.date).toISOString().split('T')[0] : '—'}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      {entry.project_name ? (
+                        <div className="max-w-[200px]">
+                          <span className="font-semibold text-[#26301f] text-xs block truncate" title={entry.project_name}>
+                            {entry.project_name}
+                          </span>
+                          <span className="text-[11px] text-[#6b7663] font-mono block truncate">
+                            {entry.project_code || ''} {entry.task_title ? `• ${entry.task_title}` : ''}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[#6b7663] italic">General / Internal</span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 tabular-nums">
                       <span className="font-bold text-[#26301f]">{entry.hours}</span> hrs

@@ -95,6 +95,11 @@ export class EmployeesController {
     const summary = await employeesService.getStatsSummary();
     return sendSuccess(res, summary);
   });
+
+  public checkProbationAlerts = asyncHandler(async (_req: Request, res: Response) => {
+    const result = await employeesService.checkProbationMilestones();
+    return sendSuccess(res, result, 200, undefined, `Probation alerts checked: ${result.alertedCount} employee(s) alerted.`);
+  });
 }
 
 export const employeesController = new EmployeesController();

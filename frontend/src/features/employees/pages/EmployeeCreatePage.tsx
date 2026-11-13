@@ -97,7 +97,7 @@ export const EmployeeCreatePage: React.FC = () => {
     emergency_address: '',
 
     // Default base salary fallback
-    initial_salary: '50000',
+    initial_salary: '',
   });
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});

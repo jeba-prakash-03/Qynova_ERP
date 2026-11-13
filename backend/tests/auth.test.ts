@@ -30,7 +30,7 @@ describe('Auth Module', () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({
-        email: 'admin@qynova.erp',
+        email: 'badcreds-test@qynova.erp',
         password: 'WrongPassword',
       });
 
@@ -127,5 +127,56 @@ describe('Auth Module', () => {
       .set('Authorization', `Bearer ${loginRes.body.data.accessToken}`)
       .send({ oldPassword: 'NewSecurePass@99', newPassword: 'Employee@123' });
     expect(restoreRes.status).toBe(200);
+  });
+
+  it('should set HTTP-only cookie on login, allow refresh via cookie, and clear cookie on logout', async () => {
+    // 1. Login sets HttpOnly refreshToken cookie
+    const loginRes = await request(app)
+      .post('/api/v1/auth/login')
+      .send({
+        email: 'admin@qynova.erp',
+        password: 'Admin@123',
+      });
+
+    expect(loginRes.status).toBe(200);
+    const setCookie = loginRes.headers['set-cookie'];
+    expect(setCookie).toBeDefined();
+    const cookieStr = Array.isArray(setCookie) ? setCookie.join(';') : (setCookie as string);
+    expect(cookieStr).toContain('refreshToken=');
+    expect(cookieStr.toLowerCase()).toContain('httponly');
+
+    // Extract cookie value for subsequent request
+    const cookieMatch = cookieStr.match(/refreshToken=([^;]+)/);
+    expect(cookieMatch).toBeTruthy();
+    const cookieHeader = `refreshToken=${cookieMatch![1]}`;
+
+    // 2. Refresh succeeds using ONLY the cookie (empty body)
+    const refreshRes = await request(app)
+      .post('/api/v1/auth/refresh')
+      .set('Cookie', [cookieHeader])
+      .send({});
+
+    expect(refreshRes.status).toBe(200);
+    expect(refreshRes.body.data).toHaveProperty('accessToken');
+    expect(refreshRes.headers['set-cookie']).toBeDefined();
+
+    // 3. Refresh without cookie and without body fails with 401
+    const noTokenRes = await request(app)
+      .post('/api/v1/auth/refresh')
+      .send({});
+
+    expect(noTokenRes.status).toBe(401);
+
+    // 4. Logout clears the cookie
+    const logoutRes = await request(app)
+      .post('/api/v1/auth/logout')
+      .set('Cookie', [cookieHeader])
+      .send({});
+
+    expect(logoutRes.status).toBe(200);
+    const logoutCookie = logoutRes.headers['set-cookie'];
+    expect(logoutCookie).toBeDefined();
+    const logoutCookieStr = Array.isArray(logoutCookie) ? logoutCookie.join(';') : (logoutCookie as string);
+    expect(logoutCookieStr).toContain('refreshToken=;');
   });
 });

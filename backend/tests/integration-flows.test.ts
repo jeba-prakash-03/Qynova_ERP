@@ -123,6 +123,8 @@ describe('Comprehensive Integration Flows (Task 3a - 3g)', () => {
     });
 
     it('step 5: Employee logs timesheet on the task', async () => {
+      await db('timesheets').where({ employee_id: devEmp.id, date: '2026-10-10' }).del();
+
       const res = await request(app)
         .post('/api/v1/timesheets')
         .set('Authorization', `Bearer ${employeeToken}`)

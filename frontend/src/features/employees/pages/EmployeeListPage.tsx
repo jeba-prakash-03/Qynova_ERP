@@ -247,11 +247,16 @@ export const EmployeeListPage: React.FC = () => {
               className="text-xs bg-[#dbe2d5] text-[#26301f] border border-[rgba(76,91,70,0.18)] rounded-[12px] px-2.5 py-1.5 shadow-[inset_1px_2px_4px_rgba(104,118,100,0.12)] focus:outline-none focus:ring-2 focus:ring-[#14776b]"
             >
               <option value="">All Lifecycle Stages</option>
+              <option value="candidate">Candidate</option>
+              <option value="selected">Selected</option>
+              <option value="offer_generated">Offer Generated</option>
+              <option value="offer_accepted">Offer Accepted</option>
               <option value="onboarding">Onboarding</option>
               <option value="probation">Probation</option>
               <option value="confirmed">Confirmed</option>
               <option value="active">Active</option>
               <option value="resigned">Resigned</option>
+              <option value="notice_period">Notice Period</option>
               <option value="relieved">Relieved</option>
             </select>
 

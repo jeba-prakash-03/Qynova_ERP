@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Modal } from '../../../shared/components/Modal';
 
 interface LostReasonModalProps {

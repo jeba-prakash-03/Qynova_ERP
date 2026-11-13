@@ -36,6 +36,7 @@ import {
   AlertTriangle,
   Award,
   Lock,
+  Calculator,
 } from 'lucide-react';
 
 // Strictly defined sequential stages
@@ -352,6 +353,14 @@ export const EmployeeDetailPage: React.FC = () => {
               <span className="text-xs px-3 py-1.5 rounded-xl font-semibold bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]">
                 Terminal Stage (Relieved)
               </span>
+            )}
+
+            {['resigned', 'notice_period', 'relieved'].includes(employee.lifecycle_stage) && (
+              <Link to="/payroll/fnf">
+                <Button variant="secondary" size="sm" leftIcon={<Calculator className="w-3.5 h-3.5" />}>
+                  FnF Settlement
+                </Button>
+              </Link>
             )}
 
             <Link to={`/employees/${id}/edit`}>

@@ -45,6 +45,7 @@ describe('Employees Module Transaction & Lifecycle', () => {
         status: 'active',
         lifecycle_stage: 'onboarding',
         experience_years: 2.5,
+        initial_salary: 45000,
         bank_details: {
           account_holder: 'Rohit Verma',
           bank_name: 'HDFC Bank',
@@ -73,6 +74,14 @@ describe('Employees Module Transaction & Lifecycle', () => {
       .first();
     expect(bankInDb).toBeDefined();
     expect(bankInDb.account_number).toBe('123456789012');
+
+    // Verify salary structure was initialized (TODO item 2)
+    const salaryInDb = await db('salary_structures')
+      .where({ employee_id: res.body.data.employee.id })
+      .first();
+    expect(salaryInDb).toBeDefined();
+    expect(Number(salaryInDb.base_salary)).toBe(45000);
+    expect(salaryInDb.effective_from).toMatch(/^2026-03-01/);
   });
 
   it('should allow employee to get their own profile via /employees/me without employees.view', async () => {

@@ -248,8 +248,21 @@ export const OfferLetterEmployeeTab: React.FC<OfferLetterEmployeeTabProps> = ({
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
-    } catch {
-      error('Failed to download offer letter PDF');
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      let errMsg = 'Failed to download offer letter PDF';
+      if (err.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text();
+          const parsed = JSON.parse(text);
+          if (parsed.message) errMsg = parsed.message;
+        } catch {
+          // ignore
+        }
+      } else if (err.response?.data?.message) {
+        errMsg = err.response.data.message;
+      }
+      error(errMsg);
     }
   };
 

@@ -1,0 +1,5396 @@
+[
+  {
+    "file": "backend/src/db/migrations/202610120004_create_company_settings_table.ts",
+    "table": "company_settings",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120004_create_company_settings_table.ts",
+    "table": "company_settings",
+    "operation": "insert",
+    "invalidColumn": "Confidential"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/migrations/202610120005_sync_settings_offer_letter_permissions.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/01_org_employees.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/01_org_employees.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "password_hash"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/01_org_employees.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/01_org_employees.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "must_change_password"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/01_org_employees.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/01_org_employees.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "password_hash"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/01_org_employees.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/01_org_employees.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "must_change_password"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "work_type"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "working_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "break_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "overtime_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "is_late"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "is_early_checkout"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "T13"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "attendance_breaks",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "work_type"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "working_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "break_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "overtime_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "is_late"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "is_early_checkout"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "work_type"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "working_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "break_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "overtime_minutes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "is_late"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/02_holidays_attendance.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "is_early_checkout"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "leave_type_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "year"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "allocated"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_balances",
+    "operation": "insert",
+    "invalidColumn": "from_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_balances",
+    "operation": "insert",
+    "invalidColumn": "to_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_balances",
+    "operation": "insert",
+    "invalidColumn": "is_half_day"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_balances",
+    "operation": "insert",
+    "invalidColumn": "days"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_balances",
+    "operation": "insert",
+    "invalidColumn": "reason"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_balances",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_balances",
+    "operation": "insert",
+    "invalidColumn": "approver_employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_balances",
+    "operation": "insert",
+    "invalidColumn": "decided_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_types",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_types",
+    "operation": "insert",
+    "invalidColumn": "leave_type_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_types",
+    "operation": "insert",
+    "invalidColumn": "year"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/03_leaves.ts",
+    "table": "leave_types",
+    "operation": "insert",
+    "invalidColumn": "allocated"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "client_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "client_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "client_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "project_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "client_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "project_manager_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "start_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "end_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "budget"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "technologies"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "client_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "client_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "17"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "14"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "12"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "client_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "client_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "https"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/04_clients_projects.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "permission_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "task_comments",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "task_comments",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "task_comments",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "task_history",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "task_history",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "task_history",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/05_tasks.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "11"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "30"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "14"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "10"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "invoice_number"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "client_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "milestone_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "issue_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "due_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "subtotal"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "tax_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "tax_amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "total"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "amount_paid"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "terms"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "clients",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "11"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "30"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "14"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "10"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "11"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "30"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "14"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "10"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expenses",
+    "operation": "insert",
+    "invalidColumn": "11"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expenses",
+    "operation": "insert",
+    "invalidColumn": "30"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expenses",
+    "operation": "insert",
+    "invalidColumn": "14"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expenses",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expenses",
+    "operation": "insert",
+    "invalidColumn": "10"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "expenses",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "1"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "11"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "30"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "14"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "10"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "11"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "30"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "14"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "10"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "11"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "30"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "14"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "approved_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "approved_at"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "10"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "00"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/06_finance.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "lost_reason"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "lost_reason"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "lead_activities",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "lead_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "type"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "title"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "performed_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "lead_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "type"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "title"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "performed_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "lead_code"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "contact_name"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "source"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "requirement"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "estimated_value"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "probability_percent"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "expected_closing_date"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "salesperson_id"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "stage"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "lost_reason"
+  },
+  {
+    "file": "backend/src/db/seeds/demo/07_crm.ts",
+    "table": "users",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/db/seeds/essential/01_essential_seed.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "module"
+  },
+  {
+    "file": "backend/src/db/seeds/essential/01_essential_seed.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "action"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "assets",
+    "operation": "insert",
+    "invalidColumn": "asset_id"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "assets",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "assets",
+    "operation": "insert",
+    "invalidColumn": "assigned_date"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "assets",
+    "operation": "insert",
+    "invalidColumn": "condition_assigned"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "assets",
+    "operation": "insert",
+    "invalidColumn": "assigned_by"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "asset_id"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "assigned_date"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "condition_assigned"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "assigned_by"
+  },
+  {
+    "file": "backend/src/modules/assets/assets.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/modules/attendance/attendance.service.ts",
+    "table": "employees",
+    "operation": "update",
+    "invalidColumn": "check_in"
+  },
+  {
+    "file": "backend/src/modules/attendance/attendance.service.ts",
+    "table": "employees",
+    "operation": "update",
+    "invalidColumn": "check_in"
+  },
+  {
+    "file": "backend/src/modules/attendance/attendance.service.ts",
+    "table": "office_locations",
+    "operation": "update",
+    "invalidColumn": "check_in"
+  },
+  {
+    "file": "backend/src/modules/auth/auth.repository.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "expires_at"
+  },
+  {
+    "file": "backend/src/modules/auth/auth.repository.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "revoked"
+  },
+  {
+    "file": "backend/src/modules/auth/auth.repository.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "user_id"
+  },
+  {
+    "file": "backend/src/modules/auth/auth.repository.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "expires_at"
+  },
+  {
+    "file": "backend/src/modules/auth/auth.repository.ts",
+    "table": "permissions",
+    "operation": "insert",
+    "invalidColumn": "revoked"
+  },
+  {
+    "file": "backend/src/modules/auth/auth.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "expires_at"
+  },
+  {
+    "file": "backend/src/modules/auth/auth.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "revoked"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "summary"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_addresses",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_communications",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "type"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "line1"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "line2"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "city"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "state"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "pincode"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "client_contacts",
+    "operation": "insert",
+    "invalidColumn": "country"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "company_name"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "industry"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "website"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "gstin"
+  },
+  {
+    "file": "backend/src/modules/clients/clients.repository.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/modules/crm/crm.repository.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "lead_id"
+  },
+  {
+    "file": "backend/src/modules/crm/crm.repository.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "type"
+  },
+  {
+    "file": "backend/src/modules/crm/crm.repository.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "title"
+  },
+  {
+    "file": "backend/src/modules/crm/crm.repository.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/modules/crm/crm.repository.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "performed_by"
+  },
+  {
+    "file": "backend/src/modules/crm/crm.repository.ts",
+    "table": "leads",
+    "operation": "insert",
+    "invalidColumn": "activity_date"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "employee_code"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "user_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "first_name"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "last_name"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "photo_url"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "date_of_birth"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "address"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "department_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "designation_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "reporting_manager_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "joining_date"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "employment_type"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "lifecycle_stage"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_bank_details",
+    "operation": "insert",
+    "invalidColumn": "skills"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "employee_code"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "user_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "first_name"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "last_name"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "photo_url"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "date_of_birth"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "department_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "designation_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "reporting_manager_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "joining_date"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "employment_type"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "lifecycle_stage"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "employee_emergency_contacts",
+    "operation": "insert",
+    "invalidColumn": "skills"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "employee_code"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "first_name"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "last_name"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "photo_url"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "phone"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "date_of_birth"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "address"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "department_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "designation_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "reporting_manager_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "joining_date"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "employment_type"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "lifecycle_stage"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.repository.ts",
+    "table": "user_roles",
+    "operation": "insert",
+    "invalidColumn": "skills"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "company_settings",
+    "operation": "insert",
+    "invalidColumn": "user_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "company_settings",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "departments",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "departments",
+    "operation": "insert",
+    "invalidColumn": "password_hash"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "departments",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "departments",
+    "operation": "insert",
+    "invalidColumn": "must_change_password"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "departments",
+    "operation": "insert",
+    "invalidColumn": "user_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "departments",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "password_hash"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "must_change_password"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "user_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "designations",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "password_hash"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "must_change_password"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "employees",
+    "operation": "insert",
+    "invalidColumn": "role_id"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "email"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "password_hash"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/employees/employees.service.ts",
+    "table": "roles",
+    "operation": "insert",
+    "invalidColumn": "must_change_password"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "expense_code"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category_id"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "employee_id"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "date"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "vendor"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "receipt_url"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.repository.ts",
+    "table": "expense_categories",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/modules/expenses/expenses.service.ts",
+    "table": "projects",
+    "operation": "update",
+    "invalidColumn": "category"
+  },
+  {
+    "file": "backend/src/modules/holidays/holidays.repository.ts",
+    "table": "holidays",
+    "operation": "insert",
+    "invalidColumn": "weekly_off_days"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "invoice_number"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "client_id"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "milestone_id"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "issue_date"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "due_date"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "subtotal"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "tax_percent"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "tax_percent"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "tax_amount"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "total"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "amount_paid"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "notes"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "terms"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "invoice_items",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "invoice_number"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "client_id"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "milestone_id"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "issue_date"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "due_date"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "subtotal"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "tax_percent"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "tax_percent"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "tax_amount"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "total"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "amount_paid"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "terms"
+  },
+  {
+    "file": "backend/src/modules/invoices/invoices.repository.ts",
+    "table": "payments",
+    "operation": "insert",
+    "invalidColumn": "created_by"
+  },
+  {
+    "file": "backend/src/modules/leaves/leaves.service.ts",
+    "table": "employees",
+    "operation": "update",
+    "invalidColumn": "approved_days"
+  },
+  {
+    "file": "backend/src/modules/leaves/leaves.service.ts",
+    "table": "employees",
+    "operation": "update",
+    "invalidColumn": "rejected_days"
+  },
+  {
+    "file": "backend/src/modules/leaves/leaves.service.ts",
+    "table": "users",
+    "operation": "update",
+    "invalidColumn": "approved_days"
+  },
+  {
+    "file": "backend/src/modules/leaves/leaves.service.ts",
+    "table": "users",
+    "operation": "update",
+    "invalidColumn": "rejected_days"
+  },
+  {
+    "file": "backend/src/modules/offer-letters/offer-letters.service.ts",
+    "table": "company_settings",
+    "operation": "update",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/offer-letters/offer-letters.service.ts",
+    "table": "company_settings",
+    "operation": "update",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/offer-letters/offer-letters.service.ts",
+    "table": "company_settings",
+    "operation": "update",
+    "invalidColumn": "accepted_at"
+  },
+  {
+    "file": "backend/src/modules/offer-letters/offer-letters.service.ts",
+    "table": "employees",
+    "operation": "update",
+    "invalidColumn": "accepted_at"
+  },
+  {
+    "file": "backend/src/modules/offer-letters/offer-letters.service.ts",
+    "table": "salary_structures",
+    "operation": "update",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/payroll/payroll.service.ts",
+    "table": "attendance",
+    "operation": "update",
+    "invalidColumn": "total_gross"
+  },
+  {
+    "file": "backend/src/modules/payroll/payroll.service.ts",
+    "table": "payroll_adjustments",
+    "operation": "update",
+    "invalidColumn": "total_gross"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "client_id"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "project_manager_id"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "start_date"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "end_date"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "budget"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "technologies"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "title"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "description"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "due_date"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "amount"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "status"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_members",
+    "operation": "insert",
+    "invalidColumn": "completed_at"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "client_id"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "project_manager_id"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "start_date"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "end_date"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "budget"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "project_milestones",
+    "operation": "insert",
+    "invalidColumn": "technologies"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "client_id"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "project_manager_id"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "start_date"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "end_date"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "budget"
+  },
+  {
+    "file": "backend/src/modules/projects/projects.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "technologies"
+  },
+  {
+    "file": "backend/src/modules/roles/roles.repository.ts",
+    "table": "role_permissions",
+    "operation": "insert",
+    "invalidColumn": "name"
+  },
+  {
+    "file": "backend/src/modules/tasks/tasks.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "task_id"
+  },
+  {
+    "file": "backend/src/modules/tasks/tasks.repository.ts",
+    "table": "tasks",
+    "operation": "insert",
+    "invalidColumn": "user_id"
+  },
+  {
+    "file": "backend/src/modules/tasks/tasks.service.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "task_id"
+  },
+  {
+    "file": "backend/src/modules/tasks/tasks.service.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "user_id"
+  },
+  {
+    "file": "backend/src/modules/tasks/tasks.service.ts",
+    "table": "projects",
+    "operation": "insert",
+    "invalidColumn": "comment"
+  },
+  {
+    "file": "backend/src/modules/timesheets/timesheets.service.ts",
+    "table": "attendance",
+    "operation": "insert",
+    "invalidColumn": "task_description"
+  },
+  {
+    "file": "backend/src/modules/timesheets/timesheets.service.ts",
+    "table": "attendance",
+    "operation": "insert",
+    "invalidColumn": "project_id"
+  },
+  {
+    "file": "backend/src/modules/timesheets/timesheets.service.ts",
+    "table": "attendance",
+    "operation": "insert",
+    "invalidColumn": "task_id"
+  },
+  {
+    "file": "backend/src/modules/timesheets/timesheets.service.ts",
+    "table": "employees",
+    "operation": "update",
+    "invalidColumn": "approver_employee_id"
+  },
+  {
+    "file": "backend/src/modules/timesheets/timesheets.service.ts",
+    "table": "employees",
+    "operation": "update",
+    "invalidColumn": "decision_note"
+  },
+  {
+    "file": "backend/src/shared/services/notification.service.ts",
+    "table": "notification_preferences",
+    "operation": "insert",
+    "invalidColumn": "event_key"
+  },
+  {
+    "file": "backend/src/shared/services/notification.service.ts",
+    "table": "notification_preferences",
+    "operation": "insert",
+    "invalidColumn": "type"
+  },
+  {
+    "file": "backend/src/shared/services/notification.service.ts",
+    "table": "notification_preferences",
+    "operation": "insert",
+    "invalidColumn": "title"
+  },
+  {
+    "file": "backend/src/shared/services/notification.service.ts",
+    "table": "notification_preferences",
+    "operation": "insert",
+    "invalidColumn": "message"
+  },
+  {
+    "file": "backend/src/shared/services/notification.service.ts",
+    "table": "notification_preferences",
+    "operation": "insert",
+    "invalidColumn": "link"
+  },
+  {
+    "file": "backend/src/shared/services/notification.service.ts",
+    "table": "notification_preferences",
+    "operation": "insert",
+    "invalidColumn": "is_read"
+  },
+  {
+    "file": "backend/src/shared/services/push.service.ts",
+    "table": "notification_preferences",
+    "operation": "update",
+    "invalidColumn": "deleted_at"
+  }
+]

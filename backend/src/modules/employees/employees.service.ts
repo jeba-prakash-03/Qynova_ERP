@@ -148,10 +148,22 @@ export class EmployeesService {
         input.emergency_contacts || null
       );
 
-      if (input.initial_salary && Number(input.initial_salary) > 0) {
+      let initialSalary = input.initial_salary ? Number(input.initial_salary) : null;
+      if (!initialSalary || initialSalary <= 0) {
+        // Fallback: check if employee has an existing offer letter with monthly gross
+        const offerLetter = await trx('offer_letters')
+          .where({ employee_id: empId })
+          .orderBy('id', 'desc')
+          .first();
+        if (offerLetter && Number(offerLetter.monthly_gross) > 0) {
+          initialSalary = Number(offerLetter.monthly_gross);
+        }
+      }
+
+      if (initialSalary && initialSalary > 0) {
         await trx('salary_structures').insert({
           employee_id: empId,
-          base_salary: Number(input.initial_salary),
+          base_salary: initialSalary,
           is_annual: false,
           effective_from: input.joining_date || getTodayKolkata(),
           created_by: performedByUserId || null,
@@ -226,13 +238,7 @@ export class EmployeesService {
       // Non-fatal
     }
 
-    // TODO [Dev 2 Integration]: When Dev 2 merges payroll module:
-    // if (input.initial_salary) {
-    //   await salaryStructureService.createInitialSalary({
-    //     employeeId: createdEmployeeId,
-    //     ctc: input.initial_salary
-    //   });
-    // }
+    // Note: Salary structure is initialized atomically in Step D inside the database transaction above.
 
     // Queue welcome email with temporary password
     try {
@@ -515,6 +521,87 @@ export class EmployeesService {
 
   public async getStatsSummary() {
     return employeesRepository.getStatsSummary();
+  }
+
+  public async checkProbationMilestones(): Promise<{ alertedCount: number; employees: any[] }> {
+    const employeesOnProbation = await db('employees as e')
+      .whereNull('e.deleted_at')
+      .where({ 'e.status': 'active', 'e.lifecycle_stage': 'probation' })
+      .select(
+        'e.id',
+        'e.employee_code',
+        'e.first_name',
+        'e.last_name',
+        'e.joining_date',
+        'e.reporting_manager_id'
+      );
+
+    const alerted: any[] = [];
+    const now = new Date();
+    const todayUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+
+    for (const emp of employeesOnProbation) {
+      const offer = await db('offer_letters')
+        .where({ employee_id: emp.id })
+        .orderBy('id', 'desc')
+        .first();
+
+      const probationMonths = offer?.probation_months !== undefined && offer?.probation_months !== null
+        ? Number(offer.probation_months)
+        : 3;
+
+      const jDate = new Date(emp.joining_date);
+      const probationEndDate = new Date(jDate);
+      probationEndDate.setMonth(probationEndDate.getMonth() + probationMonths);
+      const probationEndDateStr = probationEndDate.toISOString().split('T')[0];
+
+      const endUtc = new Date(Date.UTC(probationEndDate.getFullYear(), probationEndDate.getMonth(), probationEndDate.getDate()));
+      const diffDays = Math.ceil((endUtc.getTime() - todayUtc.getTime()) / (1000 * 60 * 60 * 24));
+
+      // Alert if probation ends within 15 days
+      if (diffDays >= -7 && diffDays <= 15) {
+        const recipientUserIds: number[] = [];
+        if (emp.reporting_manager_id) {
+          const mgr = await db('employees').where({ id: emp.reporting_manager_id }).first();
+          if (mgr?.user_id) recipientUserIds.push(Number(mgr.user_id));
+        }
+
+        const hrUsers = await db('users as u')
+          .join('user_roles as ur', 'u.id', 'ur.user_id')
+          .join('roles as r', 'ur.role_id', 'r.id')
+          .whereIn('r.name', ['HR', 'Admin'])
+          .select('u.id');
+
+        for (const u of hrUsers) {
+          recipientUserIds.push(Number(u.id));
+        }
+
+        const uniqueRecipients = Array.from(new Set(recipientUserIds));
+        if (uniqueRecipients.length > 0) {
+          const urgency = diffDays <= 3 ? 'urgent' : 'upcoming';
+          await notificationService.notify({
+            eventKey: `employee:${emp.id}:probation_alert:${probationEndDateStr}`,
+            userIds: uniqueRecipients,
+            type: diffDays <= 3 ? 'danger' : 'warning',
+            title: `Probation Review Due (${urgency})`,
+            message: `${emp.first_name} ${emp.last_name} (${emp.employee_code}) completes probation in ${diffDays} day(s) on ${probationEndDateStr}. Please conduct confirmation review.`,
+            link: `/employees/${emp.id}`,
+          });
+        }
+
+        alerted.push({
+          employee_id: emp.id,
+          employee_code: emp.employee_code,
+          name: `${emp.first_name} ${emp.last_name}`,
+          joining_date: emp.joining_date,
+          probation_months: probationMonths,
+          probation_end_date: probationEndDateStr,
+          days_remaining: diffDays,
+        });
+      }
+    }
+
+    return { alertedCount: alerted.length, employees: alerted };
   }
 }
 

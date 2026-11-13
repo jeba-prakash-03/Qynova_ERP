@@ -55,7 +55,7 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
   const [phone, setPhone] = useState('');
   const [source, setSource] = useState('Website');
   const [requirement, setRequirement] = useState('');
-  const [estimatedValue, setEstimatedValue] = useState<number | ''>(500000);
+  const [estimatedValue, setEstimatedValue] = useState<number | ''>('');
   const [probabilityPercent, setProbabilityPercent] = useState<number>(10);
   const [expectedClosingDate, setExpectedClosingDate] = useState('');
   const [salespersonId, setSalespersonId] = useState<number | ''>('');
@@ -98,8 +98,8 @@ export const LeadFormModal: React.FC<LeadFormModalProps> = ({
       setPhone('');
       setSource('Website');
       setRequirement('');
-      setEstimatedValue(500000);
-      setProbabilityPercent(10);
+      setEstimatedValue('');
+      setProbabilityPercent(LEAD_STAGES_CONFIG['lead'].defaultProbability);
       const d = new Date();
       d.setDate(d.getDate() + 30);
       setExpectedClosingDate(d.toISOString().split('T')[0]);

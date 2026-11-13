@@ -11,6 +11,11 @@ export const authApi = {
     await axiosClient.post('/auth/logout', { refreshToken });
   },
 
+  refresh: async (refreshToken?: string): Promise<{ accessToken: string; refreshToken: string }> => {
+    const res = await axiosClient.post('/auth/refresh', refreshToken ? { refreshToken } : {});
+    return res.data.data;
+  },
+
   getMe: async (): Promise<UserAuth> => {
     const res = await axiosClient.get('/auth/me');
     return res.data.data;

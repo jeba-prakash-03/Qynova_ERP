@@ -1,3 +1,4 @@
+import db from '../../db/knex';
 import { holidaysRepository } from './holidays.repository';
 import {
   Holiday,
@@ -45,9 +46,26 @@ export class HolidaysService {
   }
 
   async delete(id: number): Promise<void> {
+    const existing = await holidaysRepository.findById(id);
+    if (!existing) {
+      throw new NotFoundError(`Holiday with ID ${id} not found`);
+    }
+    const holidayDateStr = (existing.date as any) instanceof Date ? (existing.date as any).toISOString().split('T')[0] : String(existing.date);
+    const month = holidayDateStr.substring(0, 7);
+
     const deleted = await holidaysRepository.delete(id);
     if (!deleted) {
       throw new NotFoundError(`Holiday with ID ${id} not found`);
+    }
+
+    try {
+      const draftRun = await db('payroll_runs').where({ month, status: 'draft' }).first();
+      if (draftRun) {
+        const { payrollService } = await import('../payroll/payroll.service');
+        await payrollService.generatePayroll(month);
+      }
+    } catch (err) {
+      console.error('[HOLIDAY_DELETE_RECALC_ERR]', err);
     }
   }
 

@@ -188,6 +188,39 @@ describe('Expenses, Invoices, Payments, Profitability Module (Task 4)', () => {
       expect(res.headers['content-type']).toContain('application/pdf');
       expect(res.body.length).toBeGreaterThan(100);
     });
+
+    it('should queue invoice email in email_outbox when status is updated to sent', async () => {
+      // Ensure client has a primary contact with email
+      const existingContact = await db('client_contacts').where({ client_id: clientId }).first();
+      if (existingContact) {
+        await db('client_contacts').where({ id: existingContact.id }).update({ email: 'billing@client-acme.com', is_primary: true });
+      } else {
+        await db('client_contacts').insert({
+          client_id: clientId,
+          name: 'Billing Contact',
+          email: 'billing@client-acme.com',
+          is_primary: true,
+        });
+      }
+
+      const res = await request(app)
+        .patch(`/api/v1/invoices/${createdInvoiceId}/status`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ status: 'sent' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.status).toBe('sent');
+
+      // Verify email queued in email_outbox
+      const queuedEmail = await db('email_outbox')
+        .where({ event_key: `invoice-sent-${createdInvoiceId}` })
+        .first();
+
+      expect(queuedEmail).toBeDefined();
+      expect(queuedEmail.to).toBe('billing@client-acme.com');
+      expect(queuedEmail.subject).toContain('Invoice');
+      expect(queuedEmail.status).toBe('pending');
+    });
   });
 
   describe('3. Payments & Overpayment Protection (In DB Transaction)', () => {

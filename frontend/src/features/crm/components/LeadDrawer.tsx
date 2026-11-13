@@ -7,13 +7,8 @@ import {
   Building,
   User,
   Mail,
-  Phone,
-  Calendar,
-  DollarSign,
   TrendingUp,
   Tag,
-  Clock,
-  MessageSquare,
   FileText,
   PhoneCall,
   Users,
@@ -21,7 +16,6 @@ import {
   AlertCircle,
   ExternalLink,
   Edit,
-  Send,
   Plus,
 } from 'lucide-react';
 import { crmApi } from '../api';
@@ -115,7 +109,22 @@ export const LeadDrawer: React.FC<LeadDrawerProps> = ({
     },
   });
 
-  if (!leadId) return null;
+  // Lock body scroll and handle Escape key
+  useEffect(() => {
+    if (!leadId || !lead) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [leadId, lead, onClose]);
 
   const handleStageSelect = (st: LeadStage) => {
     if (st === 'lost') {
@@ -143,22 +152,7 @@ export const LeadDrawer: React.FC<LeadDrawerProps> = ({
     }
   };
 
-  // Lock body scroll and handle Escape key
-  useEffect(() => {
-    if (!lead) return;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [lead, onClose]);
+  if (!leadId) return null;
 
   const stageConf = lead ? LEAD_STAGES_CONFIG[lead.stage] : null;
 

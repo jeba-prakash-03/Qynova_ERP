@@ -72,6 +72,7 @@ describe('Task 5: Email Outbox, Notifications & Forgot Password Suite', () => {
     });
 
     it('should process pending outbox items and update status to sent', async () => {
+      await db('email_outbox').where({ status: 'pending' }).del();
       const eventKey = `test:worker:${Date.now()}`;
       await emailService.queueEmail({
         to: 'worker@test.com',

@@ -84,6 +84,24 @@ export const OfferLetterTab: React.FC = () => {
     },
   });
 
+  // Fetch company settings for preview tokens
+  const { data: companySettings } = useQuery({
+    queryKey: ['settings', 'company'],
+    queryFn: async () => {
+      const res = await axiosClient.get('/settings/company');
+      return res.data?.data;
+    },
+  });
+
+  // Fetch work settings for preview shift hours
+  const { data: workSettings } = useQuery({
+    queryKey: ['settings', 'work'],
+    queryFn: async () => {
+      const res = await axiosClient.get('/settings/work');
+      return res.data?.data;
+    },
+  });
+
   const templates: OfferLetterTemplate[] = templatesData || [];
 
   useEffect(() => {
@@ -267,30 +285,45 @@ export const OfferLetterTab: React.FC = () => {
     setIsDirty(true);
   };
 
-  // Sample data substitution for live preview
+  // Dynamic data substitution for live preview using database company & work settings
   const getSampleRenderedHtml = () => {
     let html = formData.body_html || '';
+
+    const companyAddress = [
+      companySettings?.address,
+      companySettings?.city,
+      companySettings?.state,
+      companySettings?.pincode ? `- ${companySettings.pincode}` : '',
+    ]
+      .filter(Boolean)
+      .join(', ');
+
+    const workingHours =
+      workSettings?.shift_start && workSettings?.shift_end
+        ? `${workSettings.shift_start} - ${workSettings.shift_end} (Mon-Fri)`
+        : '09:30 - 18:30 (Mon-Fri)';
+
     const sampleMap: Record<string, string> = {
-      '{{company_name}}': 'Qynova Technologies Pvt Ltd',
-      '{{company_address}}': 'Tower B, Tech Park, Chennai, Tamil Nadu - 600032',
+      '{{company_name}}': companySettings?.company_name || 'Qynova ERP',
+      '{{company_address}}': companyAddress || 'Corporate Headquarters',
       '{{letter_date}}': new Date().toLocaleDateString('en-GB'),
       '{{reference_no}}': 'OFR-2026-0042',
-      '{{employee_name}}': 'Jane Candidate',
-      '{{employee_address}}': '124 Park Avenue, Chennai, TN',
-      '{{designation}}': 'Senior Full Stack Engineer',
-      '{{department}}': 'Engineering',
-      '{{joining_date}}': '01/11/2026',
+      '{{employee_name}}': 'Candidate Name',
+      '{{employee_address}}': 'Candidate Residential Address',
+      '{{designation}}': 'Designation Title',
+      '{{department}}': 'Department Name',
+      '{{joining_date}}': new Date(Date.now() + 14 * 86400000).toLocaleDateString('en-GB'),
       '{{employment_type}}': 'FULL TIME',
       '{{monthly_gross}}': '₹1,00,000.00',
       '{{annual_ctc}}': '₹12,00,000.00',
-      '{{probation_months}}': '3',
-      '{{reporting_manager}}': 'Alex Director',
-      '{{work_location}}': 'Chennai Headquarters',
-      '{{working_hours}}': '9:30 AM - 6:30 PM (Mon-Fri)',
-      '{{notice_period_days}}': '30',
-      '{{offer_valid_until}}': '08/11/2026',
-      '{{signatory_name}}': 'Prakash Signatory',
-      '{{signatory_designation}}': 'Head of People Operations',
+      '{{probation_months}}': String(workSettings?.probation_period_months || 3),
+      '{{reporting_manager}}': 'Reporting Manager Name',
+      '{{work_location}}': companySettings?.city ? `${companySettings.city} Office` : 'Main Office',
+      '{{working_hours}}': workingHours,
+      '{{notice_period_days}}': String(workSettings?.notice_period_days || 30),
+      '{{offer_valid_until}}': new Date(Date.now() + 7 * 86400000).toLocaleDateString('en-GB'),
+      '{{signatory_name}}': companySettings?.authorized_signatory_name || 'Authorized Signatory',
+      '{{signatory_designation}}': companySettings?.authorized_signatory_designation || 'Head of People Operations',
       '{{salary_breakup_table}}': `<table style="width: 100%; border-collapse: collapse; margin: 12px 0;">
   <thead>
     <tr style="background-color: #dbe2d5; color: #26301f;">

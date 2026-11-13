@@ -75,6 +75,7 @@ export const EmployeeDashboard: React.FC = () => {
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch {
       alert('Failed to download offer letter PDF');
     }

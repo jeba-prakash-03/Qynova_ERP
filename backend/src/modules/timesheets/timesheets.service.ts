@@ -10,6 +10,11 @@ export interface TimesheetEntry {
   employee_name?: string;
   employee_code?: string;
   department_name?: string;
+  project_id?: number | null;
+  project_name?: string | null;
+  project_code?: string | null;
+  task_id?: number | null;
+  task_title?: string | null;
   date: string;
   hours: number;
   task_description: string;
@@ -31,6 +36,19 @@ export class TimesheetsService {
   ): Promise<TimesheetEntry> {
     if (hours <= 0 || hours > 24) {
       throw new BadRequestError('Hours must be between 0.1 and 24');
+    }
+
+    // Daily hours aggregated validation
+    const existingTimesheets = await db('timesheets')
+      .where({ employee_id: employeeId, date })
+      .sum('hours as total_hours')
+      .first();
+
+    const currentTotal = Number(existingTimesheets?.total_hours || 0);
+    if (currentTotal + hours > 24) {
+      throw new BadRequestError(
+        `Total timesheet hours for date ${date} cannot exceed 24 hours. Already logged: ${currentTotal}h, attempted: ${hours}h.`
+      );
     }
 
     // Check attendance logged hours for comparison warning
@@ -87,14 +105,23 @@ export class TimesheetsService {
     const q = db('timesheets as t')
       .join('employees as e', 't.employee_id', 'e.id')
       .leftJoin('departments as d', 'e.department_id', 'd.id')
+      .leftJoin('projects as p', 't.project_id', 'p.id')
+      .leftJoin('tasks as tk', 't.task_id', 'tk.id')
       .where('t.status', 'pending')
       .select(
         't.*',
         'e.employee_code',
         db.raw("CONCAT(e.first_name, ' ', e.last_name) as employee_name"),
-        'd.name as department_name'
+        'd.name as department_name',
+        'p.name as project_name',
+        'p.project_code',
+        'tk.title as task_title'
       )
       .orderBy('t.date', 'desc');
+
+    if (currentUser.employeeId) {
+      q.whereNot('t.employee_id', currentUser.employeeId);
+    }
 
     if (!isHrOrAdmin) {
       if (!currentUser.employeeId) return [];
@@ -129,6 +156,11 @@ export class TimesheetsService {
       currentUser.roles.some((r) => ['admin', 'hr'].includes(r.toLowerCase())) ||
       currentUser.permissions.includes('timesheets.view') ||
       currentUser.permissions.includes('*');
+
+    // Self-approval prevention
+    if (status === 'approved' && currentUser.employeeId && entry.employee_id === currentUser.employeeId) {
+      throw new ForbiddenError('You cannot approve your own timesheet entry.');
+    }
 
     if (!isReportingManager && !isHrOrAdmin) {
       throw new ForbiddenError(

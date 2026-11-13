@@ -81,4 +81,17 @@ router.post(
   asyncHandler(payrollController.updateStatus)
 );
 
+// 10. Full & Final Settlement (FnF)
+router.get(
+  '/fnf/:employeeId',
+  requireAnyPermission('payroll.view', 'payroll.run'),
+  asyncHandler(payrollController.calculateFnF)
+);
+
+router.post(
+  '/fnf/:employeeId',
+  requireAnyPermission('payroll.run', 'payroll.edit'),
+  asyncHandler(payrollController.calculateFnF)
+);
+
 export default router;

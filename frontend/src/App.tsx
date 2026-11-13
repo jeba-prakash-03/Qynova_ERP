@@ -37,6 +37,7 @@ import { LeaveApprovalsPage } from './features/leaves/pages/LeaveApprovalsPage';
 
 // Payroll & Timesheets
 import { PayrollRunPage } from './features/payroll/pages/PayrollRunPage';
+import { FnFSettlementPage } from './features/payroll/pages/FnFSettlementPage';
 import { MyPayslipsPage } from './features/payroll/pages/MyPayslipsPage';
 import { MyTimesheetsPage } from './features/timesheets/pages/MyTimesheetsPage';
 import { TimesheetApprovalsPage } from './features/timesheets/pages/TimesheetApprovalsPage';
@@ -151,7 +152,14 @@ export const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route path="/employees/:id" element={<EmployeeDetailPage />} />
+        <Route
+          path="/employees/:id"
+          element={
+            <ProtectedRoute permission="employees.view">
+              <EmployeeDetailPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/employees/:id/edit"
           element={
@@ -252,6 +260,14 @@ export const App: React.FC = () => {
           element={
             <ProtectedRoute permission="payroll.view">
               <PayrollRunPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payroll/fnf"
+          element={
+            <ProtectedRoute permission="payroll.view">
+              <FnFSettlementPage />
             </ProtectedRoute>
           }
         />

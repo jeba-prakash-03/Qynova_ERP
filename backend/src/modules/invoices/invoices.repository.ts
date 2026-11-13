@@ -124,6 +124,7 @@ export class InvoicesRepository {
         'c.company_name as client_company',
         'c.company_name as client_name',
         'c.gstin as client_gstin',
+        db.raw('(SELECT email FROM client_contacts WHERE client_id = inv.client_id ORDER BY is_primary DESC, id ASC LIMIT 1) as client_email'),
         'p.name as project_name',
         'p.project_code',
         'm.title as milestone_title'
@@ -149,6 +150,7 @@ export class InvoicesRepository {
         'c.company_name as client_company',
         'c.company_name as client_name',
         'c.gstin as client_gstin',
+        db.raw('(SELECT email FROM client_contacts WHERE client_id = inv.client_id ORDER BY is_primary DESC, id ASC LIMIT 1) as client_email'),
         'p.name as project_name',
         'p.project_code',
         'm.title as milestone_title'

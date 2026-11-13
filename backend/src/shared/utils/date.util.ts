@@ -62,3 +62,32 @@ export function toMysqlDatetime(d: Date | string | null | undefined): string | n
   const seconds = pad(dateObj.getSeconds());
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+/**
+ * Safely parse 'YYYY-MM-DD' into numeric components
+ */
+export function parseDateString(dateStr: string): { year: number; month: number; day: number } {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return { year, month, day };
+}
+
+/**
+ * Generate an array of 'YYYY-MM-DD' between startDate and endDate inclusive using UTC date maths
+ */
+export function getDateRangeArray(startDateStr: string, endDateStr: string): string[] {
+  const dates: string[] = [];
+  const [sY, sM, sD] = startDateStr.split('-').map(Number);
+  const [eY, eM, eD] = endDateStr.split('-').map(Number);
+
+  const current = new Date(Date.UTC(sY, sM - 1, sD));
+  const end = new Date(Date.UTC(eY, eM - 1, eD));
+
+  while (current <= end) {
+    const y = current.getUTCFullYear();
+    const m = String(current.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(current.getUTCDate()).padStart(2, '0');
+    dates.push(`${y}-${m}-${d}`);
+    current.setUTCDate(current.getUTCDate() + 1);
+  }
+  return dates;
+}
