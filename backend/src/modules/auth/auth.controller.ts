@@ -3,6 +3,7 @@ import { authService } from './auth.service';
 import { sendSuccess } from '../../shared/utils/response.util';
 import { asyncHandler } from '../../shared/utils/async-handler.util';
 import { UnauthorizedError } from '../../shared/errors/app-error';
+import { getClientIp } from '../../shared/middleware/rate-limit.middleware';
 
 export class AuthController {
   private setRefreshTokenCookie(res: Response, token: string): void {
@@ -27,7 +28,7 @@ export class AuthController {
   }
 
   public login = asyncHandler(async (req: Request, res: Response) => {
-    const ip = req.ip || (req.headers['x-forwarded-for'] as string);
+    const ip = getClientIp(req);
     const userAgent = req.headers['user-agent'];
     const result = await authService.login(req.body, ip, userAgent);
     this.setRefreshTokenCookie(res, result.refreshToken);

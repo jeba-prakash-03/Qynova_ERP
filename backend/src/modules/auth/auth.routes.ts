@@ -2,7 +2,12 @@ import { Router } from 'express';
 import { authController } from './auth.controller';
 import { validate } from '../../shared/middleware/validate.middleware';
 import { authenticate } from '../../shared/middleware/auth.middleware';
-import { checkLoginRateLimit } from '../../shared/middleware/rate-limit.middleware';
+import {
+  checkLoginRateLimit,
+  forgotPasswordLimiter,
+  resetPasswordLimiter,
+  refreshLimiter,
+} from '../../shared/middleware/rate-limit.middleware';
 import {
   loginSchema,
   refreshTokenSchema,
@@ -22,6 +27,7 @@ router.post(
 
 router.post(
   '/refresh',
+  refreshLimiter,
   validate({ body: refreshTokenSchema }),
   authController.refresh
 );
@@ -40,12 +46,14 @@ router.post(
 
 router.post(
   '/forgot-password',
+  forgotPasswordLimiter,
   validate({ body: forgotPasswordSchema }),
   authController.forgotPassword
 );
 
 router.post(
   '/reset-password',
+  resetPasswordLimiter,
   validate({ body: resetPasswordSchema }),
   authController.resetPassword
 );

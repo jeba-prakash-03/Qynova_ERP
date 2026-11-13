@@ -133,7 +133,7 @@ describe('Clients and Projects Module (Dev 3 Stage 1)', () => {
 
     it('Manager should see projects they manage or lead (PRJ-0001, PRJ-0002, PRJ-0004)', async () => {
       const res = await request(app)
-        .get('/api/v1/projects')
+        .get('/api/v1/projects?limit=100')
         .set('Authorization', `Bearer ${managerToken}`);
 
       expect(res.status).toBe(200);
@@ -147,7 +147,7 @@ describe('Clients and Projects Module (Dev 3 Stage 1)', () => {
 
     it('Employee (Arjun) should see ONLY projects they are a member of (PRJ-0001, PRJ-0003)', async () => {
       const res = await request(app)
-        .get('/api/v1/projects')
+        .get('/api/v1/projects?limit=100')
         .set('Authorization', `Bearer ${employeeToken}`);
 
       expect(res.status).toBe(200);

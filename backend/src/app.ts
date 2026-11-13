@@ -1,5 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './shared/middleware/error.middleware';
 import db from './db/knex';
@@ -36,6 +38,29 @@ import offerLettersRoutes from './modules/offer-letters/offer-letters.routes';
 export const createApp = (): Application => {
   const app = express();
 
+  // Security headers via Helmet
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    })
+  );
+
+  // Global rate limiter (skipped in automated tests)
+  if (process.env.NODE_ENV !== 'test') {
+    app.use(
+      rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 1000,
+        standardHeaders: true,
+        legacyHeaders: false,
+        message: {
+          success: false,
+          message: 'Too many requests from this IP, please try again after 15 minutes.',
+        },
+      })
+    );
+  }
+
   // CORS Configuration
   const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
   app.use(
@@ -50,9 +75,9 @@ export const createApp = (): Application => {
   // Cookie parser
   app.use(cookieParser());
 
-  // Body parsers
-  app.use(express.json({ limit: '10mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+  // Body parsers (1mb default limit)
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
   // Health check with actual DB connectivity validation
   app.get('/health', async (_req: Request, res: Response) => {

@@ -77,7 +77,19 @@ else
   exit 1
 fi
 
-# Enforce 7-day retention policy
+# Archive uploaded files storage directory
+UPLOADS_DIR="${UPLOADS_DIR:-${REPO_ROOT}/storage/documents}"
+UPLOADS_BACKUP_FILE="${BACKUP_DIR}/qynova_erp_uploads_${TIMESTAMP}.tar.gz"
+
+echo "==> Archiving uploaded files from ${UPLOADS_DIR}..."
+mkdir -p "${UPLOADS_DIR}"
+tar -czf "${UPLOADS_BACKUP_FILE}" -C "$(dirname "${UPLOADS_DIR}")" "$(basename "${UPLOADS_DIR}")"
+if [[ -s "${UPLOADS_BACKUP_FILE}" ]]; then
+  UPLOADS_SIZE=$(du -h "${UPLOADS_BACKUP_FILE}" | cut -f1)
+  echo "==> Uploads archive successful! File size: ${UPLOADS_SIZE}"
+fi
+
+# Enforce retention policy for both database dumps and uploaded files archives
 echo "==> Pruning backups older than ${RETENTION_DAYS} days..."
 PRUNED_COUNT=0
 while IFS= read -r old_file; do
@@ -86,7 +98,7 @@ while IFS= read -r old_file; do
     echo "    Removed expired backup: ${old_file}"
     PRUNED_COUNT=$((PRUNED_COUNT + 1))
   fi
-done < <(find "${BACKUP_DIR}" -type f -name "qynova_erp_backup_*.sql.gz" -mtime +"${RETENTION_DAYS}")
+done < <(find "${BACKUP_DIR}" -type f \( -name "qynova_erp_backup_*.sql.gz" -o -name "qynova_erp_uploads_*.tar.gz" \) -mtime +"${RETENTION_DAYS}")
 
 echo "==> Cleaned up ${PRUNED_COUNT} old backup file(s)."
 echo "==> Backup process completed successfully."

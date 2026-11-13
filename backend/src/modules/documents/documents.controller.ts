@@ -37,6 +37,11 @@ export class DocumentsController {
   download = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const doc = await documentsService.getDocumentForDownload(id, req.user!);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent(doc.file_name)}"`
+    );
     return res.download(doc.file_path, doc.file_name);
   };
 

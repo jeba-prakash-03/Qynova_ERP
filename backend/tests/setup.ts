@@ -9,6 +9,13 @@ if (fs.existsSync(envTestPath)) {
   dotenv.config({ path: path.resolve(__dirname, '../.env') });
 }
 
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+  process.env.JWT_SECRET = 'test_super_secret_jwt_access_key_min_32_chars_long!';
+}
+if (!process.env.JWT_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET.length < 32) {
+  process.env.JWT_REFRESH_SECRET = 'test_super_secret_jwt_refresh_key_min_32_chars_long!';
+}
+
 import db from '../src/db/knex';
 
 beforeAll(async () => {

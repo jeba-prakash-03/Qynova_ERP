@@ -190,18 +190,53 @@ describe('Documents & Employee Lifecycle — Stage 2 (Dev 1)', () => {
       uploadedResumeId = res.body.data.id;
     });
 
-    it('should allow the owner and Admin/HR to view and download sensitive documents', async () => {
+    it('should allow the owner and Admin/HR to view and download sensitive documents with secure headers', async () => {
       // 1. Owner employee downloading their own Aadhaar
       const ownerRes = await request(app)
         .get(`/api/v1/documents/${uploadedAadhaarId}/download`)
         .set('Authorization', `Bearer ${employeeToken}`);
       expect(ownerRes.status).toBe(200);
+      expect(ownerRes.headers['x-content-type-options']).toBe('nosniff');
+      expect(ownerRes.headers['content-disposition']).toContain('attachment');
 
       // 2. Admin downloading the Aadhaar
       const adminRes = await request(app)
         .get(`/api/v1/documents/${uploadedAadhaarId}/download`)
         .set('Authorization', `Bearer ${adminToken}`);
       expect(adminRes.status).toBe(200);
+      expect(adminRes.headers['x-content-type-options']).toBe('nosniff');
+      expect(adminRes.headers['content-disposition']).toContain('attachment');
+    });
+
+    it('should reject file upload with disallowed extension (.txt or .exe)', async () => {
+      const badFilePath = path.join(__dirname, 'test_script.txt');
+      fs.writeFileSync(badFilePath, 'hello text content');
+      try {
+        const res = await request(app)
+          .post(`/api/v1/employees/${employeeId}/documents`)
+          .set('Authorization', `Bearer ${adminToken}`)
+          .field('type', 'resume')
+          .attach('file', badFilePath);
+        expect(res.status).toBe(400);
+      } finally {
+        if (fs.existsSync(badFilePath)) fs.unlinkSync(badFilePath);
+      }
+    });
+
+    it('should reject file upload when magic bytes do not match extension', async () => {
+      const fakePdfPath = path.join(__dirname, 'fake_pdf.pdf');
+      fs.writeFileSync(fakePdfPath, 'THIS IS NOT A REAL PDF AND DOES NOT START WITH PDF MAGIC BYTES');
+      try {
+        const res = await request(app)
+          .post(`/api/v1/employees/${employeeId}/documents`)
+          .set('Authorization', `Bearer ${adminToken}`)
+          .field('type', 'resume')
+          .attach('file', fakePdfPath);
+        expect(res.status).toBe(400);
+        expect(res.body.message).toMatch(/magic bytes|signature/i);
+      } finally {
+        if (fs.existsSync(fakePdfPath)) fs.unlinkSync(fakePdfPath);
+      }
     });
 
     it('should block non-owner/manager from downloading sensitive documents (aadhaar)', async () => {

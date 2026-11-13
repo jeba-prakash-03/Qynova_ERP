@@ -1,5 +1,10 @@
+import crypto from 'crypto';
+import type { Knex } from 'knex';
 import db from '../../db/knex';
 import { UserRecord } from './auth.types';
+
+const hashToken = (token: string): string =>
+  crypto.createHash('sha256').update(token).digest('hex');
 
 export class AuthRepository {
   public async findByEmail(email: string): Promise<UserRecord | undefined> {
@@ -19,10 +24,13 @@ export class AuthRepository {
     });
   }
 
-  public async updatePassword(id: number, passwordHash: string): Promise<void> {
-    await db('users').where({ id }).update({
+  public async updatePassword(id: number, passwordHash: string, trx?: Knex.Transaction): Promise<void> {
+    const q = trx || db;
+    await q('users').where({ id }).update({
       password_hash: passwordHash,
       must_change_password: false,
+      token_version: db.raw('token_version + 1'),
+      updated_at: db.fn.now(),
     });
   }
 
@@ -58,28 +66,49 @@ export class AuthRepository {
     return emp || null;
   }
 
-  public async saveRefreshToken(userId: number, token: string, expiresAt: Date): Promise<void> {
-    await db('refresh_tokens').insert({
+  public async saveRefreshToken(
+    userId: number,
+    rawToken: string,
+    expiresAt: Date,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    const q = trx || db;
+    await q('refresh_tokens').insert({
       user_id: userId,
-      token,
+      token: hashToken(rawToken),
       expires_at: expiresAt,
       revoked: false,
     });
   }
 
-  public async findRefreshToken(token: string): Promise<any | undefined> {
-    return db('refresh_tokens')
-      .where({ token, revoked: false })
-      .andWhere('expires_at', '>', db.fn.now())
+  public async findRefreshToken(
+    rawToken: string,
+    trx?: Knex.Transaction
+  ): Promise<any | undefined> {
+    const q = trx || db;
+    return q('refresh_tokens')
+      .where({ token: hashToken(rawToken) })
       .first();
   }
 
-  public async revokeRefreshToken(token: string): Promise<void> {
-    await db('refresh_tokens').where({ token }).update({ revoked: true });
+  public async revokeRefreshToken(
+    rawToken: string,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    const q = trx || db;
+    await q('refresh_tokens')
+      .where({ token: hashToken(rawToken) })
+      .update({ revoked: true });
   }
 
-  public async revokeAllUserRefreshTokens(userId: number): Promise<void> {
-    await db('refresh_tokens').where({ user_id: userId }).update({ revoked: true });
+  public async revokeAllUserRefreshTokens(
+    userId: number,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    const q = trx || db;
+    await q('refresh_tokens')
+      .where({ user_id: userId })
+      .update({ revoked: true });
   }
 }
 

@@ -334,18 +334,19 @@ export class EmployeesService {
         input.emergency_contacts
       );
 
-      // If role_id provided, update user_roles
+      // If role_id provided, update user_roles and bump token_version so new permissions take effect immediately
       if (input.role_id) {
         await trx('user_roles').where({ user_id: existing.user_id }).del();
         await trx('user_roles').insert({
           user_id: existing.user_id,
           role_id: input.role_id,
         });
+        await trx('users').where({ id: existing.user_id }).increment('token_version', 1);
       }
 
-      // If status updated, sync user account status
+      // If status updated, sync user account status and bump token_version
       if (input.status && input.status !== existing.status) {
-        await trx('users').where({ id: existing.user_id }).update({ status: input.status });
+        await trx('users').where({ id: existing.user_id }).update({ status: input.status }).increment('token_version', 1);
       }
     });
 
@@ -434,7 +435,7 @@ export class EmployeesService {
       if (nextStage === 'relieved') {
         const today = new Date().toISOString().split('T')[0];
         await trx('employees').where({ id }).update({ status: 'inactive', last_working_date: today });
-        await trx('users').where({ id: existing.user_id }).update({ status: 'disabled' });
+        await trx('users').where({ id: existing.user_id }).update({ status: 'disabled' }).increment('token_version', 1);
       }
     });
 
@@ -506,8 +507,8 @@ export class EmployeesService {
 
     await employeesRepository.softDelete(id);
 
-    // Also deactivate the user login account
-    await db('users').where({ id: existing.user_id }).update({ status: 'inactive' });
+    // Also deactivate the user login account and invalidate active sessions
+    await db('users').where({ id: existing.user_id }).update({ status: 'inactive' }).increment('token_version', 1);
 
     await auditService.record({
       userId: performedByUserId,

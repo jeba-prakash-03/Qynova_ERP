@@ -49,6 +49,8 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:-}
     ports:
       - "${BACKEND_PORT:-5000}:5000"
+    volumes:
+      - backend_uploads:/app/storage/documents
     depends_on:
       mysql:
         condition: service_healthy
@@ -70,6 +72,8 @@ services:
 
 volumes:
   mysql_data:
+    driver: local
+  backend_uploads:
     driver: local
 
 networks:

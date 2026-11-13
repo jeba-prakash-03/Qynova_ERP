@@ -5,6 +5,7 @@ export interface UserRecord {
   status: 'active' | 'inactive';
   last_login_at: string | null;
   must_change_password: boolean;
+  token_version?: number;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

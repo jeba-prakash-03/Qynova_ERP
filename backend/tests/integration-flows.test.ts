@@ -533,10 +533,15 @@ describe('Comprehensive Integration Flows (Task 3a - 3g)', () => {
       expect(newLoginRes.status).toBe(200);
       expect(newLoginRes.body.data.accessToken).toBeDefined();
 
-      // 5. Restore original password so subsequent test runs stay clean
+      // 5. Restore original password so subsequent test runs stay clean and refresh internToken
       const bcrypt = require('bcryptjs');
       const restoredHash = await bcrypt.hash('Intern@123', 10);
       await db('users').where({ email: 'intern@qynova.erp' }).update({ password_hash: restoredHash });
+
+      const reloginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: 'intern@qynova.erp', password: 'Intern@123' });
+      internToken = reloginRes.body.data.accessToken;
     });
   });
 

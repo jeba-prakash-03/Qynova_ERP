@@ -4,6 +4,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
+  parseDurationToMs,
 } from '../../shared/utils/jwt.util';
 import {
   BadRequestError,
@@ -27,7 +28,10 @@ export class AuthService {
     const user = await authRepository.findByEmail(input.email);
 
     if (!user) {
-      await recordFailedLoginAttempt(input.email);
+      // Dummy compare to equalize timing and prevent enumeration
+      const DUMMY_BCRYPT_HASH = '$2b$10$wN1K9i.YQ6aZq9R4g.F9Oe4j4Uq3x4pQeP9B8p5/Q5C2n5s6e7y8a';
+      await comparePassword(input.password, DUMMY_BCRYPT_HASH);
+      await recordFailedLoginAttempt(input.email, ip);
       throw new BadRequestError('Invalid email or password', [
         { field: 'password', message: 'Invalid email or password combination' },
       ]);
@@ -35,7 +39,7 @@ export class AuthService {
 
     const isMatch = await comparePassword(input.password, user.password_hash);
     if (!isMatch) {
-      await recordFailedLoginAttempt(input.email);
+      await recordFailedLoginAttempt(input.email, ip);
       throw new BadRequestError('Invalid email or password', [
         { field: 'password', message: 'Invalid email or password combination' },
       ]);
@@ -58,7 +62,7 @@ export class AuthService {
     }
 
     // Login successful - reset failed attempts
-    await resetLoginAttempts(input.email);
+    await resetLoginAttempts(input.email, ip);
     await authRepository.updateLastLogin(user.id);
 
     const roles = await authRepository.getUserRoles(user.id);
@@ -71,10 +75,12 @@ export class AuthService {
       employeeId,
       roles,
       permissions,
+      tokenVersion: Number(user.token_version || 0),
     });
 
     const refreshToken = generateRefreshToken({ userId: Number(user.id) });
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const refreshMs = parseDurationToMs(process.env.JWT_REFRESH_EXPIRES_IN || '7d');
+    const expiresAt = new Date(Date.now() + refreshMs);
 
     await authRepository.saveRefreshToken(Number(user.id), refreshToken, expiresAt);
 
@@ -124,39 +130,56 @@ export class AuthService {
 
     const tokenRecord = await authRepository.findRefreshToken(refreshToken);
     if (!tokenRecord) {
-      throw new UnauthorizedError('Refresh token is invalid or has been revoked');
+      throw new UnauthorizedError('Refresh token is invalid');
     }
 
-    const user = await authRepository.findById(payload.userId);
-    if (!user || user.status !== 'active') {
-      throw new UnauthorizedError('User account not found or inactive');
+    // Reuse detection: presenting a revoked token revokes all of that user's sessions immediately
+    if (tokenRecord.revoked) {
+      await authRepository.revokeAllUserRefreshTokens(tokenRecord.user_id);
+      await db('users')
+        .where({ id: tokenRecord.user_id })
+        .increment('token_version', 1);
+      throw new UnauthorizedError('Refresh token reuse detected. All sessions revoked for security.');
     }
 
-    // Rotate refresh token: revoke current token
-    await authRepository.revokeRefreshToken(refreshToken);
+    return await db.transaction(async (trx) => {
+      const user = await trx('users')
+        .where({ id: tokenRecord.user_id })
+        .whereNull('deleted_at')
+        .first();
 
-    const roles = await authRepository.getUserRoles(user.id);
-    const permissions = await authRepository.getUserPermissions(user.id);
-    const employee = await authRepository.getEmployeeByUserId(user.id);
+      if (!user || user.status !== 'active') {
+        throw new UnauthorizedError('User account not found or inactive');
+      }
 
-    const employeeId = employee ? Number(employee.id) : null;
+      // Rotate refresh token: revoke current token
+      await authRepository.revokeRefreshToken(refreshToken, trx);
 
-    const newAccessToken = generateAccessToken({
-      userId: Number(user.id),
-      employeeId,
-      roles,
-      permissions,
+      const roles = await authRepository.getUserRoles(user.id);
+      const permissions = await authRepository.getUserPermissions(user.id);
+      const employee = await authRepository.getEmployeeByUserId(user.id);
+
+      const employeeId = employee ? Number(employee.id) : null;
+
+      const newAccessToken = generateAccessToken({
+        userId: Number(user.id),
+        employeeId,
+        roles,
+        permissions,
+        tokenVersion: Number(user.token_version || 0),
+      });
+
+      const newRefreshToken = generateRefreshToken({ userId: Number(user.id) });
+      const refreshMs = parseDurationToMs(process.env.JWT_REFRESH_EXPIRES_IN || '7d');
+      const expiresAt = new Date(Date.now() + refreshMs);
+
+      await authRepository.saveRefreshToken(Number(user.id), newRefreshToken, expiresAt, trx);
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
     });
-
-    const newRefreshToken = generateRefreshToken({ userId: Number(user.id) });
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-    await authRepository.saveRefreshToken(Number(user.id), newRefreshToken, expiresAt);
-
-    return {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    };
   }
 
   public async logout(refreshToken?: string): Promise<void> {
@@ -200,7 +223,8 @@ export class AuthService {
   public async forgotPassword(email: string): Promise<void> {
     const user = await authRepository.findByEmail(email);
     if (!user) {
-      throw new NotFoundError('No registered account found with this email address');
+      // Prevent user enumeration: return generic success without doing anything
+      return;
     }
 
     const rawToken = crypto.randomBytes(32).toString('hex');
