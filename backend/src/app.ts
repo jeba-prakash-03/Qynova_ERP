@@ -28,8 +28,8 @@ import expensesRoutes from './modules/expenses/expenses.routes';
 import invoicesRoutes from './modules/invoices/invoices.routes';
 import financeRoutes from './modules/profitability/profitability.routes';
 import crmRoutes from './modules/crm/crm.routes';
-import dashboardRoutes from './modules/registry/dashboard.routes';
-import reportsRoutes from './modules/registry/reports.routes';
+import dashboardRoutes from './shared/registry/dashboard.routes';
+import reportsRoutes from './shared/registry/reports.routes';
 import assetsRoutes from './modules/assets/assets.routes';
 import pushRoutes from './modules/push/push.routes';
 import settingsRoutes, { publicBrandingRouter } from './modules/settings/settings.routes';
@@ -110,7 +110,6 @@ export const createApp = (): Application => {
   app.use('/api/v1/holidays', holidaysRoutes);
   app.use('/api/v1/attendance', attendanceRoutes);
   app.use('/api/v1/leave-requests', leaveRequestsRoutes);
-  app.use('/api/v1/leaves', leaveRequestsRoutes);
   app.use('/api/v1/leave-balances', leaveBalancesRoutes);
   app.use('/api/v1/leave-types', leaveTypesRoutes);
   app.use('/api/v1/documents', documentsRoutes);

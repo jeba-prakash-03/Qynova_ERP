@@ -6,7 +6,7 @@ Enterprise Resource Planning system for an IT services company built with a full
 
 ## 🛠 Tech Stack
 
-- **Backend**: Node.js, Express, TypeScript, Zod validation, JWT (access + rotating refresh tokens), bcrypt.
+- **Backend**: Node.js, Express, TypeScript, Zod validation, JWT (access + SHA-256 rotating refresh tokens with reuse detection), token versioning, Helmet, rate limiting, bcryptjs.
 - **Database**: MySQL 8.0, Knex.js migrations and seeds.
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, TanStack Query v5, React Router v6, React Hook Form + Zod, Lucide Icons.
 - **Testing**: Jest, Supertest, ts-jest.
@@ -20,44 +20,49 @@ qynova_ERP/
 ├── backend/
 │   ├── src/
 │   │   ├── modules/
-│   │   │   ├── auth/            # Login, Refresh, Logout, Change/Forgot Password, Me
+│   │   │   ├── auth/            # Login, Refresh, Logout, Change/Reset/Forgot Password, Me
 │   │   │   ├── roles/           # Roles CRUD, RBAC matrix assignment
-│   │   │   ├── permissions/     # Full project system permissions list
-│   │   │   ├── employees/       # Employee CRUD, Onboarding transaction, Profile
+│   │   │   ├── permissions/     # System permissions list & authorization
+│   │   │   ├── employees/       # Employee CRUD, Onboarding transaction, Lifecycle stages
 │   │   │   ├── departments/     # Tree hierarchy departments CRUD
 │   │   │   ├── designations/    # Titles and designations CRUD
+│   │   │   ├── attendance/      # Check-in/out, Breaks, Geofencing, Export
+│   │   │   ├── leaves/          # Leave requests, Balances, Types, Approvals, Concurrency locking
+│   │   │   ├── payroll/         # Salary structures, Payroll runs, Payslip PDF, PF deduction
+│   │   │   ├── timesheets/      # Timesheet logging & approval
+│   │   │   ├── clients/         # Client accounts CRUD
+│   │   │   ├── projects/        # Projects lifecycle, members, budgets
+│   │   │   ├── tasks/           # Tasks workflow (backlog to completed), subtasks
+│   │   │   ├── expenses/        # Project & company expenses
+│   │   │   ├── invoices/        # Milestone-based invoicing & payments
+│   │   │   ├── profitability/   # Revenue, labor costs, and net margins
+│   │   │   ├── crm/             # Leads pipeline and client/project conversion
+│   │   │   ├── assets/          # Hardware/software asset assignment and maintenance
+│   │   │   ├── settings/        # Company settings and branding configuration
 │   │   │   ├── audit-logs/      # Immutable audit trail queries and diffs
-│   │   │   └── notifications/   # In-app notifications with deduplication
+│   │   │   ├── documents/       # File upload with magic bytes validation and secure downloads
+│   │   │   ├── notifications/   # In-app notifications with deduplication
+│   │   │   └── push/            # Web push notification device tokens
 │   │   ├── shared/
-│   │   │   ├── middleware/      # authenticate, requirePermission, validate, rateLimit, errorHandler
-│   │   │   ├── services/        # auditService, notificationService (used by teammates)
-│   │   │   ├── constants/       # SYSTEM_ROLES, ALL_SYSTEM_PERMISSIONS (all 134 permissions)
-│   │   │   ├── utils/           # response helpers, asyncHandler, jwt, password hashing
+│   │   │   ├── registry/        # Centralized dashboard widgets and reports registry & exporters
+│   │   │   ├── middleware/      # authenticate, requirePermission, rateLimit, helmet, errorHandler
+│   │   │   ├── services/        # auditService, notificationService, emailService
+│   │   │   ├── constants/       # SYSTEM_ROLES, ALL_SYSTEM_PERMISSIONS
+│   │   │   ├── utils/           # response helpers, asyncHandler, jwt, date, password hashing
 │   │   │   └── errors/          # AppError, BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError
 │   │   └── db/
 │   │       ├── knexfile.ts      # Knex configuration
-│   │       ├── migrations/      # YYYYMMDDHHmm_<module>_<description>.ts
-│   │       └── seeds/           # 01_initial_seed.ts (roles, permissions, test users, depts, employees)
-│   └── tests/                   # Jest integration and unit test suites
+│   │       ├── migrations/      # Strict YYYYMMDDHHMM_<name>.ts schema migrations
+│   │       └── seeds/           # Essential and demo seeds
+│   └── tests/                   # 27 Jest backend integration and unit test suites
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── features/
-│   │   │   ├── auth/            # Login, Change Password, Forgot Password
-│   │   │   ├── dashboard/       # Admin Dashboard, Manager Dashboard, Employee Self-Service
-│   │   │   ├── employees/       # Directory list, Create with Dev 2 salary placeholder, Detail tabs, Edit
-│   │   │   ├── departments/     # Tree and Table view hierarchy manager
-│   │   │   ├── designations/    # Title directory and employee counts
-│   │   │   ├── roles/           # Role list, Module × Action permissions grid
-│   │   │   ├── audit-logs/      # Audit log viewer and JSON diff inspection modal
-│   │   │   └── notifications/   # Bell icon, unread counter badge, 30s polling dropdown
-│   │   └── shared/
-│   │       ├── components/      # DataTable, Modal, ConfirmDialog, FormField, Can, ProtectedRoute, EmptyState, Loader, ErrorState
-│   │       ├── context/         # AuthContext, ToastContext
-│   │       ├── hooks/           # useAuth, usePermission
-│   │       ├── navigation/      # menuConfig.ts (Single file for teammates to add menu entries)
-│   │       └── api/             # Axios client with transparent 401 refresh interceptor
+│   │   ├── features/            # Auth, Dashboard, Employees, Leaves, Attendance, Payroll, Projects, etc.
+│   │   └── shared/              # Reusable UI components, contexts, hooks, navigation, and API client
 │   └── index.html
+├── scripts/
+│   └── backup.sh                # Automated MySQL dump, uploaded files tar.gz archive & retention pruning
 └── package.json                 # Monorepo workspaces configuration
 ```
 
@@ -122,10 +127,26 @@ npm run dev:frontend
 
 ## 🧪 Testing
 
-Run automated tests (Auth, Rate Limiting, RBAC enforcement, Atomic Employee creation transaction):
+Run backend automated test suites (27 Jest suites, 281 tests covering Auth, Hardening, Concurrency, Payroll, Leaves, Workflows, Reporting):
 ```bash
 npm run test:backend
 ```
+
+Run frontend unit and component tests:
+```bash
+npm run test:frontend
+```
+
+---
+
+## ⚖️ Statutory Deductions & Compliance Status
+
+- **Provident Fund (PF)**: Implemented. Calculates 12% on basic salary, capped by default at `15,000 INR` (configurable via `company_settings.pf_wage_cap`).
+- **TODO - Employee State Insurance (ESI)**: Planned for future release once medical benefit rules are established.
+- **TODO - Professional Tax (PT)**: State-specific slabs planned for future release.
+- **TODO - Tax Deducted at Source (TDS)**: Income tax slab calculations planned for future release.
+
+---
 
 ### Seeded Test Accounts
 

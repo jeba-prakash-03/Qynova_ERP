@@ -1,3 +1,25 @@
+/**
+ * ==============================================================================
+ * MIGRATION HISTORY NOTE - DUPLICATE TIMESTAMP 202610110002
+ * ==============================================================================
+ * This migration shares timestamp '202610110002' with:
+ *   - 202610110002_payroll_adjustments_and_components.ts
+ *   - 202610110002_tasks_create_tasks_tables.ts
+ *
+ * DO NOT RENAME THIS FILE.
+ * This migration has already been applied across production, staging, and dev
+ * environments. Renaming this file would alter its filename in knex_migrations,
+ * causing checksum mismatches and corrupting migration tracking.
+ *
+ * Knex executes migrations in strict lexicographical (alphabetical) order by filename.
+ * Alphabetical execution order:
+ *   1. 202610110002_payroll_adjustments_and_components.ts ("p" precedes "t")
+ *   2. 202610110002_tasks_create_tasks_tables.ts
+ *
+ * All future migrations must strictly follow YYYYMMDDHHMM_unique_name naming rule.
+ * ==============================================================================
+ */
+
 import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {

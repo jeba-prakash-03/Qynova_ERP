@@ -60,4 +60,37 @@ registerReport({
 Reports are exposed via:
 - `GET /api/v1/reports` (lists accessible reports for authenticated user)
 - `GET /api/v1/reports/:key?from=&to=&department=` (data preview)
-- `GET /api/v1/reports/:key/export?format=xlsx|pdf` (generic ExcelJS/PDFKit binary download)
+- `GET /api/v1/reports/:key/export?format=xlsx|pdf|csv|json` (generic ExcelJS/PDFKit/CSV/JSON export)
+
+---
+
+## 3. Database Migration Naming & Precedence Rules
+
+All database schema migrations in `backend/src/db/migrations/` MUST adhere to the strict timestamp naming convention:
+
+```
+YYYYMMDDHHMM_<descriptive_snake_case_name>.ts
+```
+
+### Precedence and Resolution Rules
+1. **Lexicographical Ordering**: Knex executes migration files in alphabetical/lexicographical order. If two migrations share the exact same timestamp prefix, Knex resolves execution order alphabetically by the remainder of the filename.
+2. **Never Rename Applied Migrations**: Once a migration has been committed and applied to environments, its filename is permanently recorded in the `knex_migrations` tracking table. Renaming existing migration files breaks migration checksums, prevents rolling back or upgrading, and corrupts environment deployments.
+3. **Duplicate Timestamp History Note (202610110002)**:
+   The duplicate timestamp `202610110002` was applied in early staging environments:
+   - `202610110002_payroll_adjustments_and_components.ts` (executes 1st alphabetically: 'p' before 't')
+   - `202610110002_tasks_create_tasks_tables.ts` (executes 2nd alphabetically)
+   These files MUST NOT be renamed. All subsequent migrations must ensure unique timestamps.
+
+---
+
+## 4. API Routing & Canonical Conventions
+
+To prevent route fragmentation, the ERP defines strict canonical API endpoints:
+
+| Domain | Canonical Route | Deprecated / Removed Route | Note |
+|---|---|---|---|
+| Leave Requests | `/api/v1/leave-requests` | `/api/v1/leaves` (Removed) | All frontend features and approvals communicate via `/leave-requests`. Legacy duplicate `/leaves` route was removed to prevent route ambiguity. |
+| Leave Balances | `/api/v1/leave-balances` | - | Allocations & employee balances |
+| Leave Types | `/api/v1/leave-types` | - | System & custom leave types |
+| Dashboard Widgets | `/api/v1/dashboard/widgets` | - | Plugin-based dynamic dashboard widgets |
+| Analytical Reports | `/api/v1/reports` | - | Dynamic registry tabular & exportable reports |

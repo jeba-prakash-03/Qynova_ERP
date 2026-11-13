@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { asyncHandler } from '../../shared/utils/async-handler.util';
-import { sendSuccess } from '../../shared/utils/response.util';
+import { asyncHandler } from '../utils/async-handler.util';
+import { sendSuccess } from '../utils/response.util';
 import {
   getDashboardWidgets,
   executeDashboardWidget,
@@ -9,8 +9,8 @@ import {
   getReportDefinition,
   generateExcelReport,
   generatePdfReport,
-} from '../../shared/registry';
-import { BadRequestError, NotFoundError } from '../../shared/errors/app-error';
+} from './index';
+import { BadRequestError, NotFoundError } from '../errors/app-error';
 
 export class RegistryController {
   // ==========================================

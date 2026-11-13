@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { registryController } from './registry.controller';
-import { authenticate } from '../../shared/middleware/auth.middleware';
+import { authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
 
